@@ -7,7 +7,19 @@ import {
 } from "./utils";
 import { Catalogs, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
+import { addProductToCart } from "./utils/cart";
 
+// interface / type
+export interface Carts {
+  productID: number | string;
+  price: number;
+  quantity: number;
+}
+export interface Params {
+  productID: number | string;
+  cart: Carts[];
+  quantity: number;
+}
 // functions
 async function renderSidebar(idElement: string) {
   const sidebar = document.querySelector(idElement);
@@ -44,9 +56,11 @@ async function renderLatestProduct(idElement: string) {
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
-        <img class="img-fluid w-100" src="img/${item.thumb}" alt="${
+      <a href="detail.html?id=${
+        item._id
+      }"><img class="img-fluid w-100" src="img/${item.thumb}" alt="${
         item.name
-      }" />
+      }" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
@@ -86,7 +100,7 @@ async function renderArrivedProduct(idElement: string) {
     showSpinner();
     const data = await Product.loadAll();
     hideSpinner();
-    const productClone = [...data].slice(0, 8);
+    const productClone = [...data].slice(8, 16);
     productClone.forEach((item: ProductProps) => {
       const productItem = document.createElement("div");
       productItem.className = "col-lg-3 col-md-6 col-sm-12 pb-1";
@@ -94,9 +108,11 @@ async function renderArrivedProduct(idElement: string) {
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
-        <img class="img-fluid w-100" src="img/${item.thumb}" alt="${
+        <a href="detail.html?id=${
+          item._id
+        }"><img class="img-fluid w-100" src="img/${item.thumb}" alt="${
         item.name
-      }" />
+      }" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
@@ -132,6 +148,11 @@ async function renderArrivedProduct(idElement: string) {
 
 // main
 (async () => {
+  let isHasCart: string | null = localStorage.getItem("cart");
+  let cart: Carts[] = [];
+  if (typeof isHasCart === "string") {
+    cart = JSON.parse(isHasCart);
+  }
   await renderSidebar("#siderbar-category");
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
@@ -140,12 +161,19 @@ async function renderArrivedProduct(idElement: string) {
     "#btn-cart"
   ) as NodeListOf<Element>;
   buttonCart.forEach((btn) => {
-    btn.addEventListener("click", (e: Event) => {
+    btn.addEventListener("click", async (e: Event) => {
       e.preventDefault();
       const buttonElement = e.target as HTMLAnchorElement;
       const productID: string | undefined = buttonElement.dataset.id;
       if (productID) {
         sweetAlert.success("Tuyệt vời!");
+        const params: Params = {
+          productID,
+          cart,
+          quantity: 1,
+        };
+        cart = await addProductToCart(params);
+        console.log(cart);
       }
     });
   });
