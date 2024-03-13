@@ -5,11 +5,10 @@ export interface ProductProps {
   categoryID: number;
   name: string;
   slug: string;
-  type: string;
   description: string;
   code: string;
   price: number;
-  discount: 1;
+  discount: number;
   thumb: string;
   content: string;
   status: number;

@@ -5,6 +5,7 @@ import { routes } from "./routes/index";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import path, { dirname } from "path";
+import methodOveride from "method-override";
 import errorHandler from "./utils/error";
 
 const corsOptions = {
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/utils", express.static(path.join(__dirname, "public/utils")));
 // Middeware
 app.use(cors(corsOptions));
+app.use(methodOveride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));

@@ -1,4 +1,4 @@
-import { Request, Response, Express } from "express";
+import { Express } from "express";
 import catalog from "./catalog";
 import product from "./product";
 

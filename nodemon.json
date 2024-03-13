@@ -1,5 +1,5 @@
 {
   "ext": "ts",
-  "exec": "tsx ./server/index.ts",
+  "exec": "tsx --no-cache ./server/index.ts",
   "watch": ["src"]
 }

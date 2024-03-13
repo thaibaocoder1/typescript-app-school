@@ -5,9 +5,9 @@ import {
   hideSpinner,
   sweetAlert,
 } from "./utils";
-import { Catalogs, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
-import { addProductToCart } from "./utils/cart";
+import { addProductToCart, displayNumOrder } from "./utils/cart";
+import { renderSidebar } from "./utils/sidebar";
 
 // interface / type
 export interface Carts {
@@ -21,25 +21,6 @@ export interface Params {
   quantity: number;
 }
 // functions
-async function renderSidebar(idElement: string) {
-  const sidebar = document.querySelector(idElement);
-  if (!sidebar) return;
-  sidebar.textContent = "";
-  try {
-    showSpinner();
-    const data = await Catalog.loadAll();
-    hideSpinner();
-    data.forEach((item: Catalogs) => {
-      const linkElement = document.createElement("a");
-      linkElement.className = "nav-item nav-link";
-      linkElement.href = `/shop.html?slug=${item.slug}`;
-      linkElement.textContent = item.title;
-      sidebar.appendChild(linkElement);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
 async function renderLatestProduct(idElement: string) {
   const container = document.querySelector(idElement);
   if (!container) return;
@@ -65,7 +46,11 @@ async function renderLatestProduct(idElement: string) {
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
       >
-        <a href=""><h6 class="text-truncate mb-3">${item.name}</h6></a>
+        <a href="detail.html?id=${
+          item._id
+        }" class='text-decoration-none'><h6 class="text-truncate mb-3">${
+        item.name
+      }</h6></a>
         <div class="d-flex justify-content-center">
           <h6>${formatCurrencyNumber(calcPrice(item.price, item.discount))}</h6>
           <h6 class="text-muted ml-2"><del>${formatCurrencyNumber(
@@ -117,7 +102,11 @@ async function renderArrivedProduct(idElement: string) {
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
       >
-        <a href=""><h6 class="text-truncate mb-3">${item.name}</h6></a>
+        <a href="detail.html?id=${
+          item._id
+        }" class='text-decoration-none'><h6 class="text-truncate mb-3">${
+        item.name
+      }</h6></a>
         <div class="d-flex justify-content-center">
           <h6>${formatCurrencyNumber(calcPrice(item.price, item.discount))}</h6>
           <h6 class="text-muted ml-2"><del>${formatCurrencyNumber(
@@ -153,7 +142,8 @@ async function renderArrivedProduct(idElement: string) {
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
-  await renderSidebar("#siderbar-category");
+  displayNumOrder("num-order", cart);
+  await renderSidebar("#sidebar-category");
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
   // Handle cart
@@ -173,7 +163,6 @@ async function renderArrivedProduct(idElement: string) {
           quantity: 1,
         };
         cart = await addProductToCart(params);
-        console.log(cart);
       }
     });
   });

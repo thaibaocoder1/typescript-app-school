@@ -3,9 +3,12 @@ import {
   formatCurrencyNumber,
   showSpinner,
   hideSpinner,
+  sweetAlert,
 } from "./utils";
-import { Catalogs, Catalog } from "./models/Catalog";
+import { CatalogProps, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
+import { Carts, Params } from "./main";
+import { addProductToCart, displayNumOrder } from "./utils/cart";
 
 // interface
 interface ParamsProudct {
@@ -21,7 +24,7 @@ async function renderSidebar(idElement: string) {
     showSpinner();
     const data = await Catalog.loadAll();
     hideSpinner();
-    data.forEach((item: Catalogs) => {
+    data.forEach((item: CatalogProps) => {
       const linkElement = document.createElement("a");
       linkElement.className = "nav-item nav-link";
       linkElement.href = `/shop.html?slug=${item.slug}`;
@@ -76,9 +79,11 @@ async function renderListProduct(params: ParamsProudct) {
           <a href="detail.html?id=${item._id}" class="btn btn-sm text-dark p-0"
             ><i class="fas fa-eye text-primary mr-1"></i>View Detail</a
           >
-          <a href="" class="btn btn-sm text-dark p-0"
-            ><i class="fas fa-shopping-cart text-primary mr-1"></i>Add
-            To Cart</a
+          <a href="" class="btn btn-sm text-dark p-0" id="btn-cart" data-id=${
+            item._id
+          }
+            ><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To
+            Cart</a
           >
         </div>
       </div>`;
@@ -90,12 +95,38 @@ async function renderListProduct(params: ParamsProudct) {
 }
 // main
 (async () => {
+  let isHasCart: string | null = localStorage.getItem("cart");
+  let cart: Carts[] = [];
+  if (typeof isHasCart === "string") {
+    cart = JSON.parse(isHasCart);
+  }
+  displayNumOrder("num-order", cart);
   const searchParamsURL: URLSearchParams = new URLSearchParams(location.search);
   const slug: string | null = searchParamsURL.get("slug");
   const paramsFn: ParamsProudct = {
     idElement: "#list-product",
     slug: slug,
   };
-  renderListProduct(paramsFn);
   renderSidebar("#sidebar-category");
+  await renderListProduct(paramsFn);
+  // Handle cart
+  const buttonCart = document.querySelectorAll(
+    "#btn-cart"
+  ) as NodeListOf<Element>;
+  buttonCart.forEach((btn) => {
+    btn.addEventListener("click", async (e: Event) => {
+      e.preventDefault();
+      const buttonElement = e.target as HTMLAnchorElement;
+      const productID: string | undefined = buttonElement.dataset.id;
+      if (productID) {
+        sweetAlert.success("Tuyệt vời!");
+        const params: Params = {
+          productID,
+          cart,
+          quantity: 1,
+        };
+        cart = await addProductToCart(params);
+      }
+    });
+  });
 })();

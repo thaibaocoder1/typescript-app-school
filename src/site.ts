@@ -1,8 +1,7 @@
 import { Carts } from "./main";
+import { displayNumOrder } from "./utils/cart";
 import { renderSidebar } from "./utils/sidebar";
-import { paramsCart, renderListProductInCart } from "./utils/cart";
 
-// functions
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -10,6 +9,6 @@ import { paramsCart, renderListProductInCart } from "./utils/cart";
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
+  displayNumOrder("num-order", cart);
   await renderSidebar("#sidebar-category");
-  await renderListProductInCart(paramsCart, cart);
 })();

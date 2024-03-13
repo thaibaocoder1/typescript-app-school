@@ -3,9 +3,13 @@ import {
   formatCurrencyNumber,
   showSpinner,
   hideSpinner,
+  sweetAlert,
 } from "./utils";
 import { Catalogs, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
+import { addProductToCart, displayNumOrder } from "./utils/cart";
+import { Carts, Params } from "./main";
+import { handleAddCartDetail } from "./utils/handle-detail";
 
 // interfaces
 interface RenderInfoProductParams {
@@ -87,7 +91,7 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
   <div class="d-flex align-items-center mb-4 pt-2">
     <div class="input-group quantity mr-3" style="width: 130px">
       <div class="input-group-btn">
-        <button class="btn btn-primary btn-minus">
+        <button class="btn btn-primary btn-minus" id="btn-minus">
           <i class="fa fa-minus"></i>
         </button>
       </div>
@@ -95,9 +99,10 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
         type="text"
         class="form-control bg-secondary text-center"
         value="1"
+        name="order"
       />
       <div class="input-group-btn">
-        <button class="btn btn-primary btn-plus">
+        <button class="btn btn-primary btn-plus" id="btn-plus">
           <i class="fa fa-plus"></i>
         </button>
       </div>
@@ -173,7 +178,9 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
       <a href="" class="btn btn-sm text-dark p-0"
         ><i class="fas fa-eye text-primary mr-1"></i>View Detail</a
       >
-      <a href="" class="btn btn-sm text-dark p-0"
+      <a href="" class="btn btn-sm text-dark p-0" id="btn-cart" data-id=${
+        item._id
+      }
         ><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To
         Cart</a
       >
@@ -186,6 +193,12 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
 }
 // main
 (async () => {
+  let isHasCart: string | null = localStorage.getItem("cart");
+  let cart: Carts[] = [];
+  if (typeof isHasCart === "string") {
+    cart = JSON.parse(isHasCart);
+  }
+  displayNumOrder("num-order", cart);
   const searchParams = new URLSearchParams(location.search);
   const productID = searchParams.get("id");
   if (!productID) return;
@@ -193,18 +206,49 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   const productInfo = await Product.loadOne(productID);
   hideSpinner();
   const categoryID: number = productInfo.categoryID;
-  renderSidebar("#sidebar-category");
+  await renderSidebar("#sidebar-category");
   const renderParams: RenderInfoProductParams = {
     infoIDElement: "#info-product",
     infoIDThumbnail: "#thumbnail-product",
     infoIDContent: "#content-product",
     productInfo: productInfo,
   };
-  renderInfoProduct(renderParams);
+  await renderInfoProduct(renderParams);
   const relatedParams: RenderInfoProductRelated = {
     infoIDElement: "#related-product",
     categoryID,
     productID,
   };
-  renderRelatedProduct(relatedParams);
+  await renderRelatedProduct(relatedParams);
+  // Handle cart
+  const buttonCart = document.querySelectorAll(
+    "#btn-cart"
+  ) as NodeListOf<Element>;
+  const buttonMinus = document.getElementById("btn-minus") as HTMLButtonElement;
+  const buttonPlus = document.getElementById("btn-plus") as HTMLButtonElement;
+  const buttonAddCart = document.getElementById(
+    "btn-add-cart"
+  ) as HTMLButtonElement;
+  buttonCart.forEach((btn) => {
+    btn.addEventListener("click", async (e: Event) => {
+      e.preventDefault();
+      const buttonElement = e.target as HTMLAnchorElement;
+      const productID: string | undefined = buttonElement.dataset.id;
+      if (productID) {
+        sweetAlert.success("Tuyệt vời!");
+        const params: Params = {
+          productID,
+          cart,
+          quantity: 1,
+        };
+        cart = await addProductToCart(params);
+      }
+    });
+  });
+  buttonMinus.addEventListener("click", async () => {
+    await handleAddCartDetail("minus", "order");
+  });
+  buttonPlus.addEventListener("click", async () => {
+    await handleAddCartDetail("minus", "order");
+  });
 })();

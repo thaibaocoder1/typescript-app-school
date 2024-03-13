@@ -16,8 +16,21 @@ export class DataResource<T> {
     });
     return res;
   }
-  async save(data: T): Promise<Response> {
-    const res = await fetch(`${this.endpoint}`, {
+  async update(
+    id: number | string,
+    fieldsToUpdate: Partial<T>
+  ): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/${id}?_method=PATCH`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(fieldsToUpdate),
+    });
+    return res;
+  }
+  async save(data: Partial<T>): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/save?_method=POST`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
