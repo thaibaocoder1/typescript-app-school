@@ -6,14 +6,28 @@ import {
   showSpinner,
 } from "../utils";
 import { toast } from "../utils/toast";
+import { z } from "zod";
 
 // type
 type ParamsSubmit = {
   selector: string;
   id?: string | null;
 };
-
+type FormValues = {
+  [key in string]: string | number | File;
+};
 // functions
+function getSchema() {
+  return z.object({
+    name: z.string().trim().min(5),
+    code: z.string(),
+    price: z.number(),
+    discount: z.number(),
+    quantity: z.number(),
+    description: z.string(),
+    content: z.string(),
+  });
+}
 async function handleItemProduct(id: string) {
   if (!id) return;
   try {
@@ -29,11 +43,28 @@ function setFormValues(element: HTMLFormElement, info: ProductProps) {
   setFieldValue(element, "[name='name']", info?.name);
   setFieldValue(element, "[name='code']", info?.code);
   setFieldValue(element, "[name='price']", info?.price);
+  setFieldValue(element, "[name='discount']", info?.discount);
   setFieldValue(element, "[name='quantity']", info?.quantity);
   setTextContent(element, "[name='description']", info?.description);
   setTextContent(element, "[name='content']", info?.content);
 }
-
+function getFormValues(form: HTMLFormElement) {
+  if (!form) return;
+  const formValues: FormValues = {};
+  const data = new FormData(form);
+  for (const [key, value] of data) {
+    formValues[key] = value;
+  }
+  return formValues;
+}
+function jsonToFormData(values: FormValues) {
+  if (!values) return;
+  const formData = new FormData();
+  for (const key in values) {
+    formData.append(key, String(values[key]));
+  }
+  return formData;
+}
 async function handleOnSubmit(params: ParamsSubmit) {
   const form = document.getElementById(params.selector) as HTMLFormElement;
   if (!form) return;
@@ -43,26 +74,13 @@ async function handleOnSubmit(params: ParamsSubmit) {
   }
   form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
+    const formValues: FormValues = <FormValues>getFormValues(form);
+    const formData = <FormData>jsonToFormData(formValues);
     try {
       if (params.id) {
         console.log("Edit");
       } else {
-        const res = await Product.save({
-          categoryID: 1,
-          name: "string",
-          description: "string",
-          content: "abc",
-          code: "string",
-          thumb: "thumb",
-          price: 1,
-          discount: 1,
-          status: 1,
-          quantity: 10,
-        });
-        const data = await res.json();
-        if (data.status === "success") {
-          toast.success("Thêm mới thành công");
-        }
+        console.log("Add");
       }
     } catch (error) {
       console.log("Error", error);

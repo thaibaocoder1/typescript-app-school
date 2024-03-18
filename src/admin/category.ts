@@ -1,5 +1,6 @@
 import { Catalog, CatalogProps } from "../models/Catalog";
 import { hideSpinner, showSpinner } from "../utils";
+import dayjs from "dayjs";
 
 // functions
 async function renderListCategory(selector: string) {
@@ -19,7 +20,7 @@ async function renderListCategory(selector: string) {
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
       <td>${item.title}</td>
       <td>${item._id}</td>
-      <td>${item.createdAt || "Chua co"}</td>
+      <td>${dayjs(item.createdAt).format("DD/MM/YYYY HH:mm:ss")}</td>
       <td>
         <button class="btn btn-primary" data-id=${
           item._id

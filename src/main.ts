@@ -39,7 +39,7 @@ async function renderLatestProduct(idElement: string) {
       >
       <a href="detail.html?id=${
         item._id
-      }"><img class="img-fluid w-100" src="img/${item.thumb}" alt="${
+      }"><img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
         item.name
       }" /></a>
       </div>
@@ -95,7 +95,7 @@ async function renderArrivedProduct(idElement: string) {
       >
         <a href="detail.html?id=${
           item._id
-        }"><img class="img-fluid w-100" src="img/${item.thumb}" alt="${
+        }"><img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
         item.name
       }" /></a>
       </div>

@@ -2,13 +2,17 @@ import { Schema, model } from "mongoose";
 import slugify from "slugify";
 
 interface Products extends Document {
-  categoryID: number;
+  categoryID: string;
   name: string;
   slug: string;
   description: string;
   price: number;
   discount: number;
-  thumb: string;
+  thumb: {
+    data: Buffer;
+    contentType: string;
+    fileName: string;
+  };
   content: string;
   status: number;
   quantity: number;
@@ -21,7 +25,7 @@ const productSchema: Schema = new Schema(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     discount: { type: Number, default: 0 },
-    thumb: { type: String, required: true },
+    thumb: { data: Buffer, contentType: String, fileName: String },
     content: { type: String, required: true },
     status: { type: Number, required: true },
     quantity: { type: Number, required: true },

@@ -9,6 +9,8 @@ import { CatalogProps, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
 import { Carts, Params } from "./main";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
+import { toast } from "./utils/toast";
+import { string } from "zod";
 
 // interface
 interface ParamsProudct {
@@ -38,57 +40,71 @@ async function renderSidebar(idElement: string) {
 async function renderListProduct(params: ParamsProudct) {
   const listProductEl = document.querySelector(params.idElement) as HTMLElement;
   if (!listProductEl) return;
+  listProductEl.textContent = "";
   try {
     showSpinner();
     const data = await Product.loadAll();
     hideSpinner();
     let products = [...data];
     if (params.slug) {
-      products = products.filter((item) => item.type === params.slug);
+      showSpinner();
+      const dataWithSlug = await Product.loadWithSlug(params.slug);
+      hideSpinner();
+      if (dataWithSlug) {
+        products = dataWithSlug;
+      }
     }
-    products.forEach((item: ProductProps) => {
-      const productItem = document.createElement("div");
-      productItem.className = "col-lg-4 col-md-6 col-sm-12 pb-1";
-      productItem.innerHTML = `
-      <div class="card product-item border-0 mb-4">
-        <div
-          class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
-        >
-          <a href="detail.html?id=${item._id}">
-          <img class="img-fluid w-100" src="img/${item.thumb}" alt="/${
-        item.name
-      }" />
-          </a>
-        </div>
-        <div
-          class="card-body border-left border-right text-center p-0 pt-4 pb-3"
-        >
-          <a href="detail.html?id=${item._id}" class="text-decoration-none">
-          <h6 class="text-truncate mb-3">${item.name}</h6>
-          </a>
-          <div class="d-flex justify-content-center">
-          <h6>${formatCurrencyNumber(calcPrice(item.price, item.discount))}</h6>
-          <h6 class="text-muted ml-2"><del>${formatCurrencyNumber(
-            item.price
-          )}</del></h6>
-        </div>
-        </div>
-        <div
-          class="card-footer d-flex justify-content-between bg-light border"
-        >
-          <a href="detail.html?id=${item._id}" class="btn btn-sm text-dark p-0"
-            ><i class="fas fa-eye text-primary mr-1"></i>View Detail</a
+    if (products && products.length > 0) {
+      products.forEach((item: ProductProps) => {
+        const productItem = document.createElement("div");
+        productItem.className = "col-lg-4 col-md-6 col-sm-12 pb-1";
+        productItem.innerHTML = `
+        <div class="card product-item border-0 mb-4">
+          <div
+            class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
           >
-          <a href="" class="btn btn-sm text-dark p-0" id="btn-cart" data-id=${
-            item._id
-          }
-            ><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To
-            Cart</a
+            <a href="detail.html?id=${item._id}">
+            <img class="img-fluid w-100" src="img/${
+              item.thumb.fileName
+            }" alt="/${item.name}" />
+            </a>
+          </div>
+          <div
+            class="card-body border-left border-right text-center p-0 pt-4 pb-3"
           >
-        </div>
-      </div>`;
-      listProductEl.appendChild(productItem);
-    });
+            <a href="detail.html?id=${item._id}" class="text-decoration-none">
+            <h6 class="text-truncate mb-3">${item.name}</h6>
+            </a>
+            <div class="d-flex justify-content-center">
+            <h6>${formatCurrencyNumber(
+              calcPrice(item.price, item.discount)
+            )}</h6>
+            <h6 class="text-muted ml-2"><del>${formatCurrencyNumber(
+              item.price
+            )}</del></h6>
+          </div>
+          </div>
+          <div
+            class="card-footer d-flex justify-content-between bg-light border"
+          >
+            <a href="detail.html?id=${
+              item._id
+            }" class="btn btn-sm text-dark p-0"
+              ><i class="fas fa-eye text-primary mr-1"></i>View Detail</a
+            >
+            <a href="" class="btn btn-sm text-dark p-0" id="btn-cart" data-id=${
+              item._id
+            }
+              ><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To
+              Cart</a
+            >
+          </div>
+        </div>`;
+        listProductEl.appendChild(productItem);
+      });
+    } else {
+      toast.info("Sản phẩm đang được phát triển.");
+    }
   } catch (error) {
     console.log(error);
   }

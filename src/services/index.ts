@@ -5,6 +5,14 @@ export class DataResource<T> {
     const result = await res.json();
     return result.data;
   }
+  async loadWithSlug(slug: string): Promise<T[]> {
+    const res = await fetch(`${this.endpoint}/list?slug=${slug}`);
+    const result = await res.json();
+    if (result.success) {
+      return result.data;
+    }
+    return result;
+  }
   async loadOne(id: number | string): Promise<T> {
     const res = await fetch(`${this.endpoint}/${id}`);
     const result = await res.json();
@@ -36,6 +44,13 @@ export class DataResource<T> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
+    });
+    return res;
+  }
+  async saveFormData(data: FormData): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/save?_method=POST`, {
+      method: "POST",
+      body: data,
     });
     return res;
   }

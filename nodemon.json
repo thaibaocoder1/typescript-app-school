@@ -1,5 +1,8 @@
 {
-  "ext": "ts",
+  "ext": "ts, json",
   "exec": "tsx --no-cache ./server/index.ts",
-  "watch": ["src"]
+  "watch": ["src"],
+  "execMap": {
+    "ts": "tsx"
+  }
 }

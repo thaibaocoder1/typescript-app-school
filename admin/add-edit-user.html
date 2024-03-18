@@ -31,9 +31,11 @@
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="/css/spinner.css" rel="stylesheet" />
   </head>
 
   <body id="page-top">
+    <div class="spinner"></div>
     <!-- Page Wrapper -->
     <div id="wrapper">
       <!-- Sidebar -->
@@ -429,42 +431,74 @@
             <div
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
-              <h1 class="h3 mb-0 text-gray-800">Trang thêm khách hàng</h1>
-              <a href="/admin/edit-product.html" class="btn btn-info"
+              <h1 class="h3 mb-0 text-gray-800" id="heading">
+                Trang thêm khách hàng
+              </h1>
+              <a href="/admin/add-edit-user.html" class="btn btn-info"
                 >Tạo mới</a
               >
             </div>
 
             <!-- Content Row -->
-            <div class="row pl-3">
-              <form>
+            <div class="row">
+              <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="form-product"
+              >
                 <div class="mb-3">
                   <label for="username" class="form-label">Tên đăng nhập</label>
-                  <input type="text" class="form-control" id="username" />
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                  />
                 </div>
                 <div class="mb-3">
-                  <label for="id" class="form-label">Mã khách hàng</label>
-                  <input type="text" class="form-control" id="id" />
+                  <label for="fullname" class="form-label">Họ và tên</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fullname"
+                    name="fullname"
+                  />
                 </div>
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
-                  <input type="email" class="form-control" id="email" />
-                </div>
-                <div class="mb-3">
-                  <label for="address" class="form-label">Địa chỉ</label>
-                  <input type="text" class="form-control" id="address" />
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                  />
                 </div>
                 <div class="mb-3">
                   <label for="phone" class="form-label">Số điện thoại</label>
-                  <input type="tel-" class="form-control" id="phone" />
+                  <input
+                    type="tel-"
+                    class="form-control"
+                    id="phone"
+                    name="phone"
+                  />
                 </div>
                 <div class="mb-3">
                   <label for="role" class="form-label">Vai trò</label>
-                  <select class="form-select" id="role">
+                  <select class="form-select" id="role" name="roleID">
                     <option selected>Lựa chọn...</option>
                     <option value="1">Khách hàng</option>
                     <option value="2">Người quản trị</option>
                   </select>
+                </div>
+                <div class="mb-3">
+                  <label for="image" class="form-label">Hình ảnh</label>
+                  <input
+                    class="form-control"
+                    type="file"
+                    id="image"
+                    name="imageUrl"
+                    accept="image/*"
+                  />
                 </div>
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
               </form>
@@ -531,5 +565,7 @@
         </div>
       </div>
     </div>
+
+    <script type="module" src="/src/admin/add-edit-user.ts"></script>
   </body>
 </html>

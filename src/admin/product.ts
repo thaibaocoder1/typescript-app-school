@@ -26,6 +26,7 @@ async function renderListProduct(selector: string) {
       <td>${item.name}</td>
       <td>${item._id}</td>
       <td>${formatCurrencyNumber(calcPrice(item.price, item.discount))}</td>
+      <td>${item.discount}%</td>
       <td>${item.quantity}</td>
       <td>
         <img src="/img/${item.thumb}" alt="${item.name}" height="80">

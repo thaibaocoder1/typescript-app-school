@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 class CatalogController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const catalogs = await Catalog.find({}).sort("-createdAt");
+      const catalogs = await Catalog.find({});
       res.status(StatusCodes.OK).json({
         status: "success",
         results: catalogs.length,

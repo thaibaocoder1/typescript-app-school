@@ -5,11 +5,12 @@ import {
   hideSpinner,
   sweetAlert,
 } from "./utils";
-import { Catalogs, Catalog } from "./models/Catalog";
+import { CatalogProps } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { Carts, Params } from "./main";
 import { handleAddCartDetail } from "./utils/handle-detail";
+import { renderSidebar } from "./utils/sidebar";
 
 // interfaces
 interface RenderInfoProductParams {
@@ -24,25 +25,6 @@ interface RenderInfoProductRelated {
   productID: string;
 }
 // functions
-async function renderSidebar(idElement: string) {
-  const sidebar = document.querySelector(idElement);
-  if (!sidebar) return;
-  sidebar.textContent = "";
-  try {
-    showSpinner();
-    const data = await Catalog.loadAll();
-    hideSpinner();
-    data.forEach((item: Catalogs) => {
-      const linkElement = document.createElement("a");
-      linkElement.className = "nav-item nav-link";
-      linkElement.href = `/shop.html?slug=${item.slug}`;
-      linkElement.textContent = item.title;
-      sidebar.appendChild(linkElement);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
 async function renderInfoProduct(params: RenderInfoProductParams) {
   const infoProduct = document.querySelector(
     params.infoIDElement
@@ -76,12 +58,6 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
   <p class="mb-4">
     ${params.productInfo.description}
   </p>
-  <div class="d-flex mb-3">
-    <p class="text-dark font-weight-medium mb-0 mr-3">Type:</p>
-    <span class="text-dark font-weight-normal mb-0 mr-3">${
-      params.productInfo.type
-    }</span>
-  </div>
   <div class="d-flex mb-3">
   <p class="text-dark font-weight-medium mb-0 mr-3">Quantity:</p>
   <span class="text-dark font-weight-normal mb-0 mr-3">${
@@ -129,7 +105,7 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
     </div>
   </div>`;
   thumbnailProduct.innerHTML = `<div class="carousel-item active">
-  <img class="w-100 h-100" src="img/${params.productInfo.thumb}" alt="${params.productInfo.name}" />
+  <img class="w-100 h-100" src="img/${params.productInfo.thumb.fileName}" alt="${params.productInfo.name}" />
   </div>`;
   contentProduct.innerHTML = `<p>${params.productInfo.content}</p>`;
 }
@@ -152,7 +128,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
       class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
     >
       <a href="detail.html?id=${item._id}">
-        <img class="img-fluid w-100" src="img/${item.thumb}" alt="${
+        <img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
         item.name
       }" />
       </a>
@@ -175,7 +151,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     <div
       class="card-footer d-flex justify-content-between bg-light border"
     >
-      <a href="" class="btn btn-sm text-dark p-0"
+      <a href="detail.html?id=${item._id}" class="btn btn-sm text-dark p-0"
         ><i class="fas fa-eye text-primary mr-1"></i>View Detail</a
       >
       <a href="" class="btn btn-sm text-dark p-0" id="btn-cart" data-id=${
@@ -205,13 +181,14 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   showSpinner();
   const productInfo = await Product.loadOne(productID);
   hideSpinner();
-  const categoryID: number = productInfo.categoryID;
+  const catalogObj = productInfo.categoryID as unknown as CatalogProps;
+  const categoryID = catalogObj?._id;
   await renderSidebar("#sidebar-category");
   const renderParams: RenderInfoProductParams = {
     infoIDElement: "#info-product",
     infoIDThumbnail: "#thumbnail-product",
     infoIDContent: "#content-product",
-    productInfo: productInfo,
+    productInfo,
   };
   await renderInfoProduct(renderParams);
   const relatedParams: RenderInfoProductRelated = {
@@ -226,9 +203,9 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   ) as NodeListOf<Element>;
   const buttonMinus = document.getElementById("btn-minus") as HTMLButtonElement;
   const buttonPlus = document.getElementById("btn-plus") as HTMLButtonElement;
-  const buttonAddCart = document.getElementById(
-    "btn-add-cart"
-  ) as HTMLButtonElement;
+  // const buttonAddCart = document.getElementById(
+  //   "btn-add-cart"
+  // ) as HTMLButtonElement;
   buttonCart.forEach((btn) => {
     btn.addEventListener("click", async (e: Event) => {
       e.preventDefault();

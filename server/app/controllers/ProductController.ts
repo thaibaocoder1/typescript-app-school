@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Product } from "../model/Product";
 import { StatusCodes } from "http-status-codes";
+import { Catalog } from "../model/Catalog";
 
 class ProductController {
   index = async (req: Request, res: Response, next: NextFunction) => {
@@ -44,6 +45,30 @@ class ProductController {
       });
     } catch (error) {
       next(error);
+    }
+  };
+  slug = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { slug } = req.query;
+      const catalog = await Catalog.findOne({ slug });
+      const products = await Product.find({ categoryID: catalog?._id });
+      if (products && products.length > 0) {
+        return res.status(200).json({
+          success: true,
+          results: products.length,
+          data: products,
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Không có sản phẩm nào được tìm thấy.",
+        });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Đã xảy ra lỗi khi lấy thông tin sản phẩm.",
+      });
     }
   };
 }

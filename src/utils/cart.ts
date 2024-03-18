@@ -40,7 +40,7 @@ export async function renderListProductInCart(
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `
       <td class="align-middle" style="text-align: left;">
-        <img src="img/${product.thumb}" alt="${
+        <img src="img/${product.thumb.fileName}" alt="${
         product.name
       }" style="width: 50px" />
       ${product.name}

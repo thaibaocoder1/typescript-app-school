@@ -441,7 +441,11 @@
 
             <!-- Content Row -->
             <div class="row">
-              <form method="POST" id="form-product">
+              <form
+                method="POST"
+                id="form-product"
+                enctype="multipart/form-data"
+              >
                 <div class="mb-3">
                   <label for="name" class="form-label">Tên sản phẩm</label>
                   <input
@@ -467,6 +471,15 @@
                     class="form-control"
                     id="price"
                     name="price"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="discount" class="form-label">Sale (%)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="discount"
+                    name="discount"
                   />
                 </div>
                 <div class="mb-3">
