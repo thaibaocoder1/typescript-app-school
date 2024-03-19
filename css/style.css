@@ -10026,3 +10026,45 @@ a.text-dark:focus {
     flex-direction: column;
   }
 }
+
+/* Custom css */
+#card-custom {
+  position: relative;
+}
+#card-custom:hover .card-whitelist {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+.card-sale,
+.card-whitelist {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 10;
+  transition: all 0.25s linear;
+}
+.card-sale {
+  background-color: var(--danger);
+  position: absolute;
+  left: -10px;
+  top: -10px;
+}
+.card-whitelist {
+  background-color: var(--cyan);
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0);
+}
+.card-whitelist:hover {
+  background-color: var(--red);
+  font-size: 20px;
+}

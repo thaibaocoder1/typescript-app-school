@@ -1,10 +1,5 @@
 import { Product, ProductProps } from "../models/Product";
-import {
-  hideSpinner,
-  setFieldValue,
-  setTextContent,
-  showSpinner,
-} from "../utils";
+import { setFieldValue, setTextContent } from "../utils";
 import { toast } from "../utils/toast";
 import { z } from "zod";
 
@@ -31,9 +26,7 @@ function getSchema() {
 async function handleItemProduct(id: string) {
   if (!id) return;
   try {
-    showSpinner();
     const infoProduct = await Product.loadOne(id);
-    hideSpinner();
     return infoProduct;
   } catch (error) {
     console.log("Error", error);

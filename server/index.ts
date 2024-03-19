@@ -4,6 +4,7 @@ import { startDB } from "./db/index";
 import { routes } from "./routes/index";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import path, { dirname } from "path";
 import methodOveride from "method-override";
 import errorHandler from "./utils/error";
@@ -24,9 +25,9 @@ const port = 8888;
 startDB("mongodb://127.0.0.1:27017/course-typescript-poly");
 // Static folder
 app.use(express.static(path.join(__dirname, "public")));
-// app.use("/utils", express.static(path.join(__dirname, "public/utils")));
 // Middeware
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(methodOveride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

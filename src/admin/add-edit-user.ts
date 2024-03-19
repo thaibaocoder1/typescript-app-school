@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { User, UserProps } from "../models/User";
-import { hideSpinner, setFieldValue, showSpinner } from "../utils";
+import { setFieldValue } from "../utils";
 import { toast } from "../utils/toast";
 
 // type
@@ -33,9 +33,7 @@ function getSchema() {
 async function handleLoadItem(id: string) {
   if (!id) return;
   try {
-    showSpinner();
     const info = await User.loadOne(id);
-    hideSpinner();
     return info;
   } catch (error) {
     console.log("Error", error);

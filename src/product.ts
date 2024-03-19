@@ -10,7 +10,6 @@ import { ProductProps, Product } from "./models/Product";
 import { Carts, Params } from "./main";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { toast } from "./utils/toast";
-import { string } from "zod";
 
 // interface
 interface ParamsProudct {
@@ -59,7 +58,15 @@ async function renderListProduct(params: ParamsProudct) {
         const productItem = document.createElement("div");
         productItem.className = "col-lg-4 col-md-6 col-sm-12 pb-1";
         productItem.innerHTML = `
-        <div class="card product-item border-0 mb-4">
+        <div class="card product-item border-0 mb-4" id="card-custom">
+        <div class="card-sale">
+          <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
+        </div>
+        <div class="card-whitelist">
+        <span>
+          <i class="fas fa-heart" style="color: inherit;"></i>
+        </span>
+        </div>
           <div
             class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
           >
@@ -135,7 +142,7 @@ async function renderListProduct(params: ParamsProudct) {
       const buttonElement = e.target as HTMLAnchorElement;
       const productID: string | undefined = buttonElement.dataset.id;
       if (productID) {
-        sweetAlert.success("Tuyệt vời!");
+        sweetAlert.success();
         const params: Params = {
           productID,
           cart,

@@ -21,3 +21,13 @@ export function setTextContent(
   if (element) element.textContent = text;
   return element;
 }
+export function getRandomNumber(n: number) {
+  if (n <= 0) return -1;
+  const random = Math.random() * n;
+  return Math.round(random);
+}
+export function getRandomImage() {
+  let sourceImage = null;
+  sourceImage = `https://picsum.photos/id/${getRandomNumber(1000)}/400/400`;
+  return sourceImage;
+}

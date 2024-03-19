@@ -1,3 +1,45 @@
+import { User } from "./models/User";
+import { getRandomImage } from "./utils";
+import { toast } from "./utils/toast";
+
+async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
+  if (data) {
+    data["role"] = "User";
+    data["imageUrl"] = getRandomImage();
+  }
+  try {
+    const users = await User.loadAll();
+    if (Array.isArray(users) && users.length > 0) {
+      users.forEach(async (user) => {
+        if (user.email === data.email) {
+          toast.error("Duplicate user. Please check again");
+        } else {
+          const infoUser = await User.save(data);
+          if (infoUser) {
+            toast.success("Register successfully");
+            setTimeout(() => {
+              window.location.assign("/login.html");
+            }, 2000);
+          } else {
+            toast.error("Register failed");
+          }
+        }
+      });
+    } else {
+      const infoUser = await User.save(data);
+      if (infoUser.ok && infoUser.status === 201) {
+        toast.success("Register successfully");
+        setTimeout(() => {
+          window.location.assign("/login.html");
+        }, 500);
+      } else {
+        toast.error("Register failed");
+      }
+    }
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
 // Main
 (() => {
   new Validator({
@@ -27,10 +69,3 @@
     onSubmit: handleOnSubmitForm,
   });
 })();
-
-// Handle form submit
-async function handleOnSubmitForm(
-  formValues: Record<string, any>
-): Promise<void> {
-  console.log("Form submitted with values:", formValues);
-}

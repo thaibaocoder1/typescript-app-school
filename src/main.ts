@@ -33,7 +33,17 @@ async function renderLatestProduct(idElement: string) {
     productClone.forEach((item: ProductProps) => {
       const productItem = document.createElement("div");
       productItem.className = "col-lg-3 col-md-6 col-sm-12 pb-1";
-      productItem.innerHTML = `<div class="card product-item border-0 mb-4">
+      productItem.innerHTML = `<div class="card product-item border-0 mb-4" id="card-custom">
+      <div class="card-sale">
+        <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
+      </div>
+      <div class="card-whitelist" >
+        <span>
+          <i class="fas fa-heart" style="color: inherit;" data-id=${
+            item._id
+          }></i>
+        </span>
+      </div>
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
@@ -89,7 +99,17 @@ async function renderArrivedProduct(idElement: string) {
     productClone.forEach((item: ProductProps) => {
       const productItem = document.createElement("div");
       productItem.className = "col-lg-3 col-md-6 col-sm-12 pb-1";
-      productItem.innerHTML = `<div class="card product-item border-0 mb-4">
+      productItem.innerHTML = `<div class="card product-item border-0 mb-4" id="card-custom">
+      <div class="card-sale">
+        <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
+      </div>
+      <div class="card-whitelist">
+        <span>
+          <i class="fas fa-heart" data-id=${
+            item._id
+          } style="color: inherit;"></i>
+        </span>
+      </div>
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
@@ -156,7 +176,7 @@ async function renderArrivedProduct(idElement: string) {
       const buttonElement = e.target as HTMLAnchorElement;
       const productID: string | undefined = buttonElement.dataset.id;
       if (productID) {
-        sweetAlert.success("Tuyệt vời!");
+        sweetAlert.success();
         const params: Params = {
           productID,
           cart,
@@ -165,5 +185,12 @@ async function renderArrivedProduct(idElement: string) {
         cart = await addProductToCart(params);
       }
     });
+  });
+  // Handle whitelist
+  const buttonWhiteList = document.querySelectorAll(
+    ".card-whitelist"
+  ) as NodeListOf<HTMLDivElement>;
+  buttonWhiteList.forEach((btn) => {
+    btn.addEventListener("click", (e: Event) => {});
   });
 })();

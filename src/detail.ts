@@ -76,6 +76,7 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
         class="form-control bg-secondary text-center"
         value="1"
         name="order"
+        data-value="1"
       />
       <div class="input-group-btn">
         <button class="btn btn-primary btn-plus" id="btn-plus">
@@ -124,7 +125,17 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     relatedProducts.forEach((item) => {
       const productItem = document.createElement("div");
       productItem.className = "card product-item border-0";
-      productItem.innerHTML = `<div
+      productItem.id = "card-custom";
+      productItem.innerHTML = `
+      <div class="card-sale">
+        <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
+      </div>
+      <div class="card-whitelist" data-id=${item._id}>
+        <span>
+          <i class="fas fa-heart" style="color: inherit;"></i>
+        </span>
+      </div>
+      <div
       class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
     >
       <a href="detail.html?id=${item._id}">
@@ -203,16 +214,16 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   ) as NodeListOf<Element>;
   const buttonMinus = document.getElementById("btn-minus") as HTMLButtonElement;
   const buttonPlus = document.getElementById("btn-plus") as HTMLButtonElement;
-  // const buttonAddCart = document.getElementById(
-  //   "btn-add-cart"
-  // ) as HTMLButtonElement;
+  const buttonAddCart = document.getElementById(
+    "btn-add-cart"
+  ) as HTMLButtonElement;
   buttonCart.forEach((btn) => {
     btn.addEventListener("click", async (e: Event) => {
       e.preventDefault();
       const buttonElement = e.target as HTMLAnchorElement;
       const productID: string | undefined = buttonElement.dataset.id;
       if (productID) {
-        sweetAlert.success("Tuyệt vời!");
+        sweetAlert.success();
         const params: Params = {
           productID,
           cart,
@@ -223,9 +234,21 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     });
   });
   buttonMinus.addEventListener("click", async () => {
-    await handleAddCartDetail("minus", "order");
+    handleAddCartDetail("minus", "order");
   });
   buttonPlus.addEventListener("click", async () => {
-    await handleAddCartDetail("minus", "order");
+    handleAddCartDetail("plus", "order");
+  });
+  buttonAddCart.addEventListener("click", async () => {
+    const inputQuantity = document.querySelector(
+      `input[name='order']`
+    ) as HTMLInputElement;
+    sweetAlert.success();
+    const params: Params = {
+      productID,
+      cart,
+      quantity: parseInt(inputQuantity.dataset.value as string),
+    };
+    cart = await addProductToCart(params);
   });
 })();

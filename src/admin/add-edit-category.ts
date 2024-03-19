@@ -1,5 +1,4 @@
 import { Catalog } from "../models/Catalog";
-import { hideSpinner, showSpinner } from "../utils";
 import { toast } from "../utils/toast";
 import slugify from "slugify";
 
@@ -13,9 +12,7 @@ type ParamsSubmit = {
 async function handleItemCatalog(id: string) {
   if (!id) return;
   try {
-    showSpinner();
     const infoCatalog = await Catalog.loadOne(id);
-    hideSpinner();
     return infoCatalog;
   } catch (error) {
     console.log("Error", error);

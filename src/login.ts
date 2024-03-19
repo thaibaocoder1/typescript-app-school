@@ -1,3 +1,37 @@
+import { User } from "./models/User";
+import { toast } from "./utils/toast";
+interface AccessTokenData {
+  role: string;
+  id: string;
+  accessToken: string;
+  expireIns: number;
+}
+interface ApiResponse {
+  success: boolean | string;
+  data: AccessTokenData;
+}
+async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
+  try {
+    const res = await User.check(data);
+    const user: ApiResponse = await res.json();
+    if (res.ok && res.status === 200) {
+      toast.success("Đăng nhập thành công");
+      if (user.data.role === "User") {
+        localStorage.setItem("accessToken", JSON.stringify(user.data));
+        setTimeout(() => {
+          window.location.assign("/index.html");
+        }, 500);
+      } else {
+        localStorage.setItem("accessToken", JSON.stringify(user.data));
+        setTimeout(() => {
+          window.location.assign("/admin/index.html");
+        }, 500);
+      }
+    }
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
 // Main
 (() => {
   new Validator({
@@ -13,10 +47,3 @@
     onSubmit: handleOnSubmitForm1,
   });
 })();
-
-// Handle form submit
-async function handleOnSubmitForm1(
-  formValues: Record<string, any>
-): Promise<void> {
-  console.log("Form submitted with values:", formValues);
-}

@@ -1,11 +1,6 @@
 // main
 import { Product, ProductProps } from "../models/Product";
-import {
-  calcPrice,
-  formatCurrencyNumber,
-  hideSpinner,
-  showSpinner,
-} from "../utils";
+import { calcPrice, formatCurrencyNumber } from "../utils";
 
 // functions
 async function renderListProduct(selector: string) {
@@ -17,9 +12,7 @@ async function renderListProduct(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    showSpinner();
     const products = await Product.loadAll();
-    hideSpinner();
     products.forEach((item: ProductProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
@@ -29,7 +22,7 @@ async function renderListProduct(selector: string) {
       <td>${item.discount}%</td>
       <td>${item.quantity}</td>
       <td>
-        <img src="/img/${item.thumb}" alt="${item.name}" height="80">
+        <img src="/img/${item.thumb.fileName}" alt="${item.name}" height="80">
       </td>
       <td>
         <button class="btn btn-primary" data-id=${

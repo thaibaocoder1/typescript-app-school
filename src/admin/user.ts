@@ -1,5 +1,4 @@
 import { User, UserProps } from "../models/User";
-import { hideSpinner, showSpinner } from "../utils";
 
 // functions
 async function renderListCategory(selector: string) {
@@ -11,9 +10,7 @@ async function renderListCategory(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    showSpinner();
     const users = await User.loadAll();
-    hideSpinner();
     if (users.length > 0 && Array.isArray(users)) {
       users.forEach((item: UserProps, index: number) => {
         const tableRow = document.createElement("tr") as HTMLTableRowElement;

@@ -8,7 +8,7 @@ export interface UserProps {
   phone: string;
   password: string;
   password_confirmation: string;
-  roleID: number;
+  role: string;
   imageUrl: string;
   createdAt: string;
   updatedAt: string;

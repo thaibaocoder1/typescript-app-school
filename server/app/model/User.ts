@@ -7,8 +7,9 @@ interface Users extends Document {
   phone: number;
   password: string;
   password_confirmation: string;
-  roleID: number;
+  role: string;
   imageUrl: Object;
+  refreshToken: string;
 }
 
 const userSchema = new Schema<Users>(
@@ -41,14 +42,17 @@ const userSchema = new Schema<Users>(
       type: String,
       default: "123abc",
     },
-    roleID: {
-      type: Number,
-      required: [true, "Role ID should not be empty!"],
+    role: {
+      type: String,
+      default: "User",
     },
     imageUrl: {
       data: Buffer,
       contentType: String,
       fileName: String,
+    },
+    refreshToken: {
+      type: String,
     },
   },
   { timestamps: true }

@@ -59,7 +59,7 @@ class ProductController {
           data: products,
         });
       } else {
-        return res.status(404).json({
+        return res.json({
           success: false,
           message: "Không có sản phẩm nào được tìm thấy.",
         });

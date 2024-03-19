@@ -1,9 +1,8 @@
 import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
 export const sweetAlert = {
-  success(message: string) {
+  success() {
     Swal.fire({
-      title: message,
       text: "Đặt sản phẩm thành công",
       icon: "success",
     });

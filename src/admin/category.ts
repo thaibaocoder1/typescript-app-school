@@ -1,5 +1,4 @@
 import { Catalog, CatalogProps } from "../models/Catalog";
-import { hideSpinner, showSpinner } from "../utils";
 import dayjs from "dayjs";
 
 // functions
@@ -12,9 +11,7 @@ async function renderListCategory(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    showSpinner();
     const catalogs = await Catalog.loadAll();
-    hideSpinner();
     catalogs.forEach((item: CatalogProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>

@@ -1,8 +1,7 @@
-export async function handleAddCartDetail(type: string, selector: string) {
+export function handleAddCartDetail(type: string, selector: string) {
   const inputQuantity = document.querySelector(
     `input[name='${selector}']`
   ) as HTMLInputElement;
-  if (!inputQuantity) return;
   let currentValue: number = parseInt(inputQuantity.value as string);
   switch (type) {
     case "plus":
@@ -17,6 +16,7 @@ export async function handleAddCartDetail(type: string, selector: string) {
   inputQuantity.addEventListener("input", () => {
     validateInput(inputQuantity);
   });
+  inputQuantity.dataset.value = inputQuantity.value;
 }
 function validateInput(element: HTMLInputElement): void {
   let currentValue = parseInt(element.value);

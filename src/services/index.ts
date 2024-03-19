@@ -18,6 +18,16 @@ export class DataResource<T> {
     const result = await res.json();
     return result.data;
   }
+  async check(data: Partial<T>): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/login?_method=POST`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    return res;
+  }
   async delete(id: number | string): Promise<Response> {
     const res = await fetch(`${this.endpoint}/${id}`, {
       method: "DELETE",
