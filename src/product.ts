@@ -12,6 +12,7 @@ import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { toast } from "./utils/toast";
 import { handleWhitelist } from "./utils/whitelist";
 import { Carts, Params, ParamsProudct, WhiteLists } from "./constants";
+import { handleViewModal } from "./utils/modal";
 
 // functions
 async function renderSidebar(idElement: string) {
@@ -63,6 +64,11 @@ async function renderListProduct(params: ParamsProudct) {
         <span>
           <i class="fas fa-heart" style="color: inherit;"></i>
         </span>
+        </div>
+        <div class="card-modal" data-id=${item._id}>
+        <span>
+          <i class="fas fa-eye" style="color: inherit;"></i>
+          </span>
         </div>
           <div
             class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
@@ -160,4 +166,5 @@ async function renderListProduct(params: ParamsProudct) {
   });
   // Handle whitelist
   handleWhitelist(".card-whitelist");
+  handleViewModal(".card-modal");
 })();

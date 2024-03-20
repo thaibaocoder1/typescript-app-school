@@ -17,6 +17,8 @@ export interface ProductProps {
   content: string;
   status: number;
   quantity: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const Product = new DataResource<ProductProps>(

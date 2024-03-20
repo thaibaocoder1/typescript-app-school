@@ -11,6 +11,7 @@ import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { renderSidebar } from "./utils/sidebar";
 import { handleWhitelist } from "./utils/whitelist";
 import { Carts, Params, WhiteLists } from "./constants";
+import { handleViewModal } from "./utils/modal";
 
 // functions
 async function renderLatestProduct(idElement: string) {
@@ -32,6 +33,11 @@ async function renderLatestProduct(idElement: string) {
       <div class="card-whitelist" data-id=${item._id}>
       <span>
         <i class="fas fa-heart" style="color: inherit;"></i>
+        </span>
+      </div>
+      <div class="card-modal" data-id=${item._id}>
+      <span>
+        <i class="fas fa-eye" style="color: inherit;"></i>
         </span>
       </div>
       <div
@@ -96,6 +102,11 @@ async function renderArrivedProduct(idElement: string) {
       <div class="card-whitelist" data-id=${item._id}>
         <span>
           <i class="fas fa-heart" style="color: inherit;"></i>
+        </span>
+      </div>
+      <div class="card-modal" data-id=${item._id}>
+      <span>
+        <i class="fas fa-eye" style="color: inherit;"></i>
         </span>
       </div>
       <div
@@ -185,4 +196,5 @@ async function renderArrivedProduct(idElement: string) {
   });
   // Handle whitelist
   handleWhitelist(".card-whitelist");
+  handleViewModal(".card-modal");
 })();

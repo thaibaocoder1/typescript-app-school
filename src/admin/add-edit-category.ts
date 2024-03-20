@@ -1,12 +1,7 @@
+import { ParamsSubmit } from "../constants";
 import { Catalog } from "../models/Catalog";
 import { toast } from "../utils/toast";
 import slugify from "slugify";
-
-// type
-type ParamsSubmit = {
-  selector: string;
-  id?: string | null;
-};
 
 // functions
 async function handleItemCatalog(id: string) {
@@ -44,6 +39,11 @@ async function handleOnSubmit(params: ParamsSubmit) {
       if (params.id) {
         const res = await Catalog.update(params.id, {
           title: inputElement.value,
+          slug: slugify(inputElement.value, {
+            trim: true,
+            lower: true,
+            locale: "vi",
+          }),
         });
         const data = await res.json();
         if (data.status === "success") {

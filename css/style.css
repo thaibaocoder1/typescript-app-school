@@ -5738,6 +5738,8 @@ a.close.disabled {
   height: 100%;
   overflow: hidden;
   outline: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: all 0.25s linear;
 }
 
 .modal-dialog {
@@ -10041,9 +10043,15 @@ a.text-dark:focus {
   visibility: visible;
   transform: scale(1);
 }
+#card-custom:hover .card-modal {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
 .card-sale,
 .card-whitelist,
-.card-delete-whitelist {
+.card-delete-whitelist,
+.card-modal {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -10079,4 +10087,18 @@ a.text-dark:focus {
 .card-delete-whitelist:hover {
   background-color: var(--gray);
   z-index: 20;
+}
+.card-modal {
+  background-color: var(--yellow);
+  position: absolute;
+  right: 10px;
+  top: 55px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0);
+  transition: all 0.25s linear;
+}
+.card-modal:hover {
+  z-index: 30;
 }

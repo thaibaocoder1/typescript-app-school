@@ -28,6 +28,16 @@ export class DataResource<T> {
     });
     return res;
   }
+  async refresh(token: string): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/refresh/${token}`);
+    const result = await res.json();
+    return result.data;
+  }
+  async verify(id: string): Promise<T> {
+    const res = await fetch(`${this.endpoint}/verify/${id}`);
+    const result = await res.json();
+    return result.data;
+  }
   async delete(id: number | string): Promise<Response> {
     const res = await fetch(`${this.endpoint}/${id}`, {
       method: "DELETE",

@@ -18,6 +18,7 @@ async function renderListCategory(selector: string) {
       <td>${item.title}</td>
       <td>${item._id}</td>
       <td>${dayjs(item.createdAt).format("DD/MM/YYYY HH:mm:ss")}</td>
+      <td>${dayjs(item.updatedAt).format("DD/MM/YYYY HH:mm:ss")}</td>
       <td>
         <button class="btn btn-primary" data-id=${
           item._id

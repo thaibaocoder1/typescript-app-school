@@ -1,12 +1,20 @@
 import { Product, ProductProps } from "../models/Product";
-import { setFieldValue, setTextContent } from "../utils";
+import {
+  hideSpinner,
+  setFieldValue,
+  setTextContent,
+  showSpinner,
+} from "../utils";
 import { toast } from "../utils/toast";
 import { z } from "zod";
+import { Buffer } from "buffer";
+import { Catalog, CatalogProps } from "../models/Catalog";
 
 // type
 type ParamsSubmit = {
   selector: string;
   id?: string | null;
+  values: ProductProps;
 };
 type FormValues = {
   [key in string]: string | number | File;
@@ -80,19 +88,63 @@ async function handleOnSubmit(params: ParamsSubmit) {
     }
   });
 }
+async function renderListCategory(
+  selector: string,
+  emptyProduct: ProductProps
+) {
+  const selectElement = document.querySelector(selector) as HTMLSelectElement;
+  if (!selectElement) return;
+  const catalogs = await Catalog.loadAll();
+  if (catalogs) {
+    catalogs.forEach((item) => {
+      const optionElement = document.createElement("option");
+      optionElement.value = item._id.toString();
+      const catalogObj = emptyProduct.categoryID as unknown as CatalogProps;
+      const categoryID = catalogObj?._id;
+      if (categoryID !== null && item._id.toString() === categoryID) {
+        optionElement.selected = true;
+      }
+      optionElement.innerText = item.title;
+      selectElement.appendChild(optionElement);
+    });
+  }
+}
 // main
 (async () => {
   const heading = document.getElementById("heading") as HTMLHeadingElement;
   const params: URLSearchParams = new URLSearchParams(location.search);
   const productID: string | null = params.get("id");
+  let emptyProduct: ProductProps;
+  if (typeof productID === "string") {
+    heading.textContent = "Trang sửa sản phẩm";
+    emptyProduct = (await handleItemProduct(productID)) as ProductProps;
+  } else {
+    emptyProduct = {
+      _id: "",
+      categoryID: "",
+      name: "",
+      slug: "",
+      description: "",
+      code: "",
+      price: 0,
+      discount: 0,
+      thumb: {
+        data: Buffer.from(""),
+        contentType: "",
+        fileName: "",
+      },
+      content: "",
+      status: 1,
+      quantity: 0,
+      createdAt: "",
+      updatedAt: "",
+    };
+  }
+  await renderListCategory("#categoryID", emptyProduct);
   const paramsFn: ParamsSubmit = {
     selector: "form-product",
     id: productID,
+    values: emptyProduct,
   };
-  if (typeof productID === "string") {
-    heading.textContent = "Trang sửa sản phẩm";
-    await handleOnSubmit(paramsFn);
-  } else {
-    await handleOnSubmit(paramsFn);
-  }
+  await handleOnSubmit(paramsFn);
 })();

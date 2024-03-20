@@ -1,4 +1,5 @@
 // main
+import dayjs from "dayjs";
 import { Product, ProductProps } from "../models/Product";
 import { calcPrice, formatCurrencyNumber } from "../utils";
 
@@ -17,13 +18,14 @@ async function renderListProduct(selector: string) {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
       <td>${item.name}</td>
-      <td>${item._id}</td>
       <td>${formatCurrencyNumber(calcPrice(item.price, item.discount))}</td>
       <td>${item.discount}%</td>
       <td>${item.quantity}</td>
       <td>
         <img src="/img/${item.thumb.fileName}" alt="${item.name}" height="80">
       </td>
+      <td>${dayjs(item.createdAt).format("DD/MM/YYYY")}</td>
+      <td>${dayjs(item.updatedAt).format("DD/MM/YYYY")}</td>
       <td>
         <button class="btn btn-primary" data-id=${
           item._id

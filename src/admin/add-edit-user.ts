@@ -123,7 +123,7 @@ async function initForm(params: ParamsSubmit) {
       phone: "",
       password: "",
       password_confirmation: "",
-      roleID: 0,
+      role: "User",
       imageUrl: "",
       createdAt: "",
       updatedAt: "",

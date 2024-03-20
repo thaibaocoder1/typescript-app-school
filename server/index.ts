@@ -17,7 +17,6 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204,
 };
-
 // Start app
 const app: Express = express();
 const port = 8888;
@@ -26,6 +25,7 @@ startDB("mongodb://127.0.0.1:27017/course-typescript-poly");
 // Static folder
 app.use(express.static(path.join(__dirname, "public")));
 // Middeware
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:5173");
@@ -36,7 +36,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
-app.use(cookieParser());
 app.use(methodOveride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

@@ -1,7 +1,7 @@
 import { DataResource } from "../services/index";
 
 export interface CatalogProps {
-  _id: number;
+  _id: string;
   title: string;
   slug: string;
   createdAt: string;

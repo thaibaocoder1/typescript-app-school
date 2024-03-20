@@ -19,6 +19,7 @@ import {
   RenderInfoProductRelated,
   WhiteLists,
 } from "./constants";
+import { handleViewModal } from "./utils/modal";
 
 // functions
 async function renderInfoProduct(params: RenderInfoProductParams) {
@@ -129,6 +130,11 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
       <div class="card-whitelist" data-id=${item._id}>
         <span>
           <i class="fas fa-heart" style="color: inherit;"></i>
+        </span>
+      </div>
+      <div class="card-modal" data-id=${item._id}>
+      <span>
+        <i class="fas fa-eye" style="color: inherit;"></i>
         </span>
       </div>
       <div
@@ -257,4 +263,5 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     cart = await addProductToCart(params);
   });
   handleWhitelist(".card-whitelist");
+  handleViewModal(".card-modal");
 })();

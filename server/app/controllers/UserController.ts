@@ -120,7 +120,31 @@ class UserController {
         });
       }
     } catch (error) {
-      next(error);
+      next();
+    }
+  };
+  verify = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findById({ _id: id });
+      if (user) {
+        res.status(StatusCodes.OK).json({
+          success: true,
+          data: user,
+        });
+      } else {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Không có tài khoản nào được tìm thấy.",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        data: {
+          message: "Error from SERVER!",
+        },
+      });
     }
   };
   detail = async (req: Request, res: Response, next: NextFunction) => {
@@ -153,6 +177,56 @@ class UserController {
         .catch(next);
     } catch (error) {
       next(error);
+    }
+  };
+  refresh = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token } = req.params;
+      if (!token) {
+        next();
+      }
+      const accessTokenLife: string = "2m";
+      const refreshTokenLife: string = "365d";
+      const accessTokenSecret: string = "thaibao2004";
+      const refreshTokenSecret: string = "thaibao2004refresh";
+      const verifyToken = await decodeToken(token, refreshTokenSecret);
+      if (verifyToken) {
+        const newAccessToken = await generateToken(
+          verifyToken.payload,
+          accessTokenSecret,
+          accessTokenLife
+        );
+        const newRefreshToken = await generateToken(
+          verifyToken.payload,
+          refreshTokenSecret,
+          refreshTokenLife
+        );
+        const user = await User.findOneAndUpdate(
+          { email: verifyToken.payload.email },
+          {
+            refreshToken: newRefreshToken,
+          }
+        );
+        if (user) {
+          res.status(StatusCodes.CREATED).json({
+            success: true,
+            data: {
+              id: user._id,
+              accessToken: newAccessToken,
+              refreshToken: newRefreshToken,
+              expireIns: Date.now() + 2 * 60 * 1000,
+            },
+          });
+        }
+        next();
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        data: {
+          message: "Error from SERVER!",
+        },
+      });
     }
   };
 }
