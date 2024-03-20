@@ -1,5 +1,5 @@
 import { calcPrice, formatCurrencyNumber } from ".";
-import { Params, Carts } from "../main";
+import { Params, Carts } from "../constants";
 import { Product } from "../models/Product";
 
 type ParamsCart = {
@@ -25,19 +25,20 @@ export async function renderListProductInCart(
   const subTotalCart = document.getElementById(
     params.subtotalElement
   ) as HTMLElement;
-  const totalCart = document.getElementById(params.totalElement) as HTMLElement;
+  // const totalCart = document.getElementById(params.totalElement) as HTMLElement;
   const numOrderCart = document.getElementById(
     params.numOrderElement
   ) as HTMLElement;
   let totalQuantity: number = 0;
   let subtotal: number = 0;
-  let total: number = 0;
+  // let total: number = 0;
   try {
     cart.forEach(async (item) => {
       subtotal += item.price * item.quantity;
       totalQuantity += item.quantity;
       const product = await Product.loadOne(item.productID);
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
+      tableRow.dataset.id = item.productID;
       tableRow.innerHTML = `
       <td class="align-middle" style="text-align: left;">
         <img src="img/${product.thumb.fileName}" alt="${
@@ -72,7 +73,9 @@ export async function renderListProductInCart(
         item.price * item.quantity
       )}</td>
       <td class="align-middle">
-        <button class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary btn-trash" data-id=${
+          item.productID
+        } id="btn-trash">
           <i class="fa fa-times"></i>
         </button>
       </td>

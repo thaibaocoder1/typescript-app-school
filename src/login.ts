@@ -1,18 +1,14 @@
 import { ApiResponse } from "./constants";
 import { User } from "./models/User";
+import { setCookie } from "./utils/cookie";
 import { toast } from "./utils/toast";
+import { Validator } from "./utils/validator";
 
-function setCookie(cname: string, cvalue: string, exdays: number): void {
-  const d = new Date();
-  d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
-  let expires = "expires=" + d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
 async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
   try {
     const res = await User.check(data);
     const user: ApiResponse = await res.json();
-    if (res.ok && res.status === 200) {
+    if (res.ok && res.status === 201) {
       toast.success("Đăng nhập thành công");
       if (user.data.role === "User") {
         localStorage.setItem("accessToken", JSON.stringify(user.data));

@@ -9,7 +9,11 @@ export interface UserProps {
   password: string;
   password_confirmation: string;
   role: string;
-  imageUrl: string;
+  imageUrl: {
+    data: Buffer;
+    contentType: string;
+    fileName: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

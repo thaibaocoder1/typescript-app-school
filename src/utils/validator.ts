@@ -238,3 +238,4 @@ class Validator {
     };
   }
 }
+export { Validator };

@@ -8,7 +8,7 @@ interface Users extends Document {
   password: string;
   password_confirmation: string;
   role: string;
-  imageUrl: Object;
+  imageUrl?: Object;
   refreshToken: string;
 }
 

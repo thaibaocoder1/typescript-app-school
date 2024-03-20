@@ -1,4 +1,4 @@
-import { WhiteLists } from "../main";
+import { WhiteLists } from "../constants";
 
 export function calcPrice(price: number, discount: number): number {
   return (price * (100 - discount)) / 100;
@@ -23,13 +23,23 @@ export function setTextContent(
   if (element) element.textContent = text;
   return element;
 }
+export function setBackgroundImage(
+  parentElement: HTMLElement,
+  selector: string,
+  src: string
+) {
+  if (!parentElement) return;
+  const element = parentElement.querySelector(selector) as HTMLImageElement;
+  if (element) element.src = src;
+  return element;
+}
 export function getRandomNumber(n: number) {
   if (n <= 0) return -1;
   const random = Math.random() * n;
   return Math.round(random);
 }
 export function getRandomImage() {
-  let sourceImage = null;
+  let sourceImage: string;
   sourceImage = `https://picsum.photos/id/${getRandomNumber(1000)}/400/400`;
   return sourceImage;
 }

@@ -1,6 +1,7 @@
 import { User } from "./models/User";
 import { getRandomImage } from "./utils";
 import { toast } from "./utils/toast";
+import { Validator } from "./utils/validator";
 
 async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
   if (data) {

@@ -16,6 +16,17 @@ class UserController {
       next(error);
     }
   };
+  detail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findOne({ _id: req.params.id });
+      res.status(StatusCodes.OK).json({
+        status: "success",
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
   add = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { ...data } = req.body;
@@ -24,6 +35,12 @@ class UserController {
           data: req.file.originalname,
           contentType: req.file.mimetype,
           fileName: req.file.originalname,
+        };
+      } else {
+        data.imageUrl = {
+          data: Buffer.from(data.email),
+          contentType: "Empty Type!",
+          fileName: req.body.imageUrl,
         };
       }
       const userExist = await User.findOne({ email: data.email });
@@ -41,6 +58,27 @@ class UserController {
           data: user,
         });
       }
+    } catch (error) {
+      next(error);
+    }
+  };
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    if (req.file) {
+      req.body.thumb = {
+        data: req.file.originalname,
+        contentType: req.file.mimetype,
+        fileName: req.file.originalname,
+      };
+    }
+    try {
+      User.create(req.body)
+        .then(() => {
+          res.status(201).json({
+            status: "success",
+            message: "Create successfully",
+          });
+        })
+        .catch(next);
     } catch (error) {
       next(error);
     }
@@ -66,7 +104,7 @@ class UserController {
           message: "Missing required information: 'email or password'",
         });
       }
-      const accessTokenLife: string = "2m";
+      const accessTokenLife: string = "20m";
       const refreshTokenLife: string = "365d";
       const accessTokenSecret: string = "thaibao2004";
       const refreshTokenSecret: string = "thaibao2004refresh";
@@ -96,29 +134,16 @@ class UserController {
       } else {
         refreshToken = user.refreshToken;
       }
-      if (user.role === "User") {
-        res.status(StatusCodes.OK).json({
-          success: true,
-          data: {
-            role: user.role,
-            id: user._id,
-            accessToken,
-            refreshToken,
-            expireIns: Date.now() + 2 * 60 * 1000,
-          },
-        });
-      } else {
-        res.status(StatusCodes.CREATED).json({
-          success: true,
-          data: {
-            role: user.role,
-            id: user._id,
-            accessToken,
-            refreshToken,
-            expireIns: Date.now() + 2 * 60 * 1000,
-          },
-        });
-      }
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        data: {
+          role: user.role,
+          id: user._id,
+          accessToken,
+          refreshToken,
+          expireIns: Date.now() + 20 * 60 * 1000,
+        },
+      });
     } catch (error) {
       next();
     }
@@ -147,45 +172,13 @@ class UserController {
       });
     }
   };
-  detail = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = await User.findOne({ _id: req.params.id });
-      res.status(StatusCodes.OK).json({
-        status: "success",
-        data: user,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-  update = async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file) {
-      req.body.thumb = {
-        data: req.file.originalname,
-        contentType: req.file.mimetype,
-        fileName: req.file.originalname,
-      };
-    }
-    try {
-      User.create(req.body)
-        .then(() => {
-          res.status(201).json({
-            status: "success",
-            message: "Create successfully",
-          });
-        })
-        .catch(next);
-    } catch (error) {
-      next(error);
-    }
-  };
   refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { token } = req.params;
       if (!token) {
         next();
       }
-      const accessTokenLife: string = "2m";
+      const accessTokenLife: string = "20m";
       const refreshTokenLife: string = "365d";
       const accessTokenSecret: string = "thaibao2004";
       const refreshTokenSecret: string = "thaibao2004refresh";
@@ -214,11 +207,42 @@ class UserController {
               id: user._id,
               accessToken: newAccessToken,
               refreshToken: newRefreshToken,
-              expireIns: Date.now() + 2 * 60 * 1000,
+              expireIns: Date.now() + 20 * 60 * 1000,
             },
           });
         }
         next();
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        data: {
+          message: "Error from SERVER!",
+        },
+      });
+    }
+  };
+  logout = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findById({ _id: id });
+      if (!user) {
+        res.status(StatusCodes.OK).json({
+          success: false,
+          data: {
+            message: "User not exist to find!",
+          },
+        });
+      } else {
+        await User.findOneAndUpdate(
+          { _id: id },
+          { refreshToken: "" },
+          { new: true }
+        );
+        res.status(StatusCodes.OK).json({
+          success: true,
+          data: user,
+        });
       }
     } catch (error) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

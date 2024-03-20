@@ -11340,7 +11340,7 @@ form.user .custom-checkbox.small label {
 
 form.user .form-control-user {
   font-size: 0.8rem;
-  border-radius: 10rem;
+  border-radius: 1rem;
   padding: 1.5rem 1rem;
 }
 
@@ -11361,7 +11361,6 @@ form.user .btn-user {
   background-color: #e12717;
   border-color: #e6e6e6;
 }
-
 .btn-google:focus,
 .btn-google.focus {
   color: #fff;
