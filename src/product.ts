@@ -4,18 +4,15 @@ import {
   showSpinner,
   hideSpinner,
   sweetAlert,
+  displayNumberWhitelist,
 } from "./utils";
 import { CatalogProps, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
-import { Carts, Params } from "./main";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { toast } from "./utils/toast";
+import { handleWhitelist } from "./utils/whitelist";
+import { Carts, Params, ParamsProudct, WhiteLists } from "./constants";
 
-// interface
-interface ParamsProudct {
-  idElement: string;
-  slug?: string | null;
-}
 // functions
 async function renderSidebar(idElement: string) {
   const sidebar = document.querySelector(idElement) as HTMLElement;
@@ -62,7 +59,7 @@ async function renderListProduct(params: ParamsProudct) {
         <div class="card-sale">
           <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
         </div>
-        <div class="card-whitelist">
+        <div class="card-whitelist" data-id=${item._id}>
         <span>
           <i class="fas fa-heart" style="color: inherit;"></i>
         </span>
@@ -119,11 +116,20 @@ async function renderListProduct(params: ParamsProudct) {
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
+  let isHasWhiteList: string | null = localStorage.getItem("whitelist");
+  let accessToken: string | null = localStorage.getItem("accessToken");
+  let accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
   let cart: Carts[] = [];
+  let whitelist: WhiteLists[] = [];
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
+  if (typeof isHasWhiteList === "string") {
+    whitelist = JSON.parse(isHasWhiteList);
+  }
   displayNumOrder("num-order", cart);
+  displayNumberWhitelist("whitelist-order", whitelist);
   const searchParamsURL: URLSearchParams = new URLSearchParams(location.search);
   const slug: string | null = searchParamsURL.get("slug");
   const paramsFn: ParamsProudct = {
@@ -152,4 +158,6 @@ async function renderListProduct(params: ParamsProudct) {
       }
     });
   });
+  // Handle whitelist
+  handleWhitelist(".card-whitelist");
 })();

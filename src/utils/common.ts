@@ -1,3 +1,5 @@
+import { WhiteLists } from "../main";
+
 export function calcPrice(price: number, discount: number): number {
   return (price * (100 - discount)) / 100;
 }
@@ -30,4 +32,16 @@ export function getRandomImage() {
   let sourceImage = null;
   sourceImage = `https://picsum.photos/id/${getRandomNumber(1000)}/400/400`;
   return sourceImage;
+}
+export function displayNumberWhitelist(
+  selector: string,
+  arr: WhiteLists[]
+): void {
+  const numOrderElement = document.getElementById(selector) as HTMLElement;
+  if (!numOrderElement) return;
+  let quantity: number = 0;
+  for (const [index, item] of arr.entries()) {
+    quantity++;
+  }
+  numOrderElement.innerText = `${quantity}`;
 }

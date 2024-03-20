@@ -47,7 +47,6 @@ class UserController {
   };
   check = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body);
       const { email, password } = req.body;
       const user = await User.findOne({ email: email });
       if (!user) {
@@ -98,34 +97,24 @@ class UserController {
         refreshToken = user.refreshToken;
       }
       if (user.role === "User") {
-        res.cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          sameSite: "strict",
-          path: "/",
-          secure: false,
-        });
         res.status(StatusCodes.OK).json({
           success: true,
           data: {
             role: user.role,
             id: user._id,
             accessToken,
+            refreshToken,
             expireIns: Date.now() + 2 * 60 * 1000,
           },
         });
       } else {
-        res.cookie("refreshTokenAdmin", refreshToken, {
-          httpOnly: true,
-          sameSite: "strict",
-          path: "/",
-          secure: false,
-        });
         res.status(StatusCodes.CREATED).json({
           success: true,
           data: {
             role: user.role,
             id: user._id,
             accessToken,
+            refreshToken,
             expireIns: Date.now() + 2 * 60 * 1000,
           },
         });

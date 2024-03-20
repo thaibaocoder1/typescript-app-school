@@ -10036,8 +10036,14 @@ a.text-dark:focus {
   visibility: visible;
   transform: scale(1);
 }
+#card-custom:hover .card-delete-whitelist {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
 .card-sale,
-.card-whitelist {
+.card-whitelist,
+.card-delete-whitelist {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -10054,6 +10060,7 @@ a.text-dark:focus {
   left: -10px;
   top: -10px;
 }
+.card-delete-whitelist,
 .card-whitelist {
   background-color: var(--cyan);
   position: absolute;
@@ -10063,8 +10070,13 @@ a.text-dark:focus {
   opacity: 0;
   visibility: hidden;
   transform: scale(0);
+  transition: all 0.25s linear;
 }
 .card-whitelist:hover {
   background-color: var(--red);
   font-size: 20px;
+}
+.card-delete-whitelist:hover {
+  background-color: var(--gray);
+  z-index: 20;
 }

@@ -4,22 +4,14 @@ import {
   showSpinner,
   hideSpinner,
   sweetAlert,
+  displayNumberWhitelist,
 } from "./utils";
 import { ProductProps, Product } from "./models/Product";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { renderSidebar } from "./utils/sidebar";
+import { handleWhitelist } from "./utils/whitelist";
+import { Carts, Params, WhiteLists } from "./constants";
 
-// interface / type
-export interface Carts {
-  productID: number | string;
-  price: number;
-  quantity: number;
-}
-export interface Params {
-  productID: number | string;
-  cart: Carts[];
-  quantity: number;
-}
 // functions
 async function renderLatestProduct(idElement: string) {
   const container = document.querySelector(idElement);
@@ -37,11 +29,9 @@ async function renderLatestProduct(idElement: string) {
       <div class="card-sale">
         <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
       </div>
-      <div class="card-whitelist" >
-        <span>
-          <i class="fas fa-heart" style="color: inherit;" data-id=${
-            item._id
-          }></i>
+      <div class="card-whitelist" data-id=${item._id}>
+      <span>
+        <i class="fas fa-heart" style="color: inherit;"></i>
         </span>
       </div>
       <div
@@ -103,11 +93,9 @@ async function renderArrivedProduct(idElement: string) {
       <div class="card-sale">
         <span>${item.discount > 0 ? item.discount + "%" : ""}</span>
       </div>
-      <div class="card-whitelist">
+      <div class="card-whitelist" data-id=${item._id}>
         <span>
-          <i class="fas fa-heart" data-id=${
-            item._id
-          } style="color: inherit;"></i>
+          <i class="fas fa-heart" style="color: inherit;"></i>
         </span>
       </div>
       <div
@@ -158,11 +146,20 @@ async function renderArrivedProduct(idElement: string) {
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
+  let isHasWhiteList: string | null = localStorage.getItem("whitelist");
+  let accessToken: string | null = localStorage.getItem("accessToken");
+  let accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
   let cart: Carts[] = [];
+  let whitelist: WhiteLists[] = [];
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
+  if (typeof isHasWhiteList === "string") {
+    whitelist = JSON.parse(isHasWhiteList);
+  }
   displayNumOrder("num-order", cart);
+  displayNumberWhitelist("whitelist-order", whitelist);
   await renderSidebar("#sidebar-category");
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
@@ -187,10 +184,5 @@ async function renderArrivedProduct(idElement: string) {
     });
   });
   // Handle whitelist
-  const buttonWhiteList = document.querySelectorAll(
-    ".card-whitelist"
-  ) as NodeListOf<HTMLDivElement>;
-  buttonWhiteList.forEach((btn) => {
-    btn.addEventListener("click", (e: Event) => {});
-  });
+  handleWhitelist(".card-whitelist");
 })();

@@ -42,6 +42,15 @@ async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
 }
 // Main
 (() => {
+  const accessToken: string | null = localStorage.getItem("accessToken");
+  const accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
+  if (typeof accessToken === "string") {
+    window.location.assign("index.html");
+  }
+  if (typeof accessTokenAdmin === "string") {
+    window.location.assign("admin/index.html");
+  }
   new Validator({
     formID: "#form-1",
     formGroupSelector: ".form-group",

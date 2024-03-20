@@ -4,26 +4,22 @@ import {
   showSpinner,
   hideSpinner,
   sweetAlert,
+  displayNumberWhitelist,
 } from "./utils";
 import { CatalogProps } from "./models/Catalog";
-import { ProductProps, Product } from "./models/Product";
+import { Product } from "./models/Product";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
-import { Carts, Params } from "./main";
 import { handleAddCartDetail } from "./utils/handle-detail";
 import { renderSidebar } from "./utils/sidebar";
+import { handleWhitelist } from "./utils/whitelist";
+import {
+  Carts,
+  Params,
+  RenderInfoProductParams,
+  RenderInfoProductRelated,
+  WhiteLists,
+} from "./constants";
 
-// interfaces
-interface RenderInfoProductParams {
-  infoIDElement: string;
-  infoIDThumbnail: string;
-  infoIDContent: string;
-  productInfo: ProductProps;
-}
-interface RenderInfoProductRelated {
-  infoIDElement: string;
-  categoryID: string | number;
-  productID: string;
-}
 // functions
 async function renderInfoProduct(params: RenderInfoProductParams) {
   const infoProduct = document.querySelector(
@@ -181,11 +177,20 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
+  let isHasWhiteList: string | null = localStorage.getItem("whitelist");
+  let accessToken: string | null = localStorage.getItem("accessToken");
+  let accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
   let cart: Carts[] = [];
+  let whitelist: WhiteLists[] = [];
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
+  if (typeof isHasWhiteList === "string") {
+    whitelist = JSON.parse(isHasWhiteList);
+  }
   displayNumOrder("num-order", cart);
+  displayNumberWhitelist("whitelist-order", whitelist);
   const searchParams = new URLSearchParams(location.search);
   const productID = searchParams.get("id");
   if (!productID) return;
@@ -251,4 +256,5 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     };
     cart = await addProductToCart(params);
   });
+  handleWhitelist(".card-whitelist");
 })();

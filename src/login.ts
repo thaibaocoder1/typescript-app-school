@@ -1,14 +1,12 @@
+import { ApiResponse } from "./constants";
 import { User } from "./models/User";
 import { toast } from "./utils/toast";
-interface AccessTokenData {
-  role: string;
-  id: string;
-  accessToken: string;
-  expireIns: number;
-}
-interface ApiResponse {
-  success: boolean | string;
-  data: AccessTokenData;
+
+function setCookie(cname: string, cvalue: string, exdays: number): void {
+  const d = new Date();
+  d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
   try {
@@ -18,11 +16,13 @@ async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
       toast.success("Đăng nhập thành công");
       if (user.data.role === "User") {
         localStorage.setItem("accessToken", JSON.stringify(user.data));
+        setCookie("refreshToken", user.data.refreshToken, 365);
         setTimeout(() => {
           window.location.assign("/index.html");
         }, 500);
       } else {
-        localStorage.setItem("accessToken", JSON.stringify(user.data));
+        localStorage.setItem("accessTokenAdmin", JSON.stringify(user.data));
+        setCookie("refreshTokenAdmin", user.data.refreshToken, 365);
         setTimeout(() => {
           window.location.assign("/admin/index.html");
         }, 500);
@@ -34,6 +34,15 @@ async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
 }
 // Main
 (() => {
+  const accessToken: string | null = localStorage.getItem("accessToken");
+  const accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
+  if (typeof accessToken === "string") {
+    window.location.assign("index.html");
+  }
+  if (typeof accessTokenAdmin === "string") {
+    window.location.assign("admin/index.html");
+  }
   new Validator({
     formID: "#form-1",
     formGroupSelector: ".form-group",
