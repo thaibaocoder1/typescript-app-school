@@ -5,6 +5,7 @@ import {
   hideSpinner,
   sweetAlert,
   displayNumberWhitelist,
+  renderAccountInfo,
 } from "./utils";
 import { CatalogProps, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
@@ -136,6 +137,15 @@ async function renderListProduct(params: ParamsProudct) {
   }
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    console.log("Chi hien thi user");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   const searchParamsURL: URLSearchParams = new URLSearchParams(location.search);
   const slug: string | null = searchParamsURL.get("slug");
   const paramsFn: ParamsProudct = {

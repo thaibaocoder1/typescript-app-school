@@ -1,4 +1,4 @@
-import { calcPrice, formatCurrencyNumber, hideSpinner, showSpinner } from ".";
+import { calcPrice, formatCurrencyNumber } from "./format";
 import { Product } from "../models/Product";
 
 export function handleViewModal(selecotor: string) {
@@ -11,7 +11,7 @@ export function handleViewModal(selecotor: string) {
     btn.addEventListener("click", async () => {
       const productID = btn.closest("div")?.dataset.id as string;
       if (productID) {
-        modal.classList.add("show");
+        modal.classList.add("is-show");
         const product = await Product.loadOne(productID);
         const modalBodyEl = modal.querySelector(
           ".modal-body"
@@ -37,9 +37,9 @@ export function handleViewModal(selecotor: string) {
   window.addEventListener("click", (e: MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.classList.contains("modal")) {
-      modal.classList.remove("show");
+      modal.classList.remove("is-show");
     } else if (target.closest("button")) {
-      modal.classList.remove("show");
+      modal.classList.remove("is-show");
     }
   });
 }

@@ -1,8 +1,5 @@
 import { WhiteLists } from "../constants";
 
-export function calcPrice(price: number, discount: number): number {
-  return (price * (100 - discount)) / 100;
-}
 export function setFieldValue(
   parentElement: HTMLElement,
   selector: string,

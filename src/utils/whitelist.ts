@@ -1,4 +1,4 @@
-import { displayNumberWhitelist } from ".";
+import { displayNumberWhitelist } from "./common";
 import { AccessTokenData, WhiteLists } from "../constants";
 import { toast } from "./toast";
 let accessToken: string | null = localStorage.getItem("accessToken");
@@ -22,9 +22,7 @@ export function handleWhitelist(selector: string) {
         infoUser = JSON.parse(accessTokenAdmin);
       } else {
         toast.info("Please login to add whitelist");
-        setTimeout(() => {
-          window.location.assign("login.html");
-        }, 3000);
+        return;
       }
       const productID: string | undefined = btn.closest("div")?.dataset.id;
       const { id } = infoUser;

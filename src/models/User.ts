@@ -14,6 +14,7 @@ export interface UserProps {
     contentType: string;
     fileName: string;
   };
+  refreshToken: string;
   createdAt: string;
   updatedAt: string;
 }

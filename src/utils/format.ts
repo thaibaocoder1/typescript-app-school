@@ -4,3 +4,6 @@ export function formatCurrencyNumber(number: number): string {
     currency: "VND",
   }).format(number);
 }
+export function calcPrice(price: number, discount: number): number {
+  return (price * (100 - discount)) / 100;
+}

@@ -5,13 +5,15 @@ import {
   hideSpinner,
   sweetAlert,
   displayNumberWhitelist,
+  handleWhitelist,
+  handleViewModal,
+  renderAccountInfo,
+  displayNumOrder,
+  renderSidebar,
+  addProductToCart,
 } from "./utils";
-import { ProductProps, Product } from "./models/Product";
-import { addProductToCart, displayNumOrder } from "./utils/cart";
-import { renderSidebar } from "./utils/sidebar";
-import { handleWhitelist } from "./utils/whitelist";
 import { Carts, Params, WhiteLists } from "./constants";
-import { handleViewModal } from "./utils/modal";
+import { ProductProps, Product } from "./models/Product";
 
 // functions
 async function renderLatestProduct(idElement: string) {
@@ -174,6 +176,15 @@ async function renderArrivedProduct(idElement: string) {
   await renderSidebar("#sidebar-category");
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    console.log("Chi hien thi user");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   // Handle cart
   const buttonCart = document.querySelectorAll(
     "#btn-cart"
