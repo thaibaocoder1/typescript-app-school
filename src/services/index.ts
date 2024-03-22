@@ -85,4 +85,15 @@ export class DataResource<T> {
     });
     return res;
   }
+  // [Update - FormData]
+  async updateFormData(data: FormData): Promise<Response> {
+    const res = await fetch(
+      `${this.endpoint}/update/${data.get("id")}?_method=PATCH`,
+      {
+        method: "PATCH",
+        body: data,
+      }
+    );
+    return res;
+  }
 }

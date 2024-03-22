@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { User, UserProps } from "../models/User";
-import { setFieldValue } from "../utils";
+import { initLogout, setBackgroundImage, setFieldValue } from "../utils";
 import { toast } from "../utils/toast";
+import { Buffer } from "buffer";
 
 // type
 type ParamsSubmit = {
@@ -13,11 +14,6 @@ type FormValues = {
   [key in string]: string | number | File;
 };
 // functions
-const imageUrlSchema = z.object({
-  name: z.string(),
-  type: z.string(),
-  size: z.number(),
-});
 function getSchema() {
   return z
     .object({
@@ -25,8 +21,7 @@ function getSchema() {
       fullname: z.string(),
       email: z.string().email(),
       phone: z.string(),
-      roleID: z.literal("1").or(z.literal("2")),
-      imageUrl: imageUrlSchema,
+      role: z.literal("User").or(z.literal("Admin")),
     })
     .required();
 }
@@ -44,6 +39,15 @@ function setFormValues(element: HTMLFormElement, defaultValues: UserProps) {
   setFieldValue(element, "[name='fullname']", defaultValues?.fullname);
   setFieldValue(element, "[name='email']", defaultValues?.email);
   setFieldValue(element, "[name='phone']", defaultValues?.phone);
+  setBackgroundImage(
+    element,
+    "img#imageUrl",
+    `${
+      defaultValues.imageUrl.fileName.includes("http")
+        ? defaultValues.imageUrl.fileName
+        : `/img/${defaultValues?.imageUrl.fileName}`
+    }`
+  );
 }
 function getFormValues(form: HTMLFormElement): FormValues {
   const formValues: FormValues = {};
@@ -65,7 +69,7 @@ function jsonToFormData(values: FormValues): FormData {
   }
   return formData;
 }
-async function validateForm(form: HTMLFormElement, formValues: FormValues) {
+async function validateForm(formValues: FormValues) {
   try {
     const schema = getSchema();
     const validUser = schema.parse(formValues);
@@ -75,19 +79,48 @@ async function validateForm(form: HTMLFormElement, formValues: FormValues) {
     return;
   }
 }
+function initPostImage(form: HTMLFormElement, selector: string) {
+  const inputFile = document.querySelector(
+    `input[name='${selector}']`
+  ) as HTMLInputElement;
+  if (inputFile) {
+    inputFile.addEventListener("change", () => {
+      if (inputFile && inputFile.files && inputFile.files.length > 0) {
+        const files = inputFile.files[0];
+        if (files) {
+          const imageUrl = URL.createObjectURL(files);
+          setBackgroundImage(form, "img#imageUrl", `${imageUrl}`);
+        }
+      } else {
+        console.log("Error");
+      }
+    });
+  }
+}
 async function initForm(params: ParamsSubmit) {
   const form = document.getElementById(params.selector) as HTMLFormElement;
   if (!form) return;
+  initPostImage(form, "imageUrl");
   setFormValues(form, params.values);
+  await initSelectRole("role", params.values);
   form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
     const formValues = getFormValues(form);
-    const isValid = await validateForm(form, formValues);
+    const isValid = await validateForm(formValues);
     if (!isValid) return;
     const formData = jsonToFormData(formValues);
+    formData.append("id", params.values._id);
     try {
       if (params.id) {
-        console.log("Edit");
+        const res = await User.updateFormData(formData);
+        if (res.ok && res.status === 201) {
+          toast.success("Update thành công");
+          setTimeout(() => {
+            window.location.assign("/admin/list-user.html");
+          }, 500);
+        } else {
+          toast.error("Có lỗi trong khi xử lý. Thử lại");
+        }
       } else {
         const res = await User.saveFormData(formData);
         if (res.ok && res.status === 201) {
@@ -104,6 +137,25 @@ async function initForm(params: ParamsSubmit) {
     }
   });
 }
+async function initSelectRole(selector: string, values: UserProps) {
+  const selectElement = document.getElementById(selector) as HTMLSelectElement;
+  if (!selectElement) return;
+  try {
+    const { role } = values;
+    ["User", "Admin"].forEach((name) => {
+      const optionEl = document.createElement("option") as HTMLOptionElement;
+      optionEl.value = name;
+      if (role.toLowerCase() === name.toLowerCase()) {
+        optionEl.selected = true;
+      }
+      optionEl.textContent = name;
+      selectElement.appendChild(optionEl);
+    });
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
 // main
 (async () => {
   const heading = document.getElementById("heading") as HTMLHeadingElement;
@@ -124,7 +176,12 @@ async function initForm(params: ParamsSubmit) {
       password: "",
       password_confirmation: "",
       role: "User",
-      imageUrl: "",
+      imageUrl: {
+        data: Buffer.from(""),
+        contentType: "",
+        fileName: "",
+      },
+      refreshToken: "",
       createdAt: "",
       updatedAt: "",
     };
@@ -135,4 +192,5 @@ async function initForm(params: ParamsSubmit) {
     values: emptyUser,
   };
   await initForm(paramsFn);
+  initLogout("logout-btn");
 })();

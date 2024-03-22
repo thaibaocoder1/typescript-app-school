@@ -1,5 +1,6 @@
 import { ParamsSubmit } from "../constants";
 import { Catalog } from "../models/Catalog";
+import { initLogout } from "../utils";
 import { toast } from "../utils/toast";
 import slugify from "slugify";
 
@@ -89,4 +90,5 @@ async function handleOnSubmit(params: ParamsSubmit) {
   } else {
     await handleOnSubmit(paramsFn);
   }
+  initLogout("logout-btn");
 })();

@@ -1,11 +1,5 @@
 import { Product, ProductProps } from "../models/Product";
-import {
-  hideSpinner,
-  setFieldValue,
-  setTextContent,
-  showSpinner,
-} from "../utils";
-import { toast } from "../utils/toast";
+import { initLogout, setFieldValue, setTextContent } from "../utils";
 import { z } from "zod";
 import { Buffer } from "buffer";
 import { Catalog, CatalogProps } from "../models/Catalog";
@@ -147,4 +141,5 @@ async function renderListCategory(
     values: emptyProduct,
   };
   await handleOnSubmit(paramsFn);
+  initLogout("logout-btn");
 })();

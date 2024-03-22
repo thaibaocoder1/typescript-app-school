@@ -1,7 +1,7 @@
 // main
 import dayjs from "dayjs";
 import { Product, ProductProps } from "../models/Product";
-import { calcPrice, formatCurrencyNumber } from "../utils";
+import { calcPrice, formatCurrencyNumber, initLogout } from "../utils";
 
 // functions
 async function renderListProduct(selector: string) {
@@ -27,7 +27,7 @@ async function renderListProduct(selector: string) {
       <td>${dayjs(item.createdAt).format("DD/MM/YYYY")}</td>
       <td>${dayjs(item.updatedAt).format("DD/MM/YYYY")}</td>
       <td>
-        <button class="btn btn-primary" data-id=${
+        <button class="btn btn-primary btn-sm" data-id=${
           item._id
         } id="btn-edit">Chỉnh sửa</button>
       </td>`;
@@ -50,4 +50,5 @@ async function renderListProduct(selector: string) {
         window.location.assign("add-edit-product.html?id=" + productID);
     });
   });
+  initLogout("logout-btn");
 })();

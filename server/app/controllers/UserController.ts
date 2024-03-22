@@ -6,7 +6,7 @@ import { generateToken, decodeToken } from "../../auth/AuthController";
 class UserController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await User.find({});
+      const users = await User.find({}).sort("-createdAt");
       res.status(StatusCodes.OK).json({
         status: "success",
         results: users.length,
@@ -34,7 +34,7 @@ class UserController {
         data.imageUrl = {
           data: req.file.originalname,
           contentType: req.file.mimetype,
-          fileName: req.file.originalname,
+          fileName: `http://localhost:8888/uploads/${req.file.originalname}`,
         };
       } else {
         data.imageUrl = {
@@ -63,22 +63,24 @@ class UserController {
     }
   };
   update = async (req: Request, res: Response, next: NextFunction) => {
-    if (req.file) {
-      req.body.thumb = {
-        data: req.file.originalname,
-        contentType: req.file.mimetype,
-        fileName: req.file.originalname,
-      };
-    }
     try {
-      User.create(req.body)
-        .then(() => {
-          res.status(201).json({
-            status: "success",
-            message: "Create successfully",
-          });
-        })
-        .catch(next);
+      const user = await User.findById({ _id: req.params.id });
+      if (!req.file) {
+        if (JSON.stringify(req.body) !== JSON.stringify(user!.toObject())) {
+          await User.findByIdAndUpdate({ _id: req.params.id }, req.body);
+        }
+      } else {
+        req.body.imageUrl = {
+          data: req.file.originalname,
+          contentType: req.file.mimetype,
+          fileName: `http://localhost:8888/uploads/${req.file.originalname}`,
+        };
+        await User.findByIdAndUpdate({ _id: req.params.id }, req.body);
+      }
+      res.status(StatusCodes.CREATED).json({
+        status: "success",
+        message: "Update successfully",
+      });
     } catch (error) {
       next(error);
     }

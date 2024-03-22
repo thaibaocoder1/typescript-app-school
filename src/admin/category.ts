@@ -1,5 +1,6 @@
 import { Catalog, CatalogProps } from "../models/Catalog";
 import dayjs from "dayjs";
+import { initLogout } from "../utils";
 
 // functions
 async function renderListCategory(selector: string) {
@@ -20,7 +21,7 @@ async function renderListCategory(selector: string) {
       <td>${dayjs(item.createdAt).format("DD/MM/YYYY HH:mm:ss")}</td>
       <td>${dayjs(item.updatedAt).format("DD/MM/YYYY HH:mm:ss")}</td>
       <td>
-        <button class="btn btn-primary" data-id=${
+        <button class="btn btn-primary btn-sm" data-id=${
           item._id
         } id="btn-edit">Chỉnh sửa</button>
       </td>`;
@@ -43,4 +44,5 @@ async function renderListCategory(selector: string) {
         window.location.assign("add-edit-category.html?id=" + catalogID);
     });
   });
+  initLogout("logout-btn");
 })();

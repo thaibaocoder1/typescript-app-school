@@ -10,7 +10,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>SB Admin 2 - Blank</title>
+    <title>baoDeV 2 - Blank</title>
 
     <!-- Custom fonts for this template-->
     <link
@@ -43,7 +43,7 @@
           <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
           </div>
-          <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+          <div class="sidebar-brand-text mx-3">baoDeV <sup>2</sup></div>
         </a>
 
         <!-- Divider -->
@@ -448,14 +448,7 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                   </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
-                  </a>
+
                   <div class="dropdown-divider"></div>
                   <a
                     class="dropdown-item"
@@ -491,27 +484,27 @@
             <!-- Content Row -->
             <div class="row">
               <form
-                class="w-100 ml-3"
+                class="w-100 ml-3 mb-3"
                 method="POST"
                 enctype="multipart/form-data"
                 id="form-product"
               >
                 <div class="mb-3">
+                  <div class="mb-3">
+                    <label for="fullname" class="form-label">Họ và tên</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="fullname"
+                      name="fullname"
+                    />
+                  </div>
                   <label for="username" class="form-label">Tên đăng nhập</label>
                   <input
                     type="text"
                     class="form-control"
                     id="username"
                     name="username"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="fullname" class="form-label">Họ và tên</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="fullname"
-                    name="fullname"
                   />
                 </div>
                 <div class="mb-3">
@@ -534,21 +527,33 @@
                 </div>
                 <div class="mb-3">
                   <label for="role" class="form-label">Vai trò</label>
-                  <select class="form-control" id="role" name="roleID">
-                    <option selected>Lựa chọn...</option>
-                    <option value="1">Khách hàng</option>
-                    <option value="2">Người quản trị</option>
-                  </select>
+                  <select class="form-control" id="role" name="role"></select>
                 </div>
                 <div class="mb-3">
                   <label for="image" class="form-label">Hình ảnh</label>
-                  <input
-                    class="form-control"
-                    type="file"
-                    id="image"
-                    name="imageUrl"
-                    accept="image/*"
-                  />
+                  <div class="d-flex justify-content-between">
+                    <div class="input-group mb-3 w-75">
+                      <input
+                        class="form-control"
+                        type="file"
+                        id="image"
+                        name="imageUrl"
+                        accept="image/*"
+                      />
+                    </div>
+                    <img
+                      src="https://placehold.co/200x200"
+                      style="
+                        width: 200px;
+                        height: 200px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                      class="img-thumbnail"
+                      id="imageUrl"
+                      alt=""
+                    />
+                  </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
               </form>
@@ -589,7 +594,9 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <h5 class="modal-title" id="exampleModalLabel">
+              Bạn muốn đăng xuất?
+            </h5>
             <button
               class="close"
               type="button"
@@ -600,7 +607,7 @@
             </button>
           </div>
           <div class="modal-body">
-            Select "Logout" below if you are ready to end your current session.
+            Click vào 'logout' nếu bạn chắc chắn muốn đăng xuất khỏi hệ thống!
           </div>
           <div class="modal-footer">
             <button
@@ -610,7 +617,7 @@
             >
               Cancel
             </button>
-            <a class="btn btn-primary" href="login.html">Logout</a>
+            <a class="btn btn-primary" href="" id="logout-btn">Logout</a>
           </div>
         </div>
       </div>
