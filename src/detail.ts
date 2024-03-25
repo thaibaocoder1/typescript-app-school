@@ -141,7 +141,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
       class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
     >
       <a href="detail.html?id=${item._id}">
-        <img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
+        <img class="img-fluid w-100" src="${item.thumb.fileName}" alt="${
         item.name
       }" />
       </a>

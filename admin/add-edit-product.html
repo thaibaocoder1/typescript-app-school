@@ -10,8 +10,9 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>baoDeV 2 - Blank</title>
-
+    <title>BSmart - Product</title>
+    <!-- Favicon -->
+    <link href="/src/typescript.svg" rel="icon" />
     <!-- Custom fonts for this template-->
     <link
       href="vendor/fontawesome-free/css/all.min.css"
@@ -484,88 +485,107 @@
             <!-- Content Row -->
             <div class="row">
               <form
-                class="w-100 ml-3"
+                class="row ml-3"
+                novalidate
                 method="POST"
                 id="form-product"
                 enctype="multipart/form-data"
               >
-                <div class="mb-3">
-                  <label for="name" class="form-label">Tên sản phẩm</label>
+                <div class="mb-3 col-lg-4">
+                  <label for="file" class="form-label">Hình ảnh</label>
                   <input
-                    type="text"
-                    class="form-control"
-                    id="name"
-                    name="name"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="code" class="form-label">Mã sản phẩm</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="code"
-                    name="code"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="price" class="form-label">Giá tiền</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="price"
-                    name="price"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="discount" class="form-label">Sale (%)</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="discount"
-                    name="discount"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="quantity" class="form-label">Số lượng</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="quantity"
-                    name="quantity"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="categoryID" class="form-label">Danh mục</label>
-                  <select
-                    class="form-control"
-                    id="categoryID"
-                    name="categoryID"
-                  ></select>
-                </div>
-                <div class="mb-3">
-                  <label for="description" class="form-label">Mô tả</label>
-                  <textarea
-                    name="description"
-                    id="description"
-                    class="form-control"
-                  ></textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="content" class="form-label">Nội dung</label>
-                  <textarea
-                    name="content"
-                    id="content"
-                    class="form-control"
-                  ></textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="formFile" class="form-label">Hình ảnh</label>
-                  <input
-                    class="form-control"
+                    class="form-control mb-3"
                     type="file"
-                    id="formFile"
+                    id="file"
                     name="thumb"
                   />
+                  <img
+                    src="https://placehold.co/350x350"
+                    alt=""
+                    class="rounded-right rounded-top w-100 d-block"
+                    style="object-fit: cover; height: 380px"
+                    id="imageUrl"
+                  />
+                </div>
+                <div id="main" class="col-lg-8">
+                  <div class="d-flex align-items-center" style="gap: 0 10px">
+                    <div class="mb-3 w-50">
+                      <label for="name" class="form-label">Tên sản phẩm</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        name="name"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                    <div class="mb-3 w-50">
+                      <label for="code" class="form-label">Mã sản phẩm</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="code"
+                        name="code"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center" style="gap: 0 10px">
+                    <div class="mb-3" style="width: calc(100% / 3)">
+                      <label for="price" class="form-label">Giá tiền</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="price"
+                        name="price"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                    <div class="mb-3" style="width: calc(100% / 3)">
+                      <label for="discount" class="form-label">Sale (%)</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="discount"
+                        name="discount"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                    <div class="mb-3" style="width: calc(100% / 3)">
+                      <label for="quantity" class="form-label">Số lượng</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="quantity"
+                        name="quantity"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="categoryID" class="form-label">Danh mục</label>
+                    <select
+                      class="form-control"
+                      id="categoryID"
+                      name="categoryID"
+                    ></select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="description" class="form-label">Mô tả</label>
+                    <textarea
+                      name="description"
+                      id="description"
+                      class="form-control"
+                    ></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="content" class="form-label">Nội dung</label>
+                    <textarea
+                      name="content"
+                      id="content"
+                      class="form-control"
+                    ></textarea>
+                  </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
               </form>

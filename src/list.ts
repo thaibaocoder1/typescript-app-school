@@ -1,12 +1,12 @@
 import Swal from "sweetalert2";
-import { AccessTokenData } from "./login";
-import { Carts, WhiteLists } from "./main";
+import { AccessTokenData, Carts, WhiteLists } from "./constants";
 import { Product } from "./models/Product";
 import {
   calcPrice,
   displayNumberWhitelist,
   formatCurrencyNumber,
   hideSpinner,
+  renderAccountInfo,
   showSpinner,
 } from "./utils";
 import { displayNumOrder } from "./utils/cart";
@@ -93,6 +93,15 @@ async function renderWhitelistProduct(
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);
   }
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    renderAccountInfo("account");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
   await renderWhitelistProduct(whitelist, "whitelist-product");
@@ -106,7 +115,9 @@ async function renderWhitelistProduct(
     buttonDeleteWhiteList.forEach((btn) => {
       btn.addEventListener("click", () => {
         const productID = btn.closest("div")?.dataset.id;
-        if (accessToken !== null && accessTokenAdmin === null) {
+        if (accessToken !== null && accessTokenAdmin !== null) {
+          infoUser = JSON.parse(accessToken);
+        } else if (accessToken !== null && accessTokenAdmin === null) {
           infoUser = JSON.parse(accessToken);
         } else if (accessToken === null && accessTokenAdmin !== null) {
           infoUser = JSON.parse(accessTokenAdmin);

@@ -38,8 +38,42 @@ class ProductController {
   };
   add = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const product = await Product.create(req.body);
-      res.status(StatusCodes.OK).json({
+      const { ...obj } = req.body;
+      obj.thumb = {
+        data: req.file?.originalname,
+        contentType: req.file?.mimetype,
+        fileName: `http://localhost:8888/uploads/${req.file?.originalname}`,
+      };
+      const product = await Product.create(obj);
+      res.status(StatusCodes.CREATED).json({
+        status: "success",
+        data: product,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { ...obj } = req.body;
+      const product = await Product.findById({ _id: req.params.id });
+      if (!req.files) {
+        if (JSON.stringify(req.body) !== JSON.stringify(product!.toObject())) {
+          await Product.findOneAndUpdate({ _id: req.params.id }, obj, {
+            new: true,
+          });
+        }
+      } else {
+        obj.thumb = {
+          data: req.file?.originalname,
+          contentType: req.file?.mimetype,
+          fileName: `http://localhost:8888/uploads/${req.file?.originalname}`,
+        };
+        await Product.findOneAndUpdate({ _id: req.params.id }, obj, {
+          new: true,
+        });
+      }
+      res.status(StatusCodes.CREATED).json({
         status: "success",
         data: product,
       });

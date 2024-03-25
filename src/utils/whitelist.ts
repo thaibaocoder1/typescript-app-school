@@ -16,7 +16,9 @@ export function handleWhitelist(selector: string) {
   let infoUser: AccessTokenData;
   buttonWhiteList.forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (accessToken !== null && accessTokenAdmin === null) {
+      if (accessToken !== null && accessTokenAdmin !== null) {
+        infoUser = JSON.parse(accessToken);
+      } else if (accessToken !== null && accessTokenAdmin === null) {
         infoUser = JSON.parse(accessToken);
       } else if (accessToken === null && accessTokenAdmin !== null) {
         infoUser = JSON.parse(accessTokenAdmin);

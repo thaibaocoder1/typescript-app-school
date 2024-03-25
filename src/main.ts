@@ -45,11 +45,9 @@ async function renderLatestProduct(idElement: string) {
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
-      <a href="detail.html?id=${
-        item._id
-      }"><img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
-        item.name
-      }" /></a>
+      <a href="detail.html?id=${item._id}"><img class="img-fluid w-100" src="${
+        item.thumb.fileName
+      }" alt="${item.name}" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
@@ -116,7 +114,7 @@ async function renderArrivedProduct(idElement: string) {
       >
         <a href="detail.html?id=${
           item._id
-        }"><img class="img-fluid w-100" src="img/${item.thumb.fileName}" alt="${
+        }"><img class="img-fluid w-100" src="${item.thumb.fileName}" alt="${
         item.name
       }" /></a>
       </div>
@@ -177,7 +175,7 @@ async function renderArrivedProduct(idElement: string) {
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
   if (accessToken !== null && accessTokenAdmin !== null) {
-    console.log("Chi hien thi user");
+    renderAccountInfo("account");
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");

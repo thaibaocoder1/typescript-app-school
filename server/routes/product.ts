@@ -1,10 +1,12 @@
 import express from "express";
 import { productController } from "../app/controllers/ProductController";
+import upload from "../middleware/multer";
 
 const router = express.Router();
 
 router.get("/list", productController.slug);
-router.post("/save", productController.add);
+router.post("/save", upload.single("thumb"), productController.add);
+router.patch("/update/:id", upload.single("thumb"), productController.update);
 router.get("/:id", productController.detail);
 router.get("/", productController.index);
 

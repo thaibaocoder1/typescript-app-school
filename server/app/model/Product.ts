@@ -4,6 +4,7 @@ import slugify from "slugify";
 interface Products extends Document {
   categoryID: string;
   name: string;
+  connectDB: string;
   slug: string;
   description: string;
   price: number;
@@ -21,14 +22,14 @@ const productSchema: Schema = new Schema(
   {
     categoryID: { type: Schema.Types.ObjectId, required: true, ref: "Catalog" },
     name: { type: String, required: true },
+    code: { type: String },
     slug: { type: String, unique: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
+    description: { type: String },
+    price: { type: Number },
     discount: { type: Number, default: 0 },
     thumb: { data: Buffer, contentType: String, fileName: String },
-    content: { type: String, required: true },
-    status: { type: Number, required: true },
-    quantity: { type: Number, required: true },
+    content: { type: String },
+    quantity: { type: Number },
   },
   {
     timestamps: true,

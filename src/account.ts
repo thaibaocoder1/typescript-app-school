@@ -82,15 +82,23 @@ async function displayInfoAccount(token: string, formSelector: string) {
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
   // Account
-  renderAccountInfo("account");
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    renderAccountInfo("account");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   renderSidebarAccount("sidebar-info");
   if (accessToken !== null && accessTokenAdmin !== null) {
-    console.log("Chi hien thi user");
+    await displayInfoAccount(accessToken, "form-account");
   } else {
     if (typeof accessToken === "string") {
       await displayInfoAccount(accessToken, "form-account");
     } else {
-      console.log("hien thi admin");
+      await displayInfoAccount(accessTokenAdmin as string, "form-account");
     }
   }
 })();

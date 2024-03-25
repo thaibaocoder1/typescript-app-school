@@ -6,7 +6,7 @@ import {
   paramsCart,
   renderListProductInCart,
 } from "./utils/cart";
-import { displayNumberWhitelist } from "./utils";
+import { displayNumberWhitelist, renderAccountInfo } from "./utils";
 import { toast } from "./utils/toast";
 import Swal from "sweetalert2";
 
@@ -16,11 +16,23 @@ import Swal from "sweetalert2";
   let isHasWhiteList: string | null = localStorage.getItem("whitelist");
   let cart: Carts[] = [];
   let whitelist: WhiteLists[] = [];
+  let accessToken: string | null = localStorage.getItem("accessToken");
+  let accessTokenAdmin: string | null =
+    localStorage.getItem("accessTokenAdmin");
   if (typeof isHasCart === "string") {
     cart = JSON.parse(isHasCart);
   }
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);
+  }
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    renderAccountInfo("account");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
   }
   displayNumberWhitelist("whitelist-order", whitelist);
   await renderSidebar("#sidebar-category");

@@ -207,6 +207,7 @@ class UserController {
             success: true,
             data: {
               id: user._id,
+              role: user.role,
               accessToken: newAccessToken,
               refreshToken: newRefreshToken,
               expireIns: Date.now() + 20 * 60 * 1000,

@@ -22,7 +22,7 @@ async function renderListProduct(selector: string) {
       <td>${item.discount}%</td>
       <td>${item.quantity}</td>
       <td>
-        <img src="/img/${item.thumb.fileName}" alt="${item.name}" height="80">
+        <img src="${item.thumb.fileName}" alt="${item.name}" height="80">
       </td>
       <td>${dayjs(item.createdAt).format("DD/MM/YYYY")}</td>
       <td>${dayjs(item.updatedAt).format("DD/MM/YYYY")}</td>

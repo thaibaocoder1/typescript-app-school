@@ -138,7 +138,7 @@ async function renderListProduct(params: ParamsProudct) {
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
   if (accessToken !== null && accessTokenAdmin !== null) {
-    console.log("Chi hien thi user");
+    renderAccountInfo("account");
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");

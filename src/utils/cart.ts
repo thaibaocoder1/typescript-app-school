@@ -25,17 +25,18 @@ export async function renderListProductInCart(
   const subTotalCart = document.getElementById(
     params.subtotalElement
   ) as HTMLElement;
-  // const totalCart = document.getElementById(params.totalElement) as HTMLElement;
+  const totalCart = document.getElementById(params.totalElement) as HTMLElement;
   const numOrderCart = document.getElementById(
     params.numOrderElement
   ) as HTMLElement;
   let totalQuantity: number = 0;
   let subtotal: number = 0;
-  // let total: number = 0;
+  let total: number = 0;
   try {
     if (cart.length > 0) {
       cart.forEach(async (item) => {
         subtotal += item.price * item.quantity;
+        total += item.price * item.quantity;
         totalQuantity += item.quantity;
         const product = await Product.loadOne(item.productID);
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
@@ -83,6 +84,7 @@ export async function renderListProductInCart(
       `;
         tableBody.appendChild(tableRow);
         subTotalCart.innerText = formatCurrencyNumber(subtotal);
+        totalCart.innerText = formatCurrencyNumber(total);
         numOrderCart.innerText = `${totalQuantity}`;
       });
     } else {
