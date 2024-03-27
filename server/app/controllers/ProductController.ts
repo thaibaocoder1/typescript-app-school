@@ -7,9 +7,7 @@ class ProductController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const queryObj = { ...req.query };
-      const excludeFields = ["page", "sort", "limit", "fields"];
-      excludeFields.forEach((el) => delete queryObj[el]);
-      const query = Product.find(queryObj);
+      const query = Product.find(queryObj).sort("-updatedAt");
       const products = await query;
       if (products?.length === 0) {
         throw new Error("Products list is empty!");

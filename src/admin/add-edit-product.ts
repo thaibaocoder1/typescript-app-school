@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import { Product, ProductProps } from "../models/Product";
 import {
   initLogout,
@@ -69,6 +70,16 @@ function jsonToFormData(values: FormValues) {
     if (key === "thumb" && typeof values[key] === "object") {
       const file = values[key] as File;
       formData.append(key, file);
+    } else if (key === "name" && typeof values[key] === "string") {
+      formData.append(key, String(values[key]));
+      formData.append(
+        "slug",
+        slugify(values[key] as string, {
+          lower: true,
+          locale: "vi",
+          trim: true,
+        })
+      );
     } else {
       formData.append(key, String(values[key]));
     }
@@ -146,7 +157,7 @@ async function handleOnSubmit(params: ParamsSubmit) {
           toast.success("Chỉnh sửa sản phẩm thành công");
           setTimeout(() => {
             window.location.assign("/admin/list-product.html");
-          }, 2000);
+          }, 1000);
         }
       } else {
         const res = await Product.saveFormData(formData);
@@ -154,7 +165,7 @@ async function handleOnSubmit(params: ParamsSubmit) {
           toast.success("Thêm mới sản phẩm thành công");
           setTimeout(() => {
             window.location.assign("/admin/list-product.html");
-          }, 2000);
+          }, 1000);
         }
       }
     } catch (error) {

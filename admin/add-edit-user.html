@@ -446,7 +446,7 @@
                   class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                   aria-labelledby="userDropdown"
                 >
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="profile.html">
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                   </a>
@@ -486,78 +486,98 @@
             <!-- Content Row -->
             <div class="row">
               <form
-                class="w-100 ml-3 mb-3"
+                class="w-100 ml-3 mb-3 row"
                 method="POST"
                 enctype="multipart/form-data"
                 id="form-product"
+                novalidate
               >
-                <div class="mb-3">
+                <div class="col col-lg-4">
                   <div class="mb-3">
-                    <label for="fullname" class="form-label">Họ và tên</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="fullname"
-                      name="fullname"
-                    />
-                  </div>
-                  <label for="username" class="form-label">Tên đăng nhập</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="username"
-                    name="username"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="phone" class="form-label">Số điện thoại</label>
-                  <input
-                    type="tel-"
-                    class="form-control"
-                    id="phone"
-                    name="phone"
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="role" class="form-label">Vai trò</label>
-                  <select class="form-control" id="role" name="role"></select>
-                </div>
-                <div class="mb-3">
-                  <label for="image" class="form-label">Hình ảnh</label>
-                  <div class="d-flex justify-content-between">
-                    <div class="input-group mb-3 w-75">
+                    <label for="image" class="form-label">Hình ảnh</label>
+                    <div class="input-group mb-3 w-100">
                       <input
-                        class="form-control"
+                        class="form-control w-100"
                         type="file"
                         id="image"
+                        style="height: 45px"
                         name="imageUrl"
                         accept="image/*"
                       />
+                      <span class="invalid-feedback"></span>
                     </div>
                     <img
-                      src="https://placehold.co/200x200"
-                      style="
-                        width: 200px;
-                        height: 200px;
-                        border-radius: 50%;
-                        object-fit: cover;
-                      "
-                      class="img-thumbnail"
+                      src=""
+                      class="img-thumbnail w-100 rounded-left rounded-right"
+                      style="height: 250px; object-fit: cover; display: block"
                       id="imageUrl"
-                      alt=""
+                      alt="Avatar"
                     />
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                <main class="col col-lg-8">
+                  <div class="d-flex" style="gap: 0 10px">
+                    <div class="mb-3 w-50">
+                      <label for="fullname" class="form-label">Họ và tên</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="fullname"
+                        name="fullname"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                    <div class="mb-3 w-50">
+                      <label for="email" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex" style="gap: 0 10px">
+                    <div class="mb-3 w-50">
+                      <label for="phone" class="form-label"
+                        >Số điện thoại</label
+                      >
+                      <input
+                        type="tel-"
+                        class="form-control"
+                        id="phone"
+                        name="phone"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                    <div class="mb-3 w-50">
+                      <label for="username" class="form-label"
+                        >Tên đăng nhập</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                      />
+                      <span class="invalid-feedback"></span>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="mb-3 w-100">
+                      <label for="role" class="form-label">Vai trò</label>
+                      <select
+                        class="form-control"
+                        id="role"
+                        name="role"
+                      ></select>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    Cập nhật
+                  </button>
+                </main>
               </form>
             </div>
           </div>

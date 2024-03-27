@@ -1,6 +1,14 @@
 import { AccessTokenData } from "../constants";
 import { User } from "../models/User";
-import { setBackgroundImage, setFieldValue, initLogout, toast } from "../utils";
+import {
+  setBackgroundImage,
+  setFieldValue,
+  initLogout,
+  toast,
+  showSpinner,
+  hideSpinner,
+} from "../utils";
+import { setFormValues } from "./add-edit-user";
 
 // functions
 async function initFormAccount(info: AccessTokenData) {
@@ -15,18 +23,22 @@ async function initFormAccount(info: AccessTokenData) {
       setFieldValue(formEl, "[name='email']", user?.email);
       setFieldValue(formEl, "[name='phone']", user?.phone);
       setFieldValue(formEl, "[name='role']", user?.role);
-      setBackgroundImage(
-        formEl,
-        ".img-fluid",
-        `${
-          user?.imageUrl.fileName.includes("https")
-            ? user?.imageUrl.fileName
-            : `/img/${user?.imageUrl.fileName}`
-        }`
-      );
+      setBackgroundImage(formEl, ".img-fluid", `${user?.imageUrl.fileName}`);
     }
   } catch (error) {
     toast.error("Có lỗi trong khi truy vấn");
+  }
+}
+async function initFormUpdate(selector: string, infoUser: AccessTokenData) {
+  const form = document.getElementById(selector) as HTMLFormElement;
+  if (!infoUser || !form) return;
+  try {
+    const info = await User.loadOne(infoUser.id);
+    if (info) {
+      setFormValues(form, info);
+    }
+  } catch (error) {
+    toast.error("Có lỗi trong khi xử lý");
   }
 }
 // main
@@ -39,4 +51,10 @@ async function initFormAccount(info: AccessTokenData) {
     await initFormAccount(infoUser);
     initLogout("logout-btn");
   }
+  document.addEventListener("click", async (e: Event) => {
+    const target = e.target as HTMLElement;
+    if (target.matches(".btn-update")) {
+      await initFormUpdate("form-user", infoUser);
+    }
+  });
 })();

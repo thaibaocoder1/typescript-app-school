@@ -17,7 +17,7 @@ export function handleViewModal(selecotor: string) {
           ".modal-body"
         ) as HTMLDivElement;
         modalBodyEl.innerHTML = `<div class="d-flex flex-column">
-        <img src="./img/${product.thumb.fileName}" class="img-fluid" alt="${
+        <img src="${product.thumb.fileName}" class="img-fluid" alt="${
           product.name
         }" />
         <div class="modal-body-inner">

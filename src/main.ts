@@ -45,7 +45,9 @@ async function renderLatestProduct(idElement: string) {
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
-      <a href="detail.html?id=${item._id}"><img class="img-fluid w-100" src="${
+      <a href="detail.html?id=${
+        item._id
+      }"><img class="img-fluid w-100" style="height: 220px; object-fit: contain; margin: 0 auto;" src="${
         item.thumb.fileName
       }" alt="${item.name}" /></a>
       </div>
@@ -114,9 +116,9 @@ async function renderArrivedProduct(idElement: string) {
       >
         <a href="detail.html?id=${
           item._id
-        }"><img class="img-fluid w-100" src="${item.thumb.fileName}" alt="${
-        item.name
-      }" /></a>
+        }"><img class="img-fluid w-100" style="height: 220px; object-fit: contain; margin: 0 auto;" src="${
+        item.thumb.fileName
+      }" alt="${item.name}" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"

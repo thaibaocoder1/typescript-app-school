@@ -16,7 +16,6 @@ async function renderListCategory(selector: string) {
       users.forEach((item: UserProps, index: number) => {
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
         tableRow.innerHTML = `<th scope="row">${index + 1}</th>
-        <td>${item._id}</td>
         <td>${item.fullname}</td>
         <td>${item.username}</td>
         <td>${item.email}</td>

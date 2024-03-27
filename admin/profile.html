@@ -446,7 +446,7 @@
                   class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                   aria-labelledby="userDropdown"
                 >
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="profile.html">
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                   </a>
@@ -496,7 +496,7 @@
                     <img
                       src=""
                       class="img-fluid"
-                      alt="..."
+                      alt="Avatar"
                       style="
                         border-radius: 50%;
                         width: 250px;
@@ -570,10 +570,21 @@
                     </div>
                   </div>
                 </section>
-                <button type="submit" class="btn btn-primary ml-auto d-block">
-                  Chỉnh sửa thông tin
-                </button>
               </form>
+              <div
+                class="actions d-flex w-100 justify-content-end"
+                style="gap: 0 10px"
+              >
+                <button
+                  type="button"
+                  class="btn btn-primary btn-update"
+                  data-toggle="modal"
+                  data-target="#updateModal"
+                >
+                  Cập nhật thông tin
+                </button>
+                <button class="btn btn-primary d-block">Đổi mật khẩu</button>
+              </div>
             </div>
           </div>
           <!-- /.container-fluid -->
@@ -635,6 +646,153 @@
               Cancel
             </button>
             <a class="btn btn-primary" href="" id="logout-btn">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Modal-->
+    <div
+      class="modal fade"
+      id="updateModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Thông tin tài khoản
+            </h5>
+            <button
+              class="close"
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form
+              class="w-100 ml-3 mb-3 row"
+              method="POST"
+              enctype="multipart/form-data"
+              id="form-user"
+              novalidate
+            >
+              <div class="col col-lg-4">
+                <div class="mb-3">
+                  <label for="image" class="form-label">Hình ảnh</label>
+                  <div class="input-group mb-3 w-100">
+                    <input
+                      class="form-control w-100"
+                      type="file"
+                      id="image"
+                      style="height: 45px"
+                      name="imageUrl"
+                      accept="image/*"
+                    />
+                    <span class="invalid-feedback"></span>
+                  </div>
+                  <img
+                    src=""
+                    class="img-thumbnail w-100 rounded-left rounded-right"
+                    style="height: 250px; object-fit: cover; display: block"
+                    id="imageUrl"
+                    alt="Avatar"
+                  />
+                </div>
+              </div>
+              <main class="col col-lg-8">
+                <div class="d-flex" style="gap: 0 10px">
+                  <div class="mb-3 w-50">
+                    <label for="fullname" class="form-label">Họ và tên</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="fullname"
+                      name="fullname"
+                    />
+                    <span class="invalid-feedback"></span>
+                  </div>
+                  <div class="mb-3 w-50">
+                    <label for="email" class="form-label">Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                    />
+                    <span class="invalid-feedback"></span>
+                  </div>
+                </div>
+                <div class="d-flex" style="gap: 0 10px">
+                  <div class="mb-3 w-50">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <input
+                      type="tel-"
+                      class="form-control"
+                      id="phone"
+                      name="phone"
+                    />
+                    <span class="invalid-feedback"></span>
+                  </div>
+                  <div class="mb-3 w-50">
+                    <label for="username" class="form-label"
+                      >Tên đăng nhập</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      name="username"
+                    />
+                    <span class="invalid-feedback"></span>
+                  </div>
+                </div>
+                <div class="d-flex">
+                  <div class="mb-3 w-100">
+                    <label for="role" class="form-label">Vai trò</label>
+                    <select class="form-control" id="role" name="role"></select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+              </main>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Modal-->
+    <div
+      class="modal fade"
+      id="updateModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Thông tin tài khoản
+            </h5>
+            <button
+              class="close"
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Doi mat khau</p>
           </div>
         </div>
       </div>

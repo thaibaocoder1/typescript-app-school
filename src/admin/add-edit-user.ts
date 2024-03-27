@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { User, UserProps } from "../models/User";
-import { initLogout, setBackgroundImage, setFieldValue } from "../utils";
+import {
+  initLogout,
+  setBackgroundImage,
+  setFieldValue,
+  setTextContent,
+} from "../utils";
 import { toast } from "../utils/toast";
 import { Buffer } from "buffer";
 
@@ -17,10 +22,12 @@ type FormValues = {
 function getSchema() {
   return z
     .object({
-      username: z.string().trim().min(5),
-      fullname: z.string(),
+      username: z.string().trim().min(2),
+      fullname: z.string().trim().min(2),
       email: z.string().email(),
-      phone: z.string(),
+      phone: z.string().regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, {
+        message: "Phone is invalid",
+      }),
       role: z.literal("User").or(z.literal("Admin")),
     })
     .required();
@@ -34,7 +41,10 @@ async function handleLoadItem(id: string) {
     console.log("Error", error);
   }
 }
-function setFormValues(element: HTMLFormElement, defaultValues: UserProps) {
+export function setFormValues(
+  element: HTMLFormElement,
+  defaultValues: UserProps
+) {
   setFieldValue(element, "[name='username']", defaultValues?.username);
   setFieldValue(element, "[name='fullname']", defaultValues?.fullname);
   setFieldValue(element, "[name='email']", defaultValues?.email);
@@ -42,11 +52,7 @@ function setFormValues(element: HTMLFormElement, defaultValues: UserProps) {
   setBackgroundImage(
     element,
     "img#imageUrl",
-    `${
-      defaultValues.imageUrl.fileName.includes("http")
-        ? defaultValues.imageUrl.fileName
-        : `/img/${defaultValues?.imageUrl.fileName}`
-    }`
+    `${defaultValues.imageUrl.fileName || "https://placehold.co/250x250"}`
   );
 }
 function getFormValues(form: HTMLFormElement): FormValues {
@@ -69,15 +75,35 @@ function jsonToFormData(values: FormValues): FormData {
   }
   return formData;
 }
-async function validateForm(formValues: FormValues) {
+function setFieldError(form: HTMLFormElement, name: string, error: string) {
+  const element = form.querySelector(
+    `input[name='${name}']`
+  ) as HTMLInputElement;
+  if (element) {
+    element.setCustomValidity(error);
+    setTextContent(element.parentElement!, ".invalid-feedback", error);
+  }
+}
+async function validateForm(form: HTMLFormElement, formValues: FormValues) {
   try {
+    ["fullname", "email", "phone", "username", "role"].forEach((name) =>
+      setFieldError(form, name, "")
+    );
     const schema = getSchema();
-    const validUser = schema.parse(formValues);
-    return validUser;
+    const isValid = schema.safeParse(formValues);
+    if (!isValid.success) {
+      const formatted = isValid.error.issues;
+      formatted.forEach((item) => {
+        setFieldError(form, item.path[0] as string, item.message);
+      });
+    }
   } catch (error) {
     toast.error("Có lỗi. Vui lòng kiểm tra lại!");
     return;
   }
+  const isValid = form.checkValidity();
+  if (!isValid) form.classList.add("was-validated");
+  return isValid;
 }
 function initPostImage(form: HTMLFormElement, selector: string) {
   const inputFile = document.querySelector(
@@ -106,7 +132,7 @@ async function initForm(params: ParamsSubmit) {
   form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
     const formValues = getFormValues(form);
-    const isValid = await validateForm(formValues);
+    const isValid = await validateForm(form, formValues);
     if (!isValid) return;
     const formData = jsonToFormData(formValues);
     formData.append("id", params.values._id);

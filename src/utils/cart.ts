@@ -43,7 +43,7 @@ export async function renderListProductInCart(
         tableRow.dataset.id = item.productID;
         tableRow.innerHTML = `
         <td class="align-middle" style="text-align: left;">
-          <img src="img/${product.thumb.fileName}" alt="${
+          <img src="${product.thumb.fileName}" alt="${
           product.name
         }" style="width: 50px" />
         ${product.name}

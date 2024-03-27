@@ -103,7 +103,7 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
     </div>
   </div>`;
   thumbnailProduct.innerHTML = `<div class="carousel-item active">
-  <img class="w-100 h-100" src="img/${params.productInfo.thumb.fileName}" alt="${params.productInfo.name}" />
+  <img class="w-100 h-100" src="${params.productInfo.thumb.fileName}" alt="${params.productInfo.name}" />
   </div>`;
   contentProduct.innerHTML = `<p>${params.productInfo.content}</p>`;
 }
