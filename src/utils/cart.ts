@@ -1,13 +1,21 @@
 import { calcPrice, formatCurrencyNumber } from "./format";
 import { Params, Carts } from "../constants";
 import { Product } from "../models/Product";
+import Swal from "sweetalert2";
+import { toast } from ".";
 
-type ParamsCart = {
+export type ParamsCart = {
   [k: string]: string;
+};
+export const paramsQuantity: ParamsCart = {
+  subTotal: "subtotal-cart",
+  total: "total-cart",
+  ship: "ship-cost",
 };
 export const paramsCart: ParamsCart = {
   tableElement: "#table-cart",
   subtotalElement: "subtotal-cart",
+  shipElement: "#ship-cost",
   totalElement: "total-cart",
   numOrderElement: "num-order",
 };
@@ -26,17 +34,22 @@ export async function renderListProductInCart(
     params.subtotalElement
   ) as HTMLElement;
   const totalCart = document.getElementById(params.totalElement) as HTMLElement;
+  const shipCostElement = document.querySelector(
+    params.shipElement
+  ) as HTMLElement;
   const numOrderCart = document.getElementById(
     params.numOrderElement
   ) as HTMLElement;
   let totalQuantity: number = 0;
   let subtotal: number = 0;
   let total: number = 0;
+  let shipping: number = 0;
   try {
     if (cart.length > 0) {
       cart.forEach(async (item) => {
         subtotal += item.price * item.quantity;
-        total += item.price * item.quantity;
+        shipping += item.quantity * 5000;
+        total = subtotal + shipping;
         totalQuantity += item.quantity;
         const product = await Product.loadOne(item.productID);
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
@@ -71,7 +84,7 @@ export async function renderListProductInCart(
             </div>
           </div>
         </td>
-        <td class="align-middle">${formatCurrencyNumber(
+        <td class="align-middle" id="subtotal-product">${formatCurrencyNumber(
           item.price * item.quantity
         )}</td>
         <td class="align-middle">
@@ -84,6 +97,7 @@ export async function renderListProductInCart(
       `;
         tableBody.appendChild(tableRow);
         subTotalCart.innerText = formatCurrencyNumber(subtotal);
+        shipCostElement.innerText = formatCurrencyNumber(shipping);
         totalCart.innerText = formatCurrencyNumber(total);
         numOrderCart.innerText = `${totalQuantity}`;
       });
@@ -135,35 +149,86 @@ export function displayNumOrder(selector: string, cart: Carts[]): void {
 export function addCartToStorage(cartCopy: Carts[]): void {
   return localStorage.setItem("cart", JSON.stringify(cartCopy));
 }
-export function calcTotalCart(selector: string, cart: Carts[]): void {
-  const subtotalElement = document.getElementById(selector) as HTMLDivElement;
+export function calcTotalCart(params: ParamsCart, cart: Carts[]): void {
+  const subtotalElement = document.getElementById(
+    params.subTotal
+  ) as HTMLElement;
+  const totalElement = document.getElementById(params.total) as HTMLElement;
+  const shippingElement = document.getElementById(params.ship) as HTMLElement;
   if (!subtotalElement) return;
   const subtotal: number = cart.reduce((sum, item) => {
     return sum + item.quantity * item.price;
   }, 0);
+  const shipCost: number = cart.reduce((total, item) => {
+    return total + item.quantity * 5000;
+  }, 0);
+  const sum: number = subtotal + shipCost;
   subtotalElement.innerText = `${formatCurrencyNumber(subtotal)}`;
+  shippingElement.innerText = `${formatCurrencyNumber(shipCost)}`;
+  totalElement.innerText = `${formatCurrencyNumber(sum)}`;
 }
-export async function handleChangeQuantity(type: string, cart: Carts[]) {
-  const inputElement = document.querySelector(
-    "input[name='quantity']"
-  ) as HTMLInputElement;
-  if (!inputElement) return;
+export async function handleChangeQuantity(
+  type: string,
+  inputElement: HTMLInputElement,
+  cart: Carts[]
+) {
   const productID = <string>inputElement.dataset.id;
   const index: number = cart.findIndex((x) => x.productID === productID);
-  const currentValue = Number.parseInt(inputElement.value, 10);
+  let currentValue = Number.parseInt(inputElement.value, 10);
   switch (type) {
     case "plus":
       if (index >= 0) {
         inputElement.value = (currentValue + 1).toString();
-        console.log(currentValue);
-        cart[index].quantity = currentValue;
-        console.log(cart);
+        cart[index].quantity = Number(inputElement.value);
       }
       break;
     case "minus":
-      inputElement.value = Math.max(currentValue - 1, 1).toString();
+      if (index >= 0) {
+        let minValue = currentValue - 1;
+        if (minValue === 0) {
+          Swal.fire({
+            title: "Xoá sản phẩm này?",
+            text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Xác nhận",
+            cancelButtonText: "Huỷ bỏ",
+          }).then(function (result) {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: "Xoá thành công sản phẩm!",
+                text: "Vào shop để chọn lại sản phẩm khác!",
+                icon: "success",
+              }).then(async function () {
+                cart.splice(index, 1);
+                const item =
+                  inputElement.parentElement?.parentElement?.parentElement;
+                item && item.remove();
+                toast.success("Xoá thành công sản phẩm");
+                addCartToStorage(cart);
+                calcTotalCart(paramsQuantity, cart);
+                if (cart.length === 0) {
+                  toast.info("Giỏ hàng trống");
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 500);
+                }
+              });
+            } else {
+              inputElement.value = "1";
+            }
+          });
+        } else {
+          inputElement.value = minValue.toString();
+          cart[index].quantity = minValue;
+        }
+      }
       break;
     default:
       break;
   }
+  addCartToStorage(cart);
+  return cart;
 }

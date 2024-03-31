@@ -3,6 +3,7 @@ import { Product, ProductProps } from "../models/Product";
 import {
   initLogout,
   setBackgroundImage,
+  setFieldError,
   setFieldValue,
   setTextContent,
   toast,
@@ -10,16 +11,23 @@ import {
 import { z } from "zod";
 import { Buffer } from "buffer";
 import { Catalog, CatalogProps } from "../models/Catalog";
+import { FormValues } from "../constants";
 
 // type
 type ParamsSubmit = {
   selector: string;
   id?: string | null;
 };
-type FormValues = {
-  [key in string]: string | number | File;
-};
 // functions
+async function getOneProduct(id: string) {
+  if (!id) return;
+  try {
+    const infoProduct = await Product.loadOne(id);
+    return infoProduct;
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
 function getSchema() {
   return z.object({
     name: z.string().trim().min(5),
@@ -30,15 +38,6 @@ function getSchema() {
     description: z.string(),
     content: z.string(),
   });
-}
-async function handleItemProduct(id: string) {
-  if (!id) return;
-  try {
-    const infoProduct = await Product.loadOne(id);
-    return infoProduct;
-  } catch (error) {
-    console.log("Error", error);
-  }
 }
 function setFormValues(element: HTMLFormElement, info: ProductProps) {
   setFieldValue(element, "[name='name']", info?.name);
@@ -86,19 +85,6 @@ function jsonToFormData(values: FormValues) {
   }
   return formData;
 }
-export function setFieldError(
-  form: HTMLFormElement,
-  name: string,
-  error: string
-) {
-  const element = form.querySelector(
-    `input[name='${name}']`
-  ) as HTMLInputElement;
-  if (element) {
-    element.setCustomValidity(error);
-    setTextContent(element.parentElement!, ".invalid-feedback", error);
-  }
-}
 async function validateForm(form: HTMLFormElement, formValues: FormValues) {
   try {
     ["name", "code", "price", "discount", "quantity"].forEach((name) =>
@@ -139,7 +125,7 @@ async function handleOnSubmit(params: ParamsSubmit) {
   const form = document.getElementById(params.selector) as HTMLFormElement;
   if (!form) return;
   if (params.id) {
-    const info = (await handleItemProduct(params.id)) as ProductProps;
+    const info = (await getOneProduct(params.id)) as ProductProps;
     setFormValues(form, info);
   }
   initUploadImage(form);
@@ -202,7 +188,7 @@ async function renderListCategory(
   let emptyProduct: ProductProps;
   if (typeof productID === "string") {
     heading.textContent = "Trang sửa sản phẩm";
-    emptyProduct = (await handleItemProduct(productID)) as ProductProps;
+    emptyProduct = (await getOneProduct(productID)) as ProductProps;
   } else {
     emptyProduct = {
       _id: "",

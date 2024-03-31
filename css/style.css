@@ -10109,3 +10109,7 @@ a.text-dark:focus {
 .card-modal:hover {
   z-index: 30;
 }
+button > i {
+  pointer-events: none;
+  user-select: none;
+}

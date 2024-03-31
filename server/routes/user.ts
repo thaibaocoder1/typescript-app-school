@@ -12,6 +12,7 @@ router.get("/logout/:id", userController.logout);
 
 router.post("/save", upload.single("imageUrl"), userController.add);
 router.patch("/update/:id", upload.single("imageUrl"), userController.update);
+router.patch("/update-fields/:id", userController.updateFields);
 router.get("/:id", userController.detail);
 router.get("/", userController.index);
 

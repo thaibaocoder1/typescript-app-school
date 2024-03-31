@@ -19,7 +19,7 @@ async function renderListCategory(selector: string) {
         <td>${item.fullname}</td>
         <td>${item.username}</td>
         <td>${item.email}</td>
-        <td>0${item.phone}</td>
+        <td>${item.phone}</td>
         <td>${item.role}</td>
         <td>
           <button class="btn btn-primary btn-sm" data-id=${

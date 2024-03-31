@@ -52,3 +52,16 @@ export function displayNumberWhitelist(
   }
   numOrderElement.innerText = `${quantity}`;
 }
+export function setFieldError(
+  form: HTMLFormElement,
+  name: string,
+  error: string
+) {
+  const element = form.querySelector(
+    `input[name='${name}']`
+  ) as HTMLInputElement;
+  if (element) {
+    element.setCustomValidity(error);
+    setTextContent(element.parentElement!, ".invalid-feedback", error);
+  }
+}

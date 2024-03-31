@@ -4,7 +4,7 @@ interface Users extends Document {
   fullname: string;
   username: string;
   email: string;
-  phone: number;
+  phone: string;
   password: string;
   password_confirmation: string;
   role: string;
@@ -31,7 +31,7 @@ const userSchema = new Schema<Users>(
       trim: true,
     },
     phone: {
-      type: Number,
+      type: String,
       required: [true, "Phone should not be empty!"],
     },
     password: {

@@ -7,7 +7,7 @@ class ProductController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const queryObj = { ...req.query };
-      const query = Product.find(queryObj).sort("-updatedAt");
+      const query = Product.find(queryObj).sort("-createdAt");
       const products = await query;
       if (products?.length === 0) {
         throw new Error("Products list is empty!");

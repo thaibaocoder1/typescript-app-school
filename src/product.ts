@@ -6,14 +6,16 @@ import {
   sweetAlert,
   displayNumberWhitelist,
   renderAccountInfo,
+  addProductToCart,
+  displayNumOrder,
+  handleViewModal,
+  toast,
+  handleWhitelist,
 } from "./utils";
 import { CatalogProps, Catalog } from "./models/Catalog";
 import { ProductProps, Product } from "./models/Product";
-import { addProductToCart, displayNumOrder } from "./utils/cart";
-import { toast } from "./utils/toast";
-import { handleWhitelist } from "./utils/whitelist";
 import { Carts, Params, ParamsProudct, WhiteLists } from "./constants";
-import { handleViewModal } from "./utils/modal";
+import debounce from "debounce";
 
 // functions
 async function renderSidebar(idElement: string) {
@@ -35,14 +37,11 @@ async function renderSidebar(idElement: string) {
     console.log(error);
   }
 }
-async function renderListProduct(params: ParamsProudct) {
+async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
   const listProductEl = document.querySelector(params.idElement) as HTMLElement;
   if (!listProductEl) return;
   listProductEl.textContent = "";
   try {
-    showSpinner();
-    const data = await Product.loadAll();
-    hideSpinner();
     let products = [...data];
     if (params.slug) {
       showSpinner();
@@ -75,9 +74,9 @@ async function renderListProduct(params: ParamsProudct) {
             class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
           >
             <a href="detail.html?id=${item._id}">
-            <img class="img-fluid w-100" src="img/${
+            <img class="img-fluid w-100" style="height: 220px; object-fit: contain;" src="${
               item.thumb.fileName
-            }" alt="/${item.name}" />
+            }" alt="${item.name}" />
             </a>
           </div>
           <div
@@ -120,6 +119,32 @@ async function renderListProduct(params: ParamsProudct) {
     console.log(error);
   }
 }
+function initSearch(selector: string) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceSearch = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const value = target.value;
+      const res = await Product.loadAll();
+      const dataApply = res.filter((item) =>
+        item.name.toLowerCase().includes(value.toLowerCase())
+      );
+      if (Array.isArray(dataApply) && dataApply.length > 0) {
+        const searchParamsURL: URLSearchParams = new URLSearchParams(
+          location.search
+        );
+        const slug: string | null = searchParamsURL.get("slug");
+        const paramsFn: ParamsProudct = {
+          idElement: "#list-product",
+          slug: slug,
+        };
+        renderListProduct(paramsFn, dataApply);
+      }
+    }, 500);
+    inputSearch.addEventListener("input", debounceSearch);
+  }
+}
+
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -153,7 +178,10 @@ async function renderListProduct(params: ParamsProudct) {
     slug: slug,
   };
   renderSidebar("#sidebar-category");
-  await renderListProduct(paramsFn);
+  showSpinner();
+  const data = await Product.loadAll();
+  hideSpinner();
+  await renderListProduct(paramsFn, data);
   // Handle cart
   const buttonCart = document.querySelectorAll(
     "#btn-cart"
@@ -177,4 +205,22 @@ async function renderListProduct(params: ParamsProudct) {
   // Handle whitelist
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
+  // Search
+  initSearch("search");
+  // Hash
+  let productApply: ProductProps[];
+  window.addEventListener("hashchange", async (e: HashChangeEvent) => {
+    const newURL = e.newURL;
+    showSpinner();
+    const products = await Product.loadAll();
+    hideSpinner();
+    if (newURL.indexOf("increase") >= 0) {
+      productApply = products.sort((a, b) => a.price - b.price);
+    } else if (newURL.indexOf("decrease") >= 0) {
+      productApply = products.sort((a, b) => b.price - a.price);
+    } else {
+      productApply = products.sort((a, b) => b.discount - a.discount);
+    }
+    await renderListProduct(paramsFn, productApply);
+  });
 })();

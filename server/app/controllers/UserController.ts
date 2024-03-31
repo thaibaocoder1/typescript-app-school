@@ -85,6 +85,29 @@ class UserController {
       next(error);
     }
   };
+  updateFields = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findById({ _id: req.params.id });
+      const { old_password, password, confirm_password } = req.body;
+      if (user?.password === old_password) {
+        await User.findByIdAndUpdate(
+          { _id: req.params.id },
+          { password, password_confirmation: confirm_password }
+        );
+        res.status(StatusCodes.CREATED).json({
+          status: "success",
+          message: "Change password success!",
+        });
+      } else {
+        res.status(StatusCodes.BAD_REQUEST).json({
+          status: "failed",
+          message: "Password not match!!",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
   check = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;

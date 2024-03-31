@@ -3,11 +3,12 @@ import { User, UserProps } from "../models/User";
 import {
   initLogout,
   setBackgroundImage,
+  setFieldError,
   setFieldValue,
-  setTextContent,
+  toast,
 } from "../utils";
-import { toast } from "../utils/toast";
 import { Buffer } from "buffer";
+import { FormValues } from "../constants";
 
 // type
 type ParamsSubmit = {
@@ -15,10 +16,16 @@ type ParamsSubmit = {
   id?: string | null;
   values: UserProps;
 };
-type FormValues = {
-  [key in string]: string | number | File;
-};
 // functions
+async function getOneUser(id: string) {
+  if (!id) return;
+  try {
+    const info = await User.loadOne(id);
+    return info;
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
 function getSchema() {
   return z
     .object({
@@ -31,15 +38,6 @@ function getSchema() {
       role: z.literal("User").or(z.literal("Admin")),
     })
     .required();
-}
-async function handleLoadItem(id: string) {
-  if (!id) return;
-  try {
-    const info = await User.loadOne(id);
-    return info;
-  } catch (error) {
-    console.log("Error", error);
-  }
 }
 export function setFormValues(
   element: HTMLFormElement,
@@ -74,15 +72,6 @@ function jsonToFormData(values: FormValues): FormData {
     }
   }
   return formData;
-}
-function setFieldError(form: HTMLFormElement, name: string, error: string) {
-  const element = form.querySelector(
-    `input[name='${name}']`
-  ) as HTMLInputElement;
-  if (element) {
-    element.setCustomValidity(error);
-    setTextContent(element.parentElement!, ".invalid-feedback", error);
-  }
 }
 async function validateForm(form: HTMLFormElement, formValues: FormValues) {
   try {
@@ -191,7 +180,7 @@ async function initSelectRole(selector: string, values: UserProps) {
   let emptyUser: UserProps;
   if (typeof userID === "string") {
     heading.textContent = "Trang sửa khách hàng";
-    emptyUser = (await handleLoadItem(userID)) as UserProps;
+    emptyUser = (await getOneUser(userID)) as UserProps;
   } else {
     emptyUser = {
       _id: "",

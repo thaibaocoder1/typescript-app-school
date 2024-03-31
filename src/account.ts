@@ -1,5 +1,5 @@
 import { AccessTokenData, Carts, WhiteLists } from "./constants";
-import { User } from "./models/User";
+import { User, UserProps } from "./models/User";
 import {
   deleteCookie,
   displayNumberWhitelist,
@@ -9,10 +9,20 @@ import {
   setFieldValue,
   showSpinner,
 } from "./utils";
-import { renderAccountInfo, renderSidebarAccount } from "./utils/account";
+import {
+  initChangeForm,
+  initUpdateForm,
+  renderAccountInfo,
+  renderSidebarAccount,
+} from "./utils/account";
 import { displayNumOrder } from "./utils/cart";
 import { toast } from "./utils/toast";
 
+// types
+export type UserData = {
+  data: Partial<UserProps>;
+  selector: string;
+};
 // functions
 async function displayInfoAccount(token: string, formSelector: string) {
   try {
@@ -101,4 +111,61 @@ async function displayInfoAccount(token: string, formSelector: string) {
       await displayInfoAccount(accessTokenAdmin as string, "form-account");
     }
   }
+
+  window.addEventListener("click", async (e: Event) => {
+    const target = e.target as HTMLElement;
+    const updateModal = document.getElementById(
+      "update-modal"
+    ) as HTMLDivElement;
+    const changeModal = document.getElementById(
+      "change-modal"
+    ) as HTMLDivElement;
+    const formUpdate = document.getElementById(
+      "form-update"
+    ) as HTMLFormElement;
+    if (target.matches("a.change-infomation")) {
+      e.preventDefault();
+      updateModal && updateModal.classList.add("is-show");
+      if (accessToken && accessToken !== null) {
+        const token: AccessTokenData = JSON.parse(accessToken);
+        showSpinner();
+        const user = await User.loadOne(token.id);
+        hideSpinner();
+        if (user) {
+          setFieldValue(formUpdate, "[name='fullname']", user?.fullname);
+          setFieldValue(formUpdate, "[name='username']", user?.username);
+          setFieldValue(formUpdate, "[name='email']", user?.email);
+          setFieldValue(formUpdate, "[name='phone']", user?.phone);
+          setBackgroundImage(
+            formUpdate,
+            ".img-thumbnail",
+            user?.imageUrl.fileName
+          );
+          const params: UserData = {
+            data: user,
+            selector: "form-update",
+          };
+          initUpdateForm(params);
+        }
+      }
+    } else if (target.matches("a.update-password")) {
+      e.preventDefault();
+      changeModal && changeModal.classList.add("is-show");
+      if (accessToken && accessToken !== null) {
+        const token: AccessTokenData = JSON.parse(accessToken);
+        showSpinner();
+        const user = await User.loadOne(token.id);
+        hideSpinner();
+        if (user) {
+          initChangeForm("form-change", user._id);
+        }
+      }
+    } else if (target.matches(".modal")) {
+      updateModal && updateModal.classList.remove("is-show");
+      changeModal && changeModal.classList.remove("is-show");
+    } else if (target.matches("button.btn-close")) {
+      updateModal && updateModal.classList.remove("is-show");
+      changeModal && changeModal.classList.remove("is-show");
+    }
+  });
 })();

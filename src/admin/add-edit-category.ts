@@ -1,7 +1,6 @@
 import { ParamsSubmit } from "../constants";
 import { Catalog } from "../models/Catalog";
-import { initLogout } from "../utils";
-import { toast } from "../utils/toast";
+import { initLogout, toast } from "../utils";
 import slugify from "slugify";
 
 // functions
