@@ -8,5 +8,5 @@ export function routes(app: Express) {
   app.use("/api/users", user);
   app.use("/api/products", product);
   app.use("/api/catalogs", catalog);
-  app.use("/api/counpons", coupon);
+  app.use("/api/coupons", coupon);
 }

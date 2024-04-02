@@ -10,7 +10,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>BSmart - User</title>
+    <title>BSmart - Coupon</title>
     <!-- Favicon -->
     <link href="/src/typescript.svg" rel="icon" />
 
@@ -501,24 +501,24 @@
             <div
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
-              <h1 class="h3 mb-0 text-gray-800">Trang khách hàng</h1>
-              <a href="/admin/add-edit-user.html" class="btn btn-info"
+              <h1 class="h3 mb-0 text-gray-800">Trang mã giảm giá</h1>
+              <a href="/admin/add-edit-coupon.html" class="btn btn-info"
                 >Tạo mới</a
               >
             </div>
 
             <!-- Content Row -->
             <div class="row pl-3">
-              <table class="table table-striped" id="table-user">
+              <table class="table table-striped" id="table-coupon">
                 <thead>
                   <tr>
                     <th scope="col">Số thứ tự</th>
-                    <th scope="col">Họ và tên</th>
-                    <th scope="col">Tên đăng nhập</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Số điện thoại</th>
-                    <th scope="col">Vai trò</th>
-                    <th scope="col" colspan="2">Thao tác</th>
+                    <th scope="col">Tên mã</th>
+                    <th scope="col">Giá trị (%)</th>
+                    <th scope="col">Ngày hết hạn (%)</th>
+                    <th scope="col">Ngày tạo</th>
+                    <th scope="col">Ngày cập nhật</th>
+                    <th scope="col">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -589,20 +589,20 @@
       </div>
     </div>
 
-    <!-- Delete Modal-->
+    <!-- Remove Modal-->
     <div
       class="modal fade"
-      id="deleteModal"
+      id="removeModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="exampleModalLabel"
+      aria-labelledby="removeModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Ngừng kích hoạt tài khoản này?
+            <h5 class="modal-title" id="removeModalLabel">
+              Bạn muốn xoá mã coupon này?
             </h5>
             <button
               class="close"
@@ -614,7 +614,10 @@
             </button>
           </div>
           <div class="modal-body">
-            Việc làm sẽ khiến tài khoản này ngừng hoạt động. Vẫn tiếp tục?
+            <p>
+              Hành động này sẽ khiến mã giảm giá bị biến mất hoàn toàn đấy. Vẫn
+              tiếp tục?
+            </p>
           </div>
           <div class="modal-footer">
             <button
@@ -624,7 +627,7 @@
             >
               Cancel
             </button>
-            <a class="btn btn-primary" href="" id="logout-btn">Logout</a>
+            <a class="btn btn-primary" href="" id="remove-btn">Delete</a>
           </div>
         </div>
       </div>
@@ -639,7 +642,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+
     <script type="module" src="/src/admin/home.ts"></script>
-    <script type="module" src="/src/admin/user.ts"></script>
+    <script type="module" src="/src/admin/coupon.ts"></script>
   </body>
 </html>

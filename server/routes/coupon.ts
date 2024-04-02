@@ -3,6 +3,12 @@ import { couponController } from "../app/controllers/CouponController";
 
 const router = express.Router();
 
-router.post("/check", couponController.index);
+router.delete("/:id", couponController.delete);
+router.patch("/:id", couponController.update);
+router.post("/save", couponController.add);
+router.post("/validate", couponController.validate);
+router.post("/check", couponController.check);
+router.get("/:id", couponController.detail);
+router.get("/", couponController.index);
 
 export default router;

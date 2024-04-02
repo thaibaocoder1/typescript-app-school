@@ -10,8 +10,10 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>baoDeV 2 - 404</title>
+    <title>BSmart - Coupon</title>
 
+    <!-- Favicon -->
+    <link href="/src/typescript.svg" rel="icon" />
     <!-- Custom fonts for this template-->
     <link
       href="vendor/fontawesome-free/css/all.min.css"
@@ -50,11 +52,11 @@
         <hr class="sidebar-divider my-0" />
 
         <!-- Nav Item - Dashboard -->
-        <li class="nav-item">
+        <li class="nav-item active">
           <a class="nav-link" href="index.html">
             <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-          </a>
+            <span>Dashboard</span></a
+          >
         </li>
 
         <!-- Divider -->
@@ -73,8 +75,8 @@
             aria-expanded="true"
             aria-controls="collapseTwo"
           >
-            <i class="fas fa-fw fa-cog"></i>
-            <span>Components</span>
+            <i class="fas fa-fw fa-list"></i>
+            <span>Danh mục</span>
           </a>
           <div
             id="collapseTwo"
@@ -83,9 +85,36 @@
             data-parent="#accordionSidebar"
           >
             <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Custom Components:</h6>
-              <a class="collapse-item" href="buttons.html">Buttons</a>
-              <a class="collapse-item" href="cards.html">Cards</a>
+              <a class="collapse-item" href="list-category.html">Danh sách</a>
+              <a class="collapse-item" href="add-edit-category.html"
+                >Thêm mới</a
+              >
+            </div>
+          </div>
+        </li>
+
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#collapseCoupon"
+            aria-expanded="true"
+            aria-controls="collapseCoupon"
+          >
+            <i class="fas fa-fw fa-donate"></i>
+            <span>Mã giảm giá</span>
+          </a>
+          <div
+            id="collapseCoupon"
+            class="collapse"
+            aria-labelledby="headingCoupon"
+            data-parent="#accordionSidebar"
+          >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="list-coupon.html">Danh sách</a>
+              <a class="collapse-item" href="add-edit-coupon.html">Thêm mới</a>
             </div>
           </div>
         </li>
@@ -100,8 +129,8 @@
             aria-expanded="true"
             aria-controls="collapseUtilities"
           >
-            <i class="fas fa-fw fa-wrench"></i>
-            <span>Utilities</span>
+            <i class="fas fa-fw fa-shopping-bag"></i>
+            <span>Sản phẩm</span>
           </a>
           <div
             id="collapseUtilities"
@@ -110,71 +139,61 @@
             data-parent="#accordionSidebar"
           >
             <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Custom Utilities:</h6>
-              <a class="collapse-item" href="utilities-color.html">Colors</a>
-              <a class="collapse-item" href="utilities-border.html">Borders</a>
-              <a class="collapse-item" href="utilities-animation.html"
-                >Animations</a
-              >
-              <a class="collapse-item" href="utilities-other.html">Other</a>
+              <a class="collapse-item" href="list-product.html">Danh sách</a>
+              <a class="collapse-item" href="add-edit-product.html">Thêm mới</a>
             </div>
           </div>
         </li>
 
-        <!-- Divider -->
-        <hr class="sidebar-divider" />
-
-        <!-- Heading -->
-        <div class="sidebar-heading">Addons</div>
-
         <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item active">
+        <li class="nav-item">
           <a
-            class="nav-link"
+            class="nav-link collapsed"
             href="#"
             data-toggle="collapse"
             data-target="#collapsePages"
             aria-expanded="true"
             aria-controls="collapsePages"
           >
-            <i class="fas fa-fw fa-folder"></i>
-            <span>Pages</span>
+            <i class="fas fa-fw fa-sort"></i>
+            <span>Đơn hàng</span>
           </a>
           <div
             id="collapsePages"
-            class="collapse show"
+            class="collapse"
             aria-labelledby="headingPages"
             data-parent="#accordionSidebar"
           >
             <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Login Screens:</h6>
-              <a class="collapse-item" href="login.html">Login</a>
-              <a class="collapse-item" href="register.html">Register</a>
-              <a class="collapse-item" href="forgot-password.html"
-                >Forgot Password</a
-              >
-              <div class="collapse-divider"></div>
-              <h6 class="collapse-header">Other Pages:</h6>
-              <a class="collapse-item active" href="404.html">404 Page</a>
-              <a class="collapse-item" href="blank.html">Blank Page</a>
+              <a class="collapse-item" href="list-order.html">Danh sách</a>
             </div>
           </div>
         </li>
 
-        <!-- Nav Item - Charts -->
+        <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-          <a class="nav-link" href="charts.html">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Charts</span></a
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#collapseUsers"
+            aria-expanded="true"
+            aria-controls="collapseUsers"
           >
-        </li>
-
-        <!-- Nav Item - Tables -->
-        <li class="nav-item">
-          <a class="nav-link" href="tables.html">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Tables</span></a
+            <i class="fas fa-fw fa-user"></i>
+            <span>Tài khoản</span>
+          </a>
+          <div
+            id="collapseUsers"
+            class="collapse"
+            aria-labelledby="headingPages"
+            data-parent="#accordionSidebar"
           >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="list-user.html">Danh sách</a>
+              <a class="collapse-item" href="add-edit-user.html">Thêm mới</a>
+            </div>
+          </div>
         </li>
 
         <!-- Divider -->
@@ -478,14 +497,61 @@
 
           <!-- Begin Page Content -->
           <div class="container-fluid">
-            <!-- 404 Error Text -->
-            <div class="text-center">
-              <div class="error mx-auto" data-text="404">404</div>
-              <p class="lead text-gray-800 mb-5">Page Not Found</p>
-              <p class="text-gray-500 mb-0">
-                It looks like you found a glitch in the matrix...
-              </p>
-              <a href="index.html">&larr; Back to Dashboard</a>
+            <!-- Page Heading -->
+            <div
+              class="d-sm-flex align-items-center justify-content-between mb-4"
+            >
+              <h1 class="h3 mb-0 text-gray-800" id="heading">
+                Trang thêm coupon
+              </h1>
+              <a href="/admin/add-edit-coupon.html" class="btn btn-info"
+                >Tạo mới</a
+              >
+            </div>
+
+            <!-- Content Row -->
+            <div class="row">
+              <form
+                class="w-100 ml-3"
+                id="form-coupon"
+                novalidate
+                method="POST"
+              >
+                <div class="mb-3">
+                  <label for="name" class="form-label">Tên coupon</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    required
+                  />
+                  <span class="invalid-feedback"></span>
+                </div>
+                <div class="mb-3">
+                  <label for="value" class="form-label">Giá trị coupon</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="value"
+                    name="value"
+                    required
+                  />
+                  <span class="invalid-feedback"></span>
+                </div>
+                <div class="mb-3">
+                  <label for="expireIns" class="form-label">Ngày hết hạn</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="expireIns"
+                    name="expireIns"
+                    required
+                  />
+                  <span class="invalid-feedback"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+              </form>
             </div>
           </div>
           <!-- /.container-fluid -->
@@ -561,5 +627,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+
+    <script type="module" src="/src/admin/home.ts"></script>
+    <script type="module" src="/src/admin/add-edit-coupon.ts"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-import { Carts, WhiteLists } from "./constants";
+import { Carts, CouponsStorage, WhiteLists } from "./constants";
 import { renderSidebar } from "./utils/sidebar";
 import {
   ParamsCart,
@@ -18,7 +18,17 @@ import {
 } from "./utils";
 import { toast } from "./utils/toast";
 import Swal from "sweetalert2";
-import { CounponProps, Coupon } from "./models/Coupon";
+import { Coupon } from "./models/Coupon";
+
+type ApiResponse = {
+  status: string;
+  message: string;
+  data?: any;
+};
+interface ErrorPayload {
+  isExpire: boolean;
+  id: string;
+}
 
 function handleChangeTextPrice(target: HTMLElement, cartReturn: Carts[]) {
   const parentElement = target.parentElement?.parentElement?.parentElement
@@ -36,7 +46,7 @@ function handleChangeTextPrice(target: HTMLElement, cartReturn: Carts[]) {
 function updateTotalCart(
   params: ParamsCart,
   cart: Carts[],
-  data?: CounponProps
+  data?: Array<CouponsStorage>
 ) {
   const subtotalElement = document.getElementById(
     params.subTotal
@@ -48,12 +58,15 @@ function updateTotalCart(
     return sum + item.quantity * item.price;
   }, 0);
   let shipCost: number = 0;
-  if (data) {
+  if (Array.isArray(data) && data.length > 0) {
+    let percentCoupon: number = data.reduce((total, item) => {
+      return total + item.coupon.value;
+    }, 0);
     shipCost =
       cart.reduce((total, item) => {
         return total + item.quantity * 5000;
       }, 0) *
-      ((100 - data.value) / 100);
+      ((100 - percentCoupon) / 100);
   }
   const sum: number = subtotal + shipCost;
   subtotalElement.innerText = `${formatCurrencyNumber(subtotal)}`;
@@ -74,18 +87,56 @@ function initFormCoupon(selector: string, cart: Carts[]): void {
       showSpinner();
       const check = await Coupon.checkCoupon({ name: counpon });
       hideSpinner();
-      if (check.ok && check.status === 200) {
-        const res = await check.json();
-        const { data } = res;
-        updateTotalCart(paramsQuantity, cart, data);
+      const data: ApiResponse = await check.json();
+      if (data.status === "success") {
+        const { data: coupon } = data;
         toast.success("Áp dụng mã giảm thành công!");
+        let list: CouponsStorage[] =
+          JSON.parse(localStorage.getItem("list-coupon") as string) || [];
+        if (Array.isArray(list) && list.length > 0) {
+          list.push({ coupon });
+        } else {
+          const counponStorage: CouponsStorage = {
+            coupon,
+          };
+          list = [counponStorage];
+        }
+        list && localStorage.setItem("list-coupon", JSON.stringify(list));
+        updateTotalCart(paramsQuantity, cart, list);
+        renderListCoupon("coupon-list");
+        form.reset();
       } else {
-        toast.error("Không tồn tại coupon!");
+        toast.error(data.message);
       }
     } catch (error) {
       console.log("error", error);
     }
   });
+}
+function renderListCoupon(selector: string) {
+  const listCoupon = document.getElementById(selector) as HTMLDivElement;
+  const counponStorage: string | null = localStorage.getItem("list-coupon");
+  if (counponStorage !== null) {
+    const list: CouponsStorage[] = JSON.parse(counponStorage);
+    listCoupon.textContent = "";
+    if (Array.isArray(list) && list.length > 0) {
+      list.forEach((item) => {
+        const { coupon } = item;
+        const counponItem = document.createElement("div");
+        counponItem.className = "coupon-item w-100 border-bottom py-2";
+        counponItem.id = coupon._id;
+        counponItem.innerHTML = `
+        <h6 class="coupon-name">${coupon.name}</h6>
+        <div class="coupon-content">
+          <span class="coupon-value">${coupon.value}%</span>
+          <button class="coupon-remove" data-id=${coupon._id}>
+            <i class="fa fa-times"></i>
+          </button>
+        </div>`;
+        listCoupon.appendChild(counponItem);
+      });
+    }
+  }
 }
 // main
 (async () => {
@@ -140,6 +191,23 @@ function initFormCoupon(selector: string, cart: Carts[]): void {
       const cartReturn = await handleChangeQuantity("plus", inputElement, cart);
       handleChangeTextPrice(target, cartReturn);
       calcTotalCart(paramsQuantity, cartReturn);
+    } else if (target.closest("button.coupon-remove")) {
+      const counponID: string = <string>target.dataset.id;
+      if (counponID) {
+        let counponStorage: CouponsStorage[] = JSON.parse(
+          localStorage.getItem("list-coupon") as string
+        );
+        const index: number = counponStorage.findIndex(
+          (item) => item.coupon._id === counponID
+        );
+        if (index >= 0) {
+          counponStorage.splice(index, 1);
+          target.parentElement?.parentElement?.remove();
+          toast.info("Xoá thành công coupon");
+          localStorage.setItem("list-coupon", JSON.stringify(counponStorage));
+          calcTotalCart(paramsQuantity, cart);
+        }
+      }
     }
   });
   modal.addEventListener("click", (e: Event) => {
@@ -180,13 +248,45 @@ function initFormCoupon(selector: string, cart: Carts[]): void {
   const checkoutButton = document.getElementById(
     "checkout-btn"
   ) as HTMLButtonElement;
-  checkoutButton.addEventListener("click", () => {
+  checkoutButton.addEventListener("click", async () => {
     if (checkoutButton && cart.length > 0) {
-      window.location.assign("checkout.html");
+      try {
+        const counponStorage: CouponsStorage[] | [] =
+          JSON.parse(localStorage.getItem("list-coupon") as string) || [];
+        if (counponStorage !== null && counponStorage.length > 0) {
+          const listID = counponStorage.map((item) => item.coupon._id);
+          showSpinner();
+          const res = await Coupon.validate(listID);
+          hideSpinner();
+          const isValid: ApiResponse = await res.json();
+          if (isValid.status === "success") {
+            window.location.assign("/checkout.html");
+          } else {
+            toast.error(isValid.message);
+            const data: ErrorPayload[] = isValid.data;
+            const listCoupon = document.querySelector("#coupon-list")
+              ?.children as HTMLCollection;
+            if (listCoupon) {
+              [...listCoupon].forEach((item) => {
+                const couponID: string = item.id;
+                const isExpire = data.find((x) => x.id.toString() === couponID);
+                if (isExpire) {
+                  item && item.classList.add("is-expire");
+                }
+              });
+            }
+          }
+        } else {
+          window.location.assign("/checkout.html");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       toast.info("Không có sản phẩm nào trong giỏ hàng");
     }
   });
   // Apply counpon for cart
   initFormCoupon("form-coupon", cart);
+  renderListCoupon("coupon-list");
 })();

@@ -119,7 +119,7 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
     console.log(error);
   }
 }
-function initSearch(selector: string) {
+function initSearch(selector: string, cart: Carts[]) {
   const inputSearch = document.getElementById(selector) as HTMLInputElement;
   if (inputSearch) {
     const debounceSearch = debounce(async (e: Event) => {
@@ -138,7 +138,30 @@ function initSearch(selector: string) {
           idElement: "#list-product",
           slug: slug,
         };
-        renderListProduct(paramsFn, dataApply);
+        await renderListProduct(paramsFn, dataApply);
+        // Handle cart
+        const buttonCart = document.querySelectorAll(
+          "#btn-cart"
+        ) as NodeListOf<Element>;
+        buttonCart.forEach((btn) => {
+          btn.addEventListener("click", async (e: Event) => {
+            e.preventDefault();
+            const buttonElement = e.target as HTMLAnchorElement;
+            const productID: string | undefined = buttonElement.dataset.id;
+            if (productID) {
+              sweetAlert.success();
+              const params: Params = {
+                productID,
+                cart,
+                quantity: 1,
+              };
+              cart = await addProductToCart(params);
+            }
+          });
+        });
+        // Handle whitelist
+        handleWhitelist(".card-whitelist");
+        handleViewModal(".card-modal");
       }
     }, 500);
     inputSearch.addEventListener("input", debounceSearch);
@@ -182,6 +205,8 @@ function initSearch(selector: string) {
   const data = await Product.loadAll();
   hideSpinner();
   await renderListProduct(paramsFn, data);
+  // Search
+  initSearch("search", cart);
   // Handle cart
   const buttonCart = document.querySelectorAll(
     "#btn-cart"
@@ -205,8 +230,6 @@ function initSearch(selector: string) {
   // Handle whitelist
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
-  // Search
-  initSearch("search");
   // Hash
   let productApply: ProductProps[];
   window.addEventListener("hashchange", async (e: HashChangeEvent) => {
@@ -222,5 +245,27 @@ function initSearch(selector: string) {
       productApply = products.sort((a, b) => b.discount - a.discount);
     }
     await renderListProduct(paramsFn, productApply);
+    const buttonCart = document.querySelectorAll(
+      "#btn-cart"
+    ) as NodeListOf<Element>;
+    buttonCart.forEach((btn) => {
+      btn.addEventListener("click", async (e: Event) => {
+        e.preventDefault();
+        const buttonElement = e.target as HTMLAnchorElement;
+        const productID: string | undefined = buttonElement.dataset.id;
+        if (productID) {
+          sweetAlert.success();
+          const params: Params = {
+            productID,
+            cart,
+            quantity: 1,
+          };
+          cart = await addProductToCart(params);
+        }
+      });
+    });
+    // Handle whitelist
+    handleWhitelist(".card-whitelist");
+    handleViewModal(".card-modal");
   });
 })();

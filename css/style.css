@@ -10113,3 +10113,33 @@ button > i {
   pointer-events: none;
   user-select: none;
 }
+#coupon-list {
+  flex-direction: column;
+}
+.coupon-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.coupon-item.is-expire {
+  background-color: var(--red);
+}
+.coupon-item.is-expire > * {
+  color: #fff;
+}
+.coupon-item.is-expire .coupon-remove:hover {
+  background-color: #fff;
+  color: #000;
+}
+.coupon-name {
+  margin-bottom: 0;
+}
+.coupon-remove {
+  outline: none;
+  border: none;
+  border-radius: 4px;
+}
+.coupon-remove:hover {
+  background-color: var(--red);
+  color: #fff;
+}

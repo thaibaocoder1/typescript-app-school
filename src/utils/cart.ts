@@ -1,5 +1,5 @@
 import { calcPrice, formatCurrencyNumber } from "./format";
-import { Params, Carts } from "../constants";
+import { Params, Carts, CouponsStorage } from "../constants";
 import { Product } from "../models/Product";
 import Swal from "sweetalert2";
 import { toast } from ".";
@@ -44,11 +44,12 @@ export async function renderListProductInCart(
   let subtotal: number = 0;
   let total: number = 0;
   let shipping: number = 0;
+  let totalPercentCounpon: number = calcPercentCoupon("list-coupon");
   try {
     if (cart.length > 0) {
       cart.forEach(async (item) => {
         subtotal += item.price * item.quantity;
-        shipping += item.quantity * 5000;
+        shipping += item.quantity * 5000 * ((100 - totalPercentCounpon) / 100);
         total = subtotal + shipping;
         totalQuantity += item.quantity;
         const product = await Product.loadOne(item.productID);
@@ -111,7 +112,6 @@ export async function renderListProductInCart(
     console.log("Error", error);
   }
 }
-
 export async function addProductToCart(params: Params) {
   let { cart, productID } = params;
   let cartItemIndex: number = cart.findIndex((x) => x.productID === productID);
@@ -149,7 +149,22 @@ export function displayNumOrder(selector: string, cart: Carts[]): void {
 export function addCartToStorage(cartCopy: Carts[]): void {
   return localStorage.setItem("cart", JSON.stringify(cartCopy));
 }
+export function calcPercentCoupon(name: string): number {
+  // check counpon if exist
+  let totalPercentCounpon: number = 0;
+  const counponStorage: string | null = localStorage.getItem(name);
+  if (counponStorage !== null) {
+    const list: CouponsStorage[] = JSON.parse(counponStorage);
+    list.forEach((item) => {
+      const { coupon } = item;
+      totalPercentCounpon += coupon.value;
+    });
+  }
+  return totalPercentCounpon;
+}
 export function calcTotalCart(params: ParamsCart, cart: Carts[]): void {
+  // check counpon if exist
+  let totalPercentCounpon: number = calcPercentCoupon("list-coupon");
   const subtotalElement = document.getElementById(
     params.subTotal
   ) as HTMLElement;
@@ -159,9 +174,11 @@ export function calcTotalCart(params: ParamsCart, cart: Carts[]): void {
   const subtotal: number = cart.reduce((sum, item) => {
     return sum + item.quantity * item.price;
   }, 0);
-  const shipCost: number = cart.reduce((total, item) => {
-    return total + item.quantity * 5000;
-  }, 0);
+  const shipCost: number =
+    cart.reduce((total, item) => {
+      return total + item.quantity * 5000;
+    }, 0) *
+    ((100 - totalPercentCounpon) / 100);
   const sum: number = subtotal + shipCost;
   subtotalElement.innerText = `${formatCurrencyNumber(subtotal)}`;
   shippingElement.innerText = `${formatCurrencyNumber(shipCost)}`;

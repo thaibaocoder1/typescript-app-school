@@ -21,7 +21,7 @@ export class DataResource<T> {
     return result;
   }
 
-  async loadOne(id: number | string): Promise<T> {
+  async loadOne(id: string): Promise<T> {
     const res = await fetch(`${this.endpoint}/${id}`, {
       credentials: "include",
     });
@@ -68,6 +68,18 @@ export class DataResource<T> {
 
   async checkCoupon(value: Partial<T>): Promise<Response> {
     const res = await fetch(`${this.endpoint}/check?_method=POST`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(value),
+      credentials: "include",
+    });
+    return res;
+  }
+
+  async validate(value: string[]): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/validate?_method=POST`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

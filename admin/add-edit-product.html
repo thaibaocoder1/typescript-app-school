@@ -92,6 +92,32 @@
           </div>
         </li>
 
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#collapseCoupon"
+            aria-expanded="true"
+            aria-controls="collapseCoupon"
+          >
+            <i class="fas fa-fw fa-donate"></i>
+            <span>Mã giảm giá</span>
+          </a>
+          <div
+            id="collapseCoupon"
+            class="collapse"
+            aria-labelledby="headingCoupon"
+            data-parent="#accordionSidebar"
+          >
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="list-coupon.html">Danh sách</a>
+              <a class="collapse-item" href="add-edit-coupon.html">Thêm mới</a>
+            </div>
+          </div>
+        </li>
+
         <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
           <a
@@ -665,7 +691,7 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-
+    <script type="module" src="/src/admin/home.ts"></script>
     <script type="module" src="/src/admin/add-edit-product.ts"></script>
   </body>
 </html>

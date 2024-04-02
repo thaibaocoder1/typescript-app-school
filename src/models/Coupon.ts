@@ -10,5 +10,5 @@ export interface CounponProps {
 }
 
 export const Coupon = new DataResource<CounponProps>(
-  "http://localhost:8888/api/counpons"
+  "http://localhost:8888/api/coupons"
 );

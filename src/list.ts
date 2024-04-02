@@ -41,9 +41,9 @@ async function renderWhitelistProduct(
       >
       <a href="detail.html?id=${
         product._id
-      }"><img class="img-fluid w-100" src="img/${
-      product.thumb.fileName
-    }" alt="${product.name}" /></a>
+      }"><img class="img-fluid w-100" src="${product.thumb.fileName}" alt="${
+      product.name
+    }" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
