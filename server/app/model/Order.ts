@@ -5,6 +5,7 @@ interface Orders extends Document {
   email: string;
   address: string;
   note: string;
+  status: number;
   phone: string;
 }
 
@@ -27,6 +28,10 @@ const orderSchema: Schema = new Schema<Orders>(
     },
     note: {
       type: String,
+    },
+    status: {
+      type: Number,
+      default: 1,
     },
     phone: {
       type: String,

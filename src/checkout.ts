@@ -92,5 +92,5 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
     shippingElement: "shipping",
   };
   await renderBillCheckout(params, cart);
-  await initFormCheckout("form-checkout");
+  await initFormCheckout("form-checkout", cart);
 })();

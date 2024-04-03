@@ -1,79 +1,23 @@
+import { UserData } from "./account";
 import { AccessTokenData, Carts, WhiteLists } from "./constants";
 import { User, UserProps } from "./models/User";
 import {
-  deleteCookie,
+  displayNumOrder,
   displayNumberWhitelist,
   hideSpinner,
-  removeLocalStorageCustomer,
+  initChangeForm,
+  initUpdateForm,
+  renderSidebarAccount,
   setBackgroundImage,
   setFieldValue,
   showSpinner,
 } from "./utils";
-import {
-  initChangeForm,
-  initUpdateForm,
-  renderAccountInfo,
-  renderSidebarAccount,
-} from "./utils/account";
-import { displayNumOrder } from "./utils/cart";
-import { toast } from "./utils/toast";
+import { displayListOrder } from "./utils/orders";
 
-// types
-export type UserData = {
-  data: Partial<UserProps>;
-  selector: string;
-};
 // functions
-async function displayInfoAccount(token: string, formSelector: string) {
-  try {
-    const formElement = document.getElementById(
-      formSelector
-    ) as HTMLFormElement;
-    if (!token || !formElement) return;
-    const accessToken: AccessTokenData = JSON.parse(token);
-    showSpinner();
-    const user = await User.loadOne(accessToken.id);
-    hideSpinner();
-    if (user) {
-      setFieldValue(formElement, "[name='fullname']", user?.fullname);
-      setFieldValue(formElement, "[name='username']", user?.username);
-      setFieldValue(formElement, "[name='email']", user?.email);
-      setFieldValue(formElement, "[name='role']", user?.role);
-      setBackgroundImage(
-        formElement,
-        ".img-thumbnail",
-        user?.imageUrl.fileName
-      );
-    }
-    const modal = document.getElementById("modal-account") as HTMLDivElement;
-    window.addEventListener("click", async (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.matches(`a.logout`)) {
-        e.preventDefault();
-        modal && modal.classList.add("is-show");
-      } else if (target.classList.contains("modal")) {
-        modal.classList.remove("is-show");
-      } else if (target.closest("button.btn-denide")) {
-        modal.classList.remove("is-show");
-      } else if (target.closest("button.btn-close")) {
-        modal.classList.remove("is-show");
-      } else if (target.closest("button.btn-confirm")) {
-        const res = await User.logout(accessToken.id);
-        if (res.refreshToken === "") {
-          toast.info("Logout success");
-          removeLocalStorageCustomer();
-          deleteCookie("refreshToken");
-          setTimeout(() => {
-            window.location.assign("login.html");
-          }, 1000);
-        }
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
+function registerLogout() {
+  console.log("handle logout");
 }
-
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -92,26 +36,17 @@ async function displayInfoAccount(token: string, formSelector: string) {
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
   // Account
-  if (accessToken !== null && accessTokenAdmin !== null) {
-    renderAccountInfo("account");
-  } else {
-    if (typeof accessToken === "string") {
-      renderAccountInfo("account");
-    } else if (typeof accessTokenAdmin === "string") {
-      renderAccountInfo("account");
-    }
-  }
   renderSidebarAccount("sidebar-info");
+  // Orders
   if (accessToken !== null && accessTokenAdmin !== null) {
-    await displayInfoAccount(accessToken, "form-account");
+    await displayListOrder(accessToken, "table-order");
   } else {
     if (typeof accessToken === "string") {
-      await displayInfoAccount(accessToken, "form-account");
+      await displayListOrder(accessToken, "table-order");
     } else {
-      await displayInfoAccount(accessTokenAdmin as string, "form-account");
+      await displayListOrder(accessTokenAdmin as string, "table-order");
     }
   }
-
   // Actions
   let user: UserProps;
   window.addEventListener("click", async (e: Event) => {
@@ -197,4 +132,6 @@ async function displayInfoAccount(token: string, formSelector: string) {
       changeModal && changeModal.classList.remove("is-show");
     }
   });
+  // Logout
+  registerLogout();
 })();

@@ -1,16 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { Catalog } from "../model/Catalog";
-import { Order } from "../model/Order";
 import { StatusCodes } from "http-status-codes";
+import { Detail } from "../model/Detail";
 
-class OrderController {
+class DetailController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const orders = await Order.find({});
+      const catalogs = await Catalog.find({});
       res.status(StatusCodes.OK).json({
         status: "success",
-        results: orders.length,
-        data: orders,
+        results: catalogs.length,
+        data: catalogs,
       });
     } catch (error) {
       next(error);
@@ -46,17 +46,17 @@ class OrderController {
   };
   add = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const order = await Order.create(req.body);
-      if (order) {
+      const orderDetail = await Detail.create(req.body);
+      if (orderDetail) {
         res.status(StatusCodes.CREATED).json({
           status: "success",
-          message: "Add order success!!",
-          data: order,
+          message: "Add order detail success!!",
+          data: orderDetail,
         });
       } else {
         res.status(StatusCodes.BAD_REQUEST).json({
           status: "failed",
-          message: "Add order failed!!",
+          message: "Add order detail failed!!",
         });
       }
     } catch (error) {
@@ -65,4 +65,4 @@ class OrderController {
   };
 }
 
-export const orderController = new OrderController();
+export const detailController = new DetailController();

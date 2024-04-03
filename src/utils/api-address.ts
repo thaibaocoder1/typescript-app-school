@@ -16,16 +16,14 @@ async function handleChangeProvince(e: Event) {
   const target = e.target as HTMLSelectElement;
   const provinceID = target.value;
   try {
-    if (provinceID) {
+    if (typeof provinceID === "string" && provinceID !== "") {
       await getAllDistricts(provinceID, "district");
     } else {
-      const provinceElement = document.getElementById(
-        "province"
-      ) as HTMLSelectElement;
+      const wardElement = document.getElementById("ward") as HTMLSelectElement;
       const districtElement = document.getElementById(
         "district"
       ) as HTMLSelectElement;
-      provinceElement.innerHTML = `<option value="">Select one province</option>`;
+      wardElement.innerHTML = `<option value="">Select one ward</option>`;
       districtElement.innerHTML = `<option value="">Select one district</option>`;
     }
   } catch (error) {

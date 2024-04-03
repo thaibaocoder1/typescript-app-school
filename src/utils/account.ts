@@ -8,7 +8,7 @@ import {
 } from ".";
 import { UserData } from "../account";
 import z from "zod";
-import { User } from "../models/User";
+import { User, UserProps } from "../models/User";
 import { FormValues } from "../constants";
 import Swal from "sweetalert2";
 
@@ -185,7 +185,7 @@ export function initUpdateForm(params: UserData) {
     }
   });
 }
-export function initChangeForm(selector: string, id: string) {
+export function initChangeForm(selector: string, user: UserProps) {
   const form = document.getElementById(selector) as HTMLFormElement;
   form.addEventListener("submit", async (e: SubmitEvent) => {
     e.preventDefault();
@@ -193,7 +193,7 @@ export function initChangeForm(selector: string, id: string) {
     const isValid = await validateFormPassword(form, formValues);
     if (!isValid) return;
     try {
-      const res = await User.updateField(id, formValues);
+      const res = await User.updateField(user._id, formValues);
       if (res.ok && res.status === 201) {
         toast.success("Change password success!!");
         Swal.fire({
@@ -210,8 +210,13 @@ export function initChangeForm(selector: string, id: string) {
               title: "Đăng xuất thành công!",
               icon: "success",
             }).then(async function () {
-              localStorage.removeItem("accessToken");
-              deleteCookie("refreshToken");
+              if (user.role.toLowerCase() === "user") {
+                localStorage.removeItem("accessToken");
+                deleteCookie("refreshToken");
+              } else {
+                localStorage.removeItem("accessTokenAdmin");
+                deleteCookie("refreshTokenAdmin");
+              }
               setTimeout(() => {
                 window.location.assign("/login.html");
               }, 500);

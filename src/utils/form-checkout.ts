@@ -6,14 +6,21 @@ import {
   showSpinner,
   toast,
 } from ".";
-import { AccessTokenData, FormValues } from "../constants";
+import { AccessTokenData, Carts, FormValues } from "../constants";
 import { User, UserProps } from "../models/User";
 import { getAllProvinces } from "./api-address";
 import { Order, OrderProps } from "../models/Order";
+import { OrderDetail, OrderDetailProps } from "../models/Detail";
 
 let infoUser: AccessTokenData;
 let accessToken: string | null = localStorage.getItem("accessToken");
 let accessTokenAdmin: string | null = localStorage.getItem("accessTokenAdmin");
+
+type ApiOrderResponse = {
+  status: string;
+  message: string;
+  data?: any;
+};
 
 function getSchema() {
   return z
@@ -85,6 +92,7 @@ async function validateFormCheckout(
 function removeUnusedFiedls(values: FormValues) {
   const formValues: FormValues = { ...values };
   formValues.address = `${formValues.province}, ${formValues.district}, ${formValues.ward}, ${formValues.address}`;
+  formValues.status = 1;
   delete formValues.province;
   delete formValues.district;
   delete formValues.ward;
@@ -107,7 +115,34 @@ function getFormValues(form: HTMLFormElement): FormValues {
   }
   return formValues;
 }
-export async function initFormCheckout(selector: string) {
+async function handleAddOrderDetail(orderID: string, cart: Array<Carts>) {
+  let isSuccess: Boolean = true;
+  try {
+    for (const item of cart) {
+      const payload: Partial<OrderDetailProps> = {
+        orderID,
+        productID: item.productID,
+        price: item.price,
+        quantity: item.quantity,
+      };
+      const res = await OrderDetail.save(payload);
+      const data: ApiOrderResponse = await res.json();
+      if (data.status === "success") {
+        isSuccess = true;
+      } else {
+        isSuccess = false;
+      }
+    }
+    if (isSuccess) {
+      toast.success("Checkout successfully!");
+    } else {
+      toast.error("Checkout failed");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function initFormCheckout(selector: string, cart: Carts[]) {
   const form = document.getElementById(selector) as HTMLFormElement;
   if (accessToken !== null && accessTokenAdmin !== null) {
     infoUser = JSON.parse(accessToken);
@@ -137,8 +172,18 @@ export async function initFormCheckout(selector: string) {
       let orderID: string = "";
       try {
         showSpinner();
-        const addOrder = await Order.save(formValuesFinal);
+        const res = await Order.save(formValuesFinal);
         hideSpinner();
+        const data: ApiOrderResponse = await res.json();
+        if (data.status === "success") {
+          const order: OrderProps = data.data;
+          if (order) {
+            orderID = order._id;
+            await handleAddOrderDetail(orderID, cart);
+          }
+        } else {
+          toast.error(data.message);
+        }
       } catch (error) {
         console.log(error);
       }

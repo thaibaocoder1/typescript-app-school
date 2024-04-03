@@ -7,6 +7,7 @@ export interface OrderProps {
   address: string;
   note: string;
   phone: string;
+  status: number;
   createdAt: string;
   updatedAt: string;
 }
