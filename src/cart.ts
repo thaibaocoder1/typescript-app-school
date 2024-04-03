@@ -260,7 +260,20 @@ function renderListCoupon(selector: string) {
           hideSpinner();
           const isValid: ApiResponse = await res.json();
           if (isValid.status === "success") {
-            window.location.assign("/checkout.html");
+            if (accessToken !== null && accessTokenAdmin !== null) {
+              window.location.assign("/checkout.html");
+            } else {
+              if (typeof accessToken === "string") {
+                window.location.assign("/checkout.html");
+              } else if (typeof accessTokenAdmin === "string") {
+                window.location.assign("/checkout.html");
+              } else {
+                toast.info("Login to checkout");
+                setTimeout(() => {
+                  window.location.assign("/login.html");
+                }, 1000);
+              }
+            }
           } else {
             toast.error(isValid.message);
             const data: ErrorPayload[] = isValid.data;

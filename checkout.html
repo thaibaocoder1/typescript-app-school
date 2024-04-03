@@ -221,7 +221,7 @@
         <div class="col-lg-8">
           <div class="mb-4">
             <h4 class="font-weight-semi-bold mb-4">Billing Address</h4>
-            <form class="row" id="form-checkout" method="POST">
+            <form class="row" id="form-checkout" method="POST" novalidate>
               <div class="col-md-6 form-group">
                 <label>Full Name</label>
                 <input
@@ -230,6 +230,7 @@
                   placeholder="Hoang Nguyen Thai Bao"
                   name="fullname"
                 />
+                <span class="invalid-feedback"></span>
               </div>
               <div class="col-md-6 form-group">
                 <label>E-mail</label>
@@ -239,15 +240,43 @@
                   placeholder="example@email.com"
                   name="email"
                 />
+                <span class="invalid-feedback"></span>
               </div>
-              <div class="col-md-6 form-group">
-                <label>Phone</label>
-                <input
+              <div class="col-md-4 form-group">
+                <label>Province</label>
+                <select
                   class="form-control"
-                  type="tel"
-                  placeholder="+84 89 456 789"
-                  name="phone"
-                />
+                  aria-label="Default select example"
+                  name="province"
+                  id="province"
+                >
+                  <option value="">Select one province</option>
+                </select>
+                <span class="invalid-feedback"></span>
+              </div>
+              <div class="col-md-4 form-group">
+                <label>District</label>
+                <select
+                  class="form-control"
+                  aria-label="Default select example"
+                  name="district"
+                  id="district"
+                >
+                  <option value="">Select one district</option>
+                </select>
+                <span class="invalid-feedback"></span>
+              </div>
+              <div class="col-md-4 form-group">
+                <label>Ward</label>
+                <select
+                  class="form-control"
+                  aria-label="Default select example"
+                  name="ward"
+                  id="ward"
+                >
+                  <option value="">Select one ward</option>
+                </select>
+                <span class="invalid-feedback"></span>
               </div>
               <div class="col-md-6 form-group">
                 <label>Address</label>
@@ -257,6 +286,17 @@
                   placeholder="123 Street"
                   name="address"
                 />
+                <span class="invalid-feedback"></span>
+              </div>
+              <div class="col-md-6 form-group">
+                <label>Phone</label>
+                <input
+                  class="form-control"
+                  type="tel"
+                  placeholder="+84 89 456 789"
+                  name="phone"
+                />
+                <span class="invalid-feedback"></span>
               </div>
               <div class="col-md-12 form-group">
                 <label for="note">Note</label>

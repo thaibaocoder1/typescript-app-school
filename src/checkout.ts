@@ -10,7 +10,7 @@ import {
   showSpinner,
   toast,
 } from "./utils";
-import { displayNumOrder } from "./utils/cart";
+import { calcPercentCoupon, displayNumOrder } from "./utils/cart";
 import { renderSidebar } from "./utils/sidebar";
 import { initFormCheckout } from "./utils/form-checkout";
 
@@ -25,23 +25,32 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
     params.subtotalElement
   ) as HTMLElement;
   const totalEl = document.getElementById(params.totalElement) as HTMLElement;
+  const shippingEl = document.getElementById(
+    params.shippingElement
+  ) as HTMLElement;
   let subtotal: number = 0;
+  let shipping: number = calcPercentCoupon("list-coupon") || 0;
   let total: number = 0;
+  let shipCost: number = cart.reduce((total, item) => {
+    return total + item.quantity * 5000;
+  }, 0);
   try {
     cart.forEach(async (item) => {
       subtotal += item.quantity * item.price;
-      total += item.quantity * item.price;
+      let shipCostPercent: number = shipCost * ((100 - shipping) / 100);
+      total = subtotal + shipCostPercent;
       showSpinner();
       const product = await Product.loadOne(item.productID);
       hideSpinner();
       const divElement = document.createElement("div");
       divElement.className = "d-flex justify-content-between";
-      divElement.innerHTML = `<p>${product.name}</p>
+      divElement.innerHTML = `<p>${product.name} x ${item.quantity}</p>
       <p>${formatCurrencyNumber(
         calcPrice(product.price, product.discount)
       )}</p>`;
       infoElement.appendChild(divElement);
       subTotalEl.textContent = formatCurrencyNumber(subtotal);
+      shippingEl.textContent = formatCurrencyNumber(shipCostPercent);
       totalEl.textContent = formatCurrencyNumber(total);
     });
   } catch (error) {
@@ -80,6 +89,7 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
     cardElement: "card-info",
     subtotalElement: "subtotal",
     totalElement: "total",
+    shippingElement: "shipping",
   };
   await renderBillCheckout(params, cart);
   await initFormCheckout("form-checkout");

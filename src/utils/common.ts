@@ -57,9 +57,7 @@ export function setFieldError(
   name: string,
   error: string
 ) {
-  const element = form.querySelector(
-    `input[name='${name}']`
-  ) as HTMLInputElement;
+  const element = form.querySelector(`[name='${name}']`) as HTMLFormElement;
   if (element) {
     element.setCustomValidity(error);
     setTextContent(element.parentElement!, ".invalid-feedback", error);
