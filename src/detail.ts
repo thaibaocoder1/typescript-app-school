@@ -33,7 +33,16 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
   const contentProduct = document.querySelector(
     params.infoIDContent
   ) as HTMLElement;
-  if (!infoProduct || !thumbnailProduct || !contentProduct) return;
+  const descriptionProduct = document.querySelector(
+    params.descIDContent
+  ) as HTMLElement;
+  if (
+    !infoProduct ||
+    !thumbnailProduct ||
+    !contentProduct ||
+    !descriptionProduct
+  )
+    return;
   infoProduct.innerHTML = `<h3 class="font-weight-semi-bold">${
     params.productInfo.name
   }</h3>
@@ -106,6 +115,7 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
   thumbnailProduct.innerHTML = `<div class="carousel-item active">
   <img class="w-100 h-100" src="${params.productInfo.thumb.fileName}" alt="${params.productInfo.name}" />
   </div>`;
+  descriptionProduct.innerHTML = `<p>${params.productInfo.description}</p>`;
   contentProduct.innerHTML = `<p>${params.productInfo.content}</p>`;
 }
 async function renderRelatedProduct(params: RenderInfoProductRelated) {
@@ -219,6 +229,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   const renderParams: RenderInfoProductParams = {
     infoIDElement: "#info-product",
     infoIDThumbnail: "#thumbnail-product",
+    descIDContent: "#description-product",
     infoIDContent: "#content-product",
     productInfo,
   };

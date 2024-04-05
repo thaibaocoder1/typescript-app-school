@@ -7,18 +7,18 @@ import {
   hideSpinner,
   initChangeForm,
   initUpdateForm,
+  removeLocalStorageAdmin,
+  removeLocalStorageCustomer,
   renderAccountInfo,
   renderSidebarAccount,
   setBackgroundImage,
   setFieldValue,
   showSpinner,
+  toast,
 } from "./utils";
+import { getUserLogin } from "./utils/get-user";
 import { displayListOrder } from "./utils/orders";
 
-// functions
-function registerLogout() {
-  console.log("handle logout");
-}
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -59,6 +59,8 @@ function registerLogout() {
   }
   // Actions
   let user: UserProps;
+  const modal = document.getElementById("modal-account") as HTMLDivElement;
+
   window.addEventListener("click", async (e: Event) => {
     const target = e.target as HTMLElement;
     const updateModal = document.getElementById(
@@ -131,17 +133,38 @@ function registerLogout() {
       if (user) {
         initChangeForm("form-change", user);
       }
+    } else if (target.matches("a.logout")) {
+      e.preventDefault();
+      const info = getUserLogin();
+      modal && modal.classList.add("is-show");
+      modal.dataset.id = info.id;
     } else if (target.matches("a.orders")) {
       e.preventDefault();
       window.location.assign("/orders.html");
     } else if (target.matches(".modal")) {
       updateModal && updateModal.classList.remove("is-show");
       changeModal && changeModal.classList.remove("is-show");
+      modal && modal.classList.remove("is-show");
     } else if (target.matches("button.btn-close")) {
       updateModal && updateModal.classList.remove("is-show");
       changeModal && changeModal.classList.remove("is-show");
+    } else if (target.matches("button.btn-denide")) {
+      modal && modal.classList.remove("is-show");
+    } else if (target.closest("button.btn-confirm")) {
+      showSpinner();
+      const res = await User.logout(modal.dataset.id as string);
+      hideSpinner();
+      if (res.refreshToken === "") {
+        toast.info("Logout success");
+        if (res.role.toLowerCase() === "user") {
+          removeLocalStorageCustomer();
+        } else {
+          removeLocalStorageAdmin();
+        }
+        setTimeout(() => {
+          window.location.assign("login.html");
+        }, 500);
+      }
     }
   });
-  // Logout
-  registerLogout();
 })();

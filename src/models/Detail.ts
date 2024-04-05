@@ -1,10 +1,11 @@
 import { DataResource } from "../services/index";
+import { OrderProps } from "./Order";
 import { ProductProps } from "./Product";
 
 export interface OrderDetailProps {
   _id: string;
   productID: string | ProductProps;
-  orderID: string;
+  orderID: string | OrderProps;
   quantity: number;
   price: number;
   createdAt: string;

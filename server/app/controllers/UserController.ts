@@ -180,26 +180,33 @@ class UserController {
       if (user) {
         const now = Math.floor(Date.now() / 1000);
         const timer = Math.floor((user?.resetedAt as number) / 1000);
-        if (now - timer > 300) {
+        if (user.resetedAt === 0) {
           res.status(StatusCodes.NOT_FOUND).json({
             success: false,
-            message: "Reset failed. Time reset expire!",
+            message: "Account has already reset!",
           });
         } else {
-          req.body.resetedAt = 0;
-          const salt = bcrypt.genSaltSync(10);
-          const hashPassword = bcrypt.hashSync(req.body.password, salt);
-          const hashCPassword = bcrypt.hashSync(
-            req.body.password_confirmation,
-            salt
-          );
-          req.body.password = hashPassword;
-          req.body.password_confirmation = hashCPassword;
-          await User.findOneAndUpdate({ _id: id }, req.body);
-          res.status(StatusCodes.OK).json({
-            success: true,
-            message: "Reset successfully!",
-          });
+          if (now - timer > 300) {
+            res.status(StatusCodes.NOT_FOUND).json({
+              success: false,
+              message: "Reset failed. Time reset expire!",
+            });
+          } else {
+            req.body.resetedAt = 0;
+            const salt = bcrypt.genSaltSync(10);
+            const hashPassword = bcrypt.hashSync(req.body.password, salt);
+            const hashCPassword = bcrypt.hashSync(
+              req.body.password_confirmation,
+              salt
+            );
+            req.body.password = hashPassword;
+            req.body.password_confirmation = hashCPassword;
+            await User.findOneAndUpdate({ _id: id }, req.body);
+            res.status(StatusCodes.OK).json({
+              success: true,
+              message: "Reset successfully!",
+            });
+          }
         }
       }
     } catch (error) {

@@ -15,7 +15,6 @@ export interface ProductProps {
     fileName: string;
   };
   content: string;
-  status: number;
   quantity: number;
   createdAt: string;
   updatedAt: string;

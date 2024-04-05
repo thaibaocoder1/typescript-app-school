@@ -18,6 +18,11 @@ type ParamsSubmit = {
   selector: string;
   id?: string | null;
 };
+type ApiResponseCommon = {
+  status: string;
+  message: string;
+  data?: any;
+};
 // functions
 async function getOneProduct(id: string) {
   if (!id) return;
@@ -139,19 +144,25 @@ async function handleOnSubmit(params: ParamsSubmit) {
       if (params.id) {
         formData.append("id", params.id);
         const res = await Product.updateFormData(formData);
-        if (res.ok && res.status === 201) {
+        const data: ApiResponseCommon = await res.json();
+        if (data.status === "success") {
           toast.success("Chỉnh sửa sản phẩm thành công");
           setTimeout(() => {
             window.location.assign("/admin/list-product.html");
-          }, 1000);
+          }, 500);
+        } else {
+          toast.error(data.message);
         }
       } else {
         const res = await Product.saveFormData(formData);
-        if (res.ok && res.status === 201) {
+        const data: ApiResponseCommon = await res.json();
+        if (data.status === "success") {
           toast.success("Thêm mới sản phẩm thành công");
           setTimeout(() => {
             window.location.assign("/admin/list-product.html");
-          }, 1000);
+          }, 500);
+        } else {
+          toast.error(data.message);
         }
       }
     } catch (error) {
@@ -205,7 +216,6 @@ async function renderListCategory(
         fileName: "",
       },
       content: "",
-      status: 1,
       quantity: 0,
       createdAt: "",
       updatedAt: "",

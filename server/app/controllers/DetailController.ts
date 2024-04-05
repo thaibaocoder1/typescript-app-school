@@ -5,9 +5,11 @@ import { Detail } from "../model/Detail";
 class DetailController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const orders = await Detail.find({ orderID: req.params.id }).populate(
-        "productID"
-      );
+      const orders = await Detail.find({ orderID: req.params.id })
+        .populate("productID")
+        .populate({
+          path: "orderID",
+        });
       res.status(StatusCodes.OK).json({
         status: "success",
         results: orders.length,

@@ -4,6 +4,7 @@ export interface RenderInfoProductParams {
   infoIDElement: string;
   infoIDThumbnail: string;
   infoIDContent: string;
+  descIDContent: string;
   productInfo: ProductProps;
 }
 export interface RenderInfoProductRelated {

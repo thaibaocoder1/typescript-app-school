@@ -1,4 +1,4 @@
-import { ApiResponse } from "../constants";
+import { ApiResponseAuth } from "../active";
 import { User } from "../models/User";
 import { hideSpinner, setCookie, showSpinner } from "../utils";
 import { toast } from "../utils/toast";
@@ -12,7 +12,7 @@ async function handleOnSubmitFormAdmin(
     showSpinner();
     const res = await User.check(data);
     hideSpinner();
-    const user: ApiResponse = await res.json();
+    const user: ApiResponseAuth = await res.json();
     if (user.success) {
       if (user.data.role.toLowerCase() === "admin") {
         toast.success("Đăng nhập thành công");
@@ -25,6 +25,10 @@ async function handleOnSubmitFormAdmin(
         toast.error("Tài khoản không có quyền truy cập!");
         return;
       }
+    } else {
+      toast.error(user.message);
+      hideSpinner();
+      return;
     }
   } catch (error) {
     console.log("Error", error);
