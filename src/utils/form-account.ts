@@ -67,3 +67,8 @@ export async function initFormUpdate(
     toast.error("Có lỗi trong khi xử lý");
   }
 }
+
+export async function initFormChange(
+  selector: string,
+  infoUser: AccessTokenData
+) {}

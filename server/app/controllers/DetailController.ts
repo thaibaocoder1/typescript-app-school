@@ -1,44 +1,17 @@
 import { Request, Response, NextFunction } from "express";
-import { Catalog } from "../model/Catalog";
 import { StatusCodes } from "http-status-codes";
 import { Detail } from "../model/Detail";
 
 class DetailController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const catalogs = await Catalog.find({});
-      res.status(StatusCodes.OK).json({
-        status: "success",
-        results: catalogs.length,
-        data: catalogs,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-  detail = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const catalog = await Catalog.findOne({ _id: req.params.id });
-      res.status(StatusCodes.OK).json({
-        status: "success",
-        data: catalog,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-  update = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const catalog = await Catalog.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body,
-        {
-          new: true,
-        }
+      const orders = await Detail.find({ orderID: req.params.id }).populate(
+        "productID"
       );
       res.status(StatusCodes.OK).json({
         status: "success",
-        data: catalog,
+        results: orders.length,
+        data: orders,
       });
     } catch (error) {
       next(error);

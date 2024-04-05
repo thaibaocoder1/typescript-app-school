@@ -135,6 +135,10 @@ async function handleAddOrderDetail(orderID: string, cart: Array<Carts>) {
     }
     if (isSuccess) {
       toast.success("Checkout successfully!");
+      localStorage && localStorage.removeItem("cart");
+      setTimeout(() => {
+        window.location.assign("/orders.html");
+      }, 500);
     } else {
       toast.error("Checkout failed");
     }

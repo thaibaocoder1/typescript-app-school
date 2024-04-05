@@ -1,8 +1,9 @@
 import { DataResource } from "../services/index";
+import { ProductProps } from "./Product";
 
 export interface OrderDetailProps {
   _id: string;
-  productID: string;
+  productID: string | ProductProps;
   orderID: string;
   quantity: number;
   price: number;

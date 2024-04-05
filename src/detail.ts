@@ -5,6 +5,7 @@ import {
   hideSpinner,
   sweetAlert,
   displayNumberWhitelist,
+  renderAccountInfo,
 } from "./utils";
 import { CatalogProps } from "./models/Catalog";
 import { Product } from "./models/Product";
@@ -197,6 +198,15 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   }
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    renderAccountInfo("account");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   const searchParams = new URLSearchParams(location.search);
   const productID = searchParams.get("id");
   if (!productID) return;

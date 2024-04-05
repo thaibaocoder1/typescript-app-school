@@ -1,5 +1,5 @@
 import { User } from "./models/User";
-import { getRandomImage } from "./utils";
+import { getRandomImage, hideSpinner, showSpinner } from "./utils";
 import { toast } from "./utils/toast";
 import { Validator } from "./utils/validator";
 
@@ -15,7 +15,9 @@ async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
         if (user.email === data.email) {
           toast.error("Duplicate user. Please check again");
         } else {
+          showSpinner();
           const infoUser = await User.save(data);
+          hideSpinner();
           if (infoUser) {
             toast.success("Register successfully");
             setTimeout(() => {
@@ -27,7 +29,9 @@ async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
         }
       });
     } else {
+      showSpinner();
       const infoUser = await User.save(data);
+      hideSpinner();
       if (infoUser.ok && infoUser.status === 201) {
         toast.success("Register successfully");
         setTimeout(() => {

@@ -1,6 +1,6 @@
 import { ApiResponse } from "../constants";
 import { User } from "../models/User";
-import { setCookie } from "../utils";
+import { hideSpinner, setCookie, showSpinner } from "../utils";
 import { toast } from "../utils/toast";
 import { Validator } from "../utils/validator";
 
@@ -9,9 +9,11 @@ async function handleOnSubmitFormAdmin(
   data: Record<string, any>
 ): Promise<void> {
   try {
+    showSpinner();
     const res = await User.check(data);
+    hideSpinner();
     const user: ApiResponse = await res.json();
-    if (res.ok && res.status === 201) {
+    if (user.success) {
       if (user.data.role.toLowerCase() === "admin") {
         toast.success("Đăng nhập thành công");
         localStorage.setItem("accessTokenAdmin", JSON.stringify(user.data));

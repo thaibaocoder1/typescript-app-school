@@ -1,9 +1,9 @@
 import { AccessTokenData, Carts, WhiteLists } from "./constants";
 import { User, UserProps } from "./models/User";
 import {
-  deleteCookie,
   displayNumberWhitelist,
   hideSpinner,
+  removeLocalStorageAdmin,
   removeLocalStorageCustomer,
   setBackgroundImage,
   setFieldValue,
@@ -58,14 +58,19 @@ async function displayInfoAccount(token: string, formSelector: string) {
       } else if (target.closest("button.btn-close")) {
         modal.classList.remove("is-show");
       } else if (target.closest("button.btn-confirm")) {
+        showSpinner();
         const res = await User.logout(accessToken.id);
+        hideSpinner();
         if (res.refreshToken === "") {
           toast.info("Logout success");
-          removeLocalStorageCustomer();
-          deleteCookie("refreshToken");
+          if (res.role.toLowerCase() === "user") {
+            removeLocalStorageCustomer();
+          } else {
+            removeLocalStorageAdmin();
+          }
           setTimeout(() => {
             window.location.assign("login.html");
-          }, 1000);
+          }, 500);
         }
       }
     });

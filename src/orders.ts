@@ -7,6 +7,7 @@ import {
   hideSpinner,
   initChangeForm,
   initUpdateForm,
+  renderAccountInfo,
   renderSidebarAccount,
   setBackgroundImage,
   setFieldValue,
@@ -35,6 +36,15 @@ function registerLogout() {
   }
   displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
+  if (accessToken !== null && accessTokenAdmin !== null) {
+    renderAccountInfo("account");
+  } else {
+    if (typeof accessToken === "string") {
+      renderAccountInfo("account");
+    } else if (typeof accessTokenAdmin === "string") {
+      renderAccountInfo("account");
+    }
+  }
   // Account
   renderSidebarAccount("sidebar-info");
   // Orders

@@ -1,5 +1,6 @@
-import { hideSpinner, showSpinner } from ".";
+import { calcPrice, formatCurrencyNumber, hideSpinner, showSpinner } from ".";
 import { AccessTokenData } from "../constants";
+import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { Order } from "../models/Order";
 
 export async function displayListOrder(token: string, selector: string) {
@@ -41,11 +42,37 @@ window.addEventListener("load", () => {
   const buttonDetail = document.querySelectorAll(
     "button#detail"
   ) as NodeListOf<HTMLButtonElement>;
+  const table = modalDetail.querySelector("table") as HTMLTableElement;
+  const tableBody = table.querySelector("tbody") as HTMLTableSectionElement;
   buttonDetail.forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const orderID = btn.dataset.id as string;
       if (orderID) {
         modalDetail && modalDetail.classList.add("is-show");
+        const orders = (await OrderDetail.loadOne(
+          orderID
+        )) as unknown as OrderDetailProps[];
+        tableBody.textContent = "";
+        if (Array.isArray(orders) && orders.length > 0) {
+          orders.forEach((item) => {
+            console.log(
+              Object.entries(item.productID).forEach((item) => {
+                console.log(item);
+              })
+            );
+            const tableRow = document.createElement("tr");
+            tableRow.innerHTML = `
+          <th scope="col">#</th>
+          <th scope="col">${item.price}</th>
+          <th scope="col">Last</th>
+          <th scope="col">${item.quantity}</th>
+          <th scope="col">${formatCurrencyNumber(
+            calcPrice(item.price, item.quantity)
+          )}</th>
+        `;
+            tableBody.appendChild(tableRow);
+          });
+        }
       }
     });
   });

@@ -20,9 +20,9 @@
 
     <div class="main">
       <form method="POST" class="form" id="form-1">
-        <h3 class="heading">Thành viên đăng nhập</h3>
+        <h3 class="heading">Lấy lại mật khẩu</h3>
         <p class="desc">
-          Cùng nhau trở thành thành viên của BSmart ngay hôm nay ❤️
+          Cùng nhau trở thành thành viên của iSmart ngay hôm nay ❤️
         </p>
 
         <div class="spacer"></div>
@@ -39,33 +39,19 @@
           <span class="form-message"></span>
         </div>
 
-        <div class="form-group">
-          <label for="password" class="form-label">Mật khẩu</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="Nhập mật khẩu"
-            class="form-control"
-          />
-          <span class="form-message"></span>
+        <button class="form-submit">Xác nhận</button>
+        <div class="spacer actions">
+          <p>
+            Bạn chưa có tài khoản? <a href="/register.html">Đăng ký ngay</a>
+          </p>
         </div>
-
-        <button class="form-submit">Đăng nhập</button>
-        <div class="spacer actions actions--custom">
-          <a href="/register.html">Đăng ký ngay</a>
-          <a href="/recovery.html">Khôi phục tài khoản</a>
-          <a href="/forgot.html">Quên mật khẩu?</a>
+        <div class="back-to-home">
+          <i class="fa fa-home"></i>
         </div>
-        <a href="index.html">
-          <div class="back-to-home">
-            <i class="fa fa-home"></i>
-          </div>
-        </a>
       </form>
     </div>
 
-    <script type="module" src="/src/utils/validator.ts"></script>
-    <script type="module" src="/src/login.ts"></script>
+    <script type="register" src="/src/utils/validator.ts"></script>
+    <script type="module" src="/src/forgot.ts"></script>
   </body>
 </html>

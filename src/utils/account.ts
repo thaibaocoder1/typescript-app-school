@@ -11,6 +11,7 @@ import z from "zod";
 import { User, UserProps } from "../models/User";
 import { FormValues } from "../constants";
 import Swal from "sweetalert2";
+import { ApiResponseAuth } from "../active";
 
 export function renderAccountInfo(selector: string) {
   const accountInfo = document.getElementById(selector) as HTMLDivElement;
@@ -194,7 +195,8 @@ export function initChangeForm(selector: string, user: UserProps) {
     if (!isValid) return;
     try {
       const res = await User.updateField(user._id, formValues);
-      if (res.ok && res.status === 201) {
+      const change: ApiResponseAuth = await res.json();
+      if (change.success) {
         toast.success("Change password success!!");
         Swal.fire({
           title: "Đăng xuất trên thiết bị này?",
@@ -223,11 +225,9 @@ export function initChangeForm(selector: string, user: UserProps) {
             });
           }
         });
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 500);
       } else {
-        toast.error("Change password failed!!");
+        toast.error(change.message);
+        return;
       }
     } catch (error) {
       console.log(error);

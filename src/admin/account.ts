@@ -1,6 +1,10 @@
 import { AccessTokenData } from "../constants";
 import { initLogout } from "../utils";
-import { initFormAccount, initFormUpdate } from "../utils/form-account";
+import {
+  initFormAccount,
+  initFormChange,
+  initFormUpdate,
+} from "../utils/form-account";
 
 // functions
 
@@ -18,6 +22,8 @@ import { initFormAccount, initFormUpdate } from "../utils/form-account";
     const target = e.target as HTMLElement;
     if (target.matches(".btn-update")) {
       await initFormUpdate("form-user", infoUser);
+    } else if (target.matches(".btn-change-pass")) {
+      await initFormChange("form-change", infoUser);
     }
   });
 })();

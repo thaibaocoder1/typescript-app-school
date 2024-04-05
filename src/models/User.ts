@@ -9,12 +9,14 @@ export interface UserProps {
   password: string;
   password_confirmation: string;
   role: string;
+  isActive: boolean;
   imageUrl: {
     data: Buffer;
     contentType: string;
     fileName: string;
   };
   refreshToken: string;
+  resetedAt?: number;
   createdAt: string;
   updatedAt: string;
 }

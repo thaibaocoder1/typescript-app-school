@@ -58,6 +58,42 @@ export class DataResource<T> {
     return result.data;
   }
 
+  async active(id: string): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/active`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+      credentials: "include",
+    });
+    return res;
+  }
+
+  async forgot(value: Partial<T>): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/forgot`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(value),
+      credentials: "include",
+    });
+    return res;
+  }
+
+  async change(value: Partial<T>): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/change`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(value),
+      credentials: "include",
+    });
+    return res;
+  }
+
   async logout(id: string): Promise<T> {
     const res = await fetch(`${this.endpoint}/logout/${id}`, {
       credentials: "include",

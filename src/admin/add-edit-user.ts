@@ -1,5 +1,5 @@
 import { User, UserProps } from "../models/User";
-import { initLogout, toast } from "../utils";
+import { hideSpinner, initLogout, showSpinner, toast } from "../utils";
 import { Buffer } from "buffer";
 import {
   getFormValues,
@@ -39,9 +39,12 @@ async function initForm(params: ParamsSubmit) {
     if (!isValid) return;
     const formData = jsonToFormData(formValues);
     formData.append("id", params.values._id);
+    formData.append("admin", "true");
     try {
       if (params.id) {
+        showSpinner();
         const res = await User.updateFormData(formData);
+        hideSpinner();
         if (res.ok && res.status === 201) {
           toast.success("Update thành công");
           setTimeout(() => {
@@ -51,7 +54,9 @@ async function initForm(params: ParamsSubmit) {
           toast.error("Có lỗi trong khi xử lý. Thử lại");
         }
       } else {
+        showSpinner();
         const res = await User.saveFormData(formData);
+        hideSpinner();
         if (res.ok && res.status === 201) {
           toast.success("Tạo mới thành công");
           setTimeout(() => {
@@ -105,6 +110,7 @@ async function initSelectRole(selector: string, values: UserProps) {
       password: "",
       password_confirmation: "",
       role: "User",
+      isActive: true,
       imageUrl: {
         data: Buffer.from(""),
         contentType: "",

@@ -9,7 +9,10 @@ interface Users extends Document {
   password_confirmation: string;
   role: string;
   imageUrl?: Object;
+  isActive: boolean;
   refreshToken: string;
+  createdAt?: Date;
+  resetedAt?: number;
 }
 
 const userSchema = new Schema<Users>(
@@ -36,15 +39,17 @@ const userSchema = new Schema<Users>(
     },
     password: {
       type: String,
-      default: "123abc",
     },
     password_confirmation: {
       type: String,
-      default: "123abc",
     },
     role: {
       type: String,
       default: "User",
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
     },
     imageUrl: {
       data: Buffer,
@@ -53,6 +58,9 @@ const userSchema = new Schema<Users>(
     },
     refreshToken: {
       type: String,
+    },
+    resetedAt: {
+      type: Number,
     },
   },
   { timestamps: true }
