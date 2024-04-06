@@ -5363,6 +5363,9 @@ a.close.disabled {
     max-width: 800px;
     margin: 1.75rem auto;
   }
+  .modal-dialog.modal-dialog--custom {
+    max-width: 600px;
+  }
   .modal-dialog-scrollable {
     max-height: calc(100% - 3.5rem);
   }
@@ -10322,4 +10325,14 @@ footer.sticky-footer .copyright {
 }
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
+}
+.modal-info-user {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  list-style: none;
+  padding: 0;
+  grid-gap: 15px;
+}
+.modal-info-user li:last-child {
+  grid-column-end: span 2;
 }

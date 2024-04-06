@@ -509,12 +509,11 @@
               <table class="table table-striped" id="table-order">
                 <thead>
                   <tr>
-                    <th scope="col">Số thứ tự</th>
-                    <th scope="col">Tên đầy đủ</th>
+                    <th scope="col">STT</th>
                     <th scope="col">Email</th>
                     <th scope="col">Số điện thoại</th>
                     <th scope="col">Địa chỉ</th>
-                    <th scope="col">Thao tác</th>
+                    <th scope="col" colspan="2">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -553,7 +552,7 @@
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog--custom" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
@@ -610,7 +609,27 @@
             </button>
           </div>
           <div class="modal-body">
-            Click vào 'logout' nếu bạn chắc chắn muốn đăng xuất khỏi hệ thống!
+            <div class="modal-info">
+              <ul class="modal-info-user"></ul>
+            </div>
+            <table class="table" id="table-detail">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Tên sản phẩm</th>
+                  <th scope="col">Hình ảnh</th>
+                  <th scope="col">Số lượng</th>
+                  <th scope="col">Đơn giá</th>
+                  <th scope="col">Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="6" id="total"></th>
+                </tr>
+              </tfoot>
+            </table>
           </div>
           <div class="modal-footer">
             <button
@@ -620,7 +639,9 @@
             >
               Cancel
             </button>
-            <a class="btn btn-primary" href="" id="logout-btn">Logout</a>
+            <a class="btn btn-primary" href="" id="btn-invoice"
+              >Print Invoice</a
+            >
           </div>
         </div>
       </div>

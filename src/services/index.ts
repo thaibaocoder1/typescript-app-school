@@ -136,10 +136,7 @@ export class DataResource<T> {
   }
 
   // [UPDATE]
-  async update(
-    id: number | string,
-    fieldsToUpdate: Partial<T>
-  ): Promise<Response> {
+  async update(id: string, fieldsToUpdate: Partial<T>): Promise<Response> {
     const res = await fetch(`${this.endpoint}/${id}?_method=PATCH`, {
       method: "PATCH",
       headers: {

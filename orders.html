@@ -186,10 +186,9 @@
             <table class="table" id="table-order">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
                   <th scope="col">Fullname</th>
                   <th scope="col">Phone</th>
-                  <th scope="col">Address</th>
+                  <th scope="col">Email</th>
                   <th scope="col" colspan="2">Action</th>
                 </tr>
               </thead>
@@ -225,6 +224,38 @@
               No
             </button>
             <button type="button" class="btn btn-primary btn-confirm">
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+
+    <!-- Modal -->
+    <div class="modal fade" tabindex="-1" id="order-cancel-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">You're want to cancel this order?</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              &#10005;
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-denide"
+              data-bs-dismiss="modal"
+            >
+              No
+            </button>
+            <button type="button" class="btn btn-primary btn-confirm-cancel">
               Yes
             </button>
           </div>

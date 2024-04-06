@@ -116,7 +116,7 @@ function jsonToFormData(values: FormValues): FormData {
   }
   return formData;
 }
-function schemaUpdatePassword() {
+export function schemaUpdatePassword() {
   return z
     .object({
       old_password: z
@@ -137,7 +137,7 @@ function schemaUpdatePassword() {
       path: ["confirm_password"],
     });
 }
-async function validateFormPassword(
+export async function validateFormPassword(
   form: HTMLFormElement,
   formValues: FormValues
 ) {

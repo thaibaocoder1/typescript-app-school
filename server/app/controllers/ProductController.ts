@@ -97,6 +97,26 @@ class ProductController {
       next(error);
     }
   };
+  updateFields = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { ...obj } = req.body;
+      const product = await Product.findById({ _id: req.params.id });
+      if (product) {
+        await Product.updateOne({ _id: req.params.id }, obj, { new: true });
+        res.status(StatusCodes.CREATED).json({
+          status: "success",
+          data: product,
+        });
+      } else {
+        res.status(StatusCodes.NOT_FOUND).json({
+          status: "failed",
+          message: "Not found product in database!!",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
   slug = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { slug } = req.query;

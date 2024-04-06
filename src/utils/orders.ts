@@ -1,9 +1,52 @@
-import { formatCurrencyNumber, hideSpinner, showSpinner } from ".";
+import { formatCurrencyNumber, hideSpinner, showSpinner, toast } from ".";
 import { AccessTokenData } from "../constants";
+import { ResponseFromServer } from "../constants/orders";
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { Order, OrderProps } from "../models/Order";
 import { ProductProps } from "../models/Product";
 
+function renderTextStatus(status: number): string {
+  let str: string = "";
+  switch (status) {
+    case 1:
+      str = "Pending";
+      break;
+    case 2:
+      str = "Confirm + Waiting Shipped";
+      break;
+    case 3:
+      str = "Completed";
+      break;
+    case 4:
+      str = "Cancelled";
+      break;
+    case 5:
+      str = "Declined";
+      break;
+    default:
+      break;
+  }
+  return str;
+}
+function handleShowButton(status: number) {
+  let str: string = "";
+  switch (status) {
+    case 1:
+    case 2:
+    case 3:
+      str = "";
+      break;
+    case 4:
+      str = "hidden";
+      break;
+    case 5:
+      str = "hidden";
+      break;
+    default:
+      break;
+  }
+  return str;
+}
 export async function displayListOrder(token: string, selector: string) {
   const decodeToken: AccessTokenData = JSON.parse(token);
   const table = document.getElementById(selector) as HTMLTableElement;
@@ -14,19 +57,21 @@ export async function displayListOrder(token: string, selector: string) {
     hideSpinner();
     tableBody.textContent = "";
     if (Array.isArray(orders) && orders.length > 0) {
-      orders.forEach((item, index) => {
+      orders.forEach((item) => {
         const tableRow = document.createElement("tr");
-        tableRow.innerHTML = `<th scope="row">${index + 1}</th>
+        tableRow.innerHTML = `
         <td>${item.fullname}</td>
         <td>${item.phone}</td>
-        <td>${item.address}</td>
+        <td>${item.email}</td>
         <td>
           <button class="btn btn-primary btn-sm" id="detail" data-id=${
             item._id
           }>Detail</button>
-          <button class="btn btn-danger btn-sm" id="cancel" data-id=${
-            item._id
-          }>Cancel</button>
+          <button class="btn btn-danger btn-sm ${handleShowButton(
+            item.status
+          )}" id="cancel" data-id=${item._id}>${renderTextStatus(
+          item.status
+        )}</button>
         </td>`;
         tableBody.appendChild(tableRow);
       });
@@ -69,7 +114,7 @@ function getStatusOrder(item: OrderProps): string {
       status = "Đã nhận hàng";
       break;
     case 4:
-      status = "Đã nhận hàng";
+      status = "Đã huỷ";
       break;
     default:
       break;
@@ -79,10 +124,16 @@ function getStatusOrder(item: OrderProps): string {
 const modalDetail = document.getElementById(
   "order-detail-modal"
 ) as HTMLDivElement;
+const modalCancel = document.getElementById(
+  "order-cancel-modal"
+) as HTMLDivElement;
 
 window.addEventListener("load", () => {
   const buttonDetail = document.querySelectorAll(
     "button#detail"
+  ) as NodeListOf<HTMLButtonElement>;
+  const buttonCancel = document.querySelectorAll(
+    "button#cancel"
   ) as NodeListOf<HTMLButtonElement>;
   const table = modalDetail.querySelector("table") as HTMLTableElement;
   const tableBody = table.querySelector("tbody") as HTMLTableSectionElement;
@@ -125,13 +176,45 @@ window.addEventListener("load", () => {
       }
     });
   });
+  buttonCancel.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const orderID = btn.dataset.id as string;
+      if (orderID) {
+        modalCancel && modalCancel.classList.add("is-show");
+        modalCancel.dataset.id = orderID;
+      }
+    });
+  });
 });
 
-window.addEventListener("click", (e) => {
+window.addEventListener("click", async (e) => {
   const target = e.target as HTMLElement;
   if (target.closest("button.btn-close")) {
     modalDetail && modalDetail.classList.remove("is-show");
   } else if (target.closest("div#order-detail-modal")) {
     modalDetail && modalDetail.classList.remove("is-show");
+  } else if (target.matches("button.btn-close")) {
+    modalCancel && modalCancel.classList.remove("is-show");
+  } else if (target.matches("button.btn-denide")) {
+    modalCancel && modalCancel.classList.remove("is-show");
+  } else if (target.closest("button.btn-confirm-cancel")) {
+    const payload: Partial<OrderProps> = {
+      status: 4,
+    };
+    showSpinner();
+    const res = await Order.updateField(
+      modalCancel.dataset.id as string,
+      payload
+    );
+    hideSpinner();
+    const data: ResponseFromServer = await res.json();
+    if (data.status === "success") {
+      toast.info("Cancel order success!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } else {
+      toast.error(data.message);
+    }
   }
 });

@@ -609,7 +609,11 @@
                 >
                   Cập nhật thông tin
                 </button>
-                <button class="btn btn-primary btn-change-pass d-block">
+                <button
+                  class="btn btn-primary btn-change-pass d-block"
+                  data-toggle="modal"
+                  data-target="#changeModal"
+                >
                   Đổi mật khẩu
                 </button>
               </div>
@@ -647,7 +651,7 @@
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog--custom" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
@@ -793,7 +797,7 @@
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog--custom" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Đổi mật khẩu</h5>
@@ -807,7 +811,46 @@
             </button>
           </div>
           <div class="modal-body">
-            <p>Doi mat khau</p>
+            <form id="form-change" method="POST" novalidate>
+              <div class="mb-3">
+                <label for="old_password" class="form-label"
+                  >Old password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="old_password"
+                  name="old_password"
+                  required
+                />
+                <span class="invalid-feedback"></span>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">New password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  required
+                />
+                <span class="invalid-feedback"></span>
+              </div>
+              <div class="mb-3">
+                <label for="confirm_password" class="form-label"
+                  >Confirm password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirm_password"
+                  name="confirm_password"
+                  required
+                />
+                <span class="invalid-feedback"></span>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
           </div>
         </div>
       </div>

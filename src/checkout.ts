@@ -57,6 +57,25 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
     toast.error("Có lỗi trong khi xử lý");
   }
 }
+function filterCartApply(isHasCart: string) {
+  let cart: Carts[] = JSON.parse(isHasCart);
+  let cartApply: Carts[] = [];
+  for (const item of cart) {
+    if (item.isBuyNow && item.isCheckout) {
+      cartApply.push(item);
+    } else {
+      if (item.isBuyNow) {
+        cartApply.push(item);
+      } else if (item.isCheckout) {
+        cartApply.push(item);
+      } else {
+        continue;
+      }
+    }
+  }
+  return cartApply;
+}
+
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -67,7 +86,7 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
   let cart: Carts[] = [];
   let whitelist: WhiteLists[] = [];
   if (typeof isHasCart === "string") {
-    cart = JSON.parse(isHasCart);
+    cart = filterCartApply(isHasCart);
   }
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);

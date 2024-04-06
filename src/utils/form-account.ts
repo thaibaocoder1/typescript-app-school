@@ -1,4 +1,12 @@
-import { setBackgroundImage, setFieldValue, toast } from ".";
+import Swal from "sweetalert2";
+import {
+  deleteCookie,
+  setBackgroundImage,
+  setFieldValue,
+  toast,
+  validateFormPassword,
+} from ".";
+import { ApiResponseAuth } from "../active";
 import { AccessTokenData } from "../constants";
 import { User } from "../models/User";
 import {
@@ -71,4 +79,52 @@ export async function initFormUpdate(
 export async function initFormChange(
   selector: string,
   infoUser: AccessTokenData
-) {}
+) {
+  const form = document.getElementById(selector) as HTMLFormElement;
+  if (!infoUser || !form) return;
+  form.addEventListener("submit", async (e: SubmitEvent) => {
+    e.preventDefault();
+    const formValues = getFormValues(form);
+    const isValid = await validateFormPassword(form, formValues);
+    if (!isValid) return;
+    try {
+      const res = await User.updateField(infoUser.id, formValues);
+      const change: ApiResponseAuth = await res.json();
+      if (change.success) {
+        toast.success("Change password success!!");
+        Swal.fire({
+          title: "Đăng xuất trên thiết bị này?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Huỷ bỏ",
+        }).then(function (result) {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: "Đăng xuất thành công!",
+              icon: "success",
+            }).then(async function () {
+              if (infoUser.role.toLowerCase() === "user") {
+                localStorage.removeItem("accessToken");
+                deleteCookie("refreshToken");
+              } else {
+                localStorage.removeItem("accessTokenAdmin");
+                deleteCookie("refreshTokenAdmin");
+              }
+              setTimeout(() => {
+                window.location.assign("/admin/login.html");
+              }, 500);
+            });
+          }
+        });
+      } else {
+        toast.error(change.message);
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}

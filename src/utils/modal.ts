@@ -28,7 +28,9 @@ export function handleViewModal(selecotor: string) {
           <h4 class="font-weight-semi-bold" style="color: var(--red)">
             Sale ${product.discount}%
           </h4>
-          <button class="btn btn-primary">Mua ngay</button>
+          <a href="" class="btn btn-primary" data-id=${
+            product._id
+          } id="btn-buy-now">Mua ngay</a>
         </div>
       </div>`;
       }

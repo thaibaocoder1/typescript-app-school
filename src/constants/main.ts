@@ -2,6 +2,8 @@ export interface Carts {
   productID: string;
   price: number;
   quantity: number;
+  isBuyNow?: boolean;
+  isCheckout?: boolean;
 }
 export interface WhiteLists {
   productID: string | undefined;

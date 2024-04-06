@@ -138,6 +138,13 @@ function renderListCoupon(selector: string) {
     }
   }
 }
+function addFlagCart(cart: Carts[]) {
+  for (const item of cart) {
+    item.isCheckout = true;
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
 // main
 (async () => {
   let isHasCart: string | null = localStorage.getItem("cart");
@@ -274,6 +281,7 @@ function renderListCoupon(selector: string) {
                 }, 1000);
               }
             }
+            addFlagCart(cart);
           } else {
             toast.error(isValid.message);
             const data: ErrorPayload[] = isValid.data;
@@ -290,6 +298,7 @@ function renderListCoupon(selector: string) {
             }
           }
         } else {
+          addFlagCart(cart);
           window.location.assign("/checkout.html");
         }
       } catch (error) {

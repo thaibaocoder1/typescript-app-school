@@ -26,4 +26,14 @@ export const sweetAlert = {
       }
     });
   },
+  dialog() {
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Đặt hàng thành công!",
+      showConfirmButton: false,
+      timer: 1000,
+      timerProgressBar: true,
+    });
+  },
 };

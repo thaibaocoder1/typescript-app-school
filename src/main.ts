@@ -14,6 +14,7 @@ import {
 } from "./utils";
 import { Carts, Params, WhiteLists } from "./constants";
 import { ProductProps, Product } from "./models/Product";
+import { handleOrderBuyNow } from "./utils/order-buy-now";
 
 // functions
 async function renderLatestProduct(idElement: string) {
@@ -208,4 +209,5 @@ async function renderArrivedProduct(idElement: string) {
   // Handle whitelist
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
+  handleOrderBuyNow("#modal-view", cart);
 })();

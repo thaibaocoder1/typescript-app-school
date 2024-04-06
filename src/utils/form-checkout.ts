@@ -11,6 +11,7 @@ import { User, UserProps } from "../models/User";
 import { getAllProvinces } from "./api-address";
 import { Order, OrderProps } from "../models/Order";
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
+import { Product, ProductProps } from "../models/Product";
 
 let infoUser: AccessTokenData;
 let accessToken: string | null = localStorage.getItem("accessToken");
@@ -115,18 +116,33 @@ function getFormValues(form: HTMLFormElement): FormValues {
   }
   return formValues;
 }
+function findCommonElements(arr1: Carts[], arr2: Carts[]) {
+  const idSet = new Set(arr1.map((item) => item.productID));
+  const commonElements = arr2.filter((item) => !idSet.has(item.productID));
+  return commonElements;
+}
 async function handleAddOrderDetail(orderID: string, cart: Array<Carts>) {
   let isSuccess: Boolean = true;
   try {
     for (const item of cart) {
+      const product = await Product.loadOne(item.productID);
+      const totalQuantity = product.quantity;
       const payload: Partial<OrderDetailProps> = {
         orderID,
         productID: item.productID,
         price: item.price,
         quantity: item.quantity,
       };
-      const res = await OrderDetail.save(payload);
-      const data: ApiOrderResponse = await res.json();
+      const payloadProduct: Partial<ProductProps> = {
+        quantity: totalQuantity - item.quantity,
+      };
+      const saveOrderDetailPromise = OrderDetail.save(payload);
+      const updateProduct = Product.updateField(item.productID, payloadProduct);
+      const [orderDetailResult, productUpdateResult] = await Promise.all([
+        saveOrderDetailPromise,
+        updateProduct,
+      ]);
+      const data: ApiOrderResponse = await orderDetailResult.json();
       if (data.status === "success") {
         isSuccess = true;
       } else {
@@ -135,7 +151,9 @@ async function handleAddOrderDetail(orderID: string, cart: Array<Carts>) {
     }
     if (isSuccess) {
       toast.success("Checkout successfully!");
-      localStorage && localStorage.removeItem("cart");
+      const cartFull = JSON.parse(localStorage.getItem("cart") as string);
+      const saveCart = findCommonElements(cart, cartFull);
+      localStorage && localStorage.setItem("cart", JSON.stringify(saveCart));
       setTimeout(() => {
         window.location.assign("/orders.html");
       }, 500);

@@ -44,6 +44,26 @@ class OrderController {
       next(error);
     }
   };
+  updateFields = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { ...obj } = req.body;
+      const order = await Order.findById({ _id: req.params.id });
+      if (order) {
+        await Order.updateOne({ _id: req.params.id }, obj, { new: true });
+        res.status(StatusCodes.CREATED).json({
+          status: "success",
+          data: order,
+        });
+      } else {
+        res.status(StatusCodes.NOT_FOUND).json({
+          status: "failed",
+          message: "Not found order in database!!",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
   add = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const order = await Order.create(req.body);
