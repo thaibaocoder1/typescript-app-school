@@ -1,10 +1,23 @@
 import { Order, OrderProps } from "../models/Order";
 import dayjs from "dayjs";
-import { formatCurrencyNumber, initLogout, toast } from "../utils";
+import {
+  formatCurrencyNumber,
+  hideSpinner,
+  initLogout,
+  showSpinner,
+  toast,
+} from "../utils";
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
-import { ProductProps } from "../models/Product";
+import { Product, ProductProps } from "../models/Product";
 import { ResponseFromServer } from "../constants/orders";
 
+// types
+type ApiResponseOrder = {
+  success: boolean;
+  data: {
+    message: string;
+  };
+};
 // functions
 function handleShowButton(status: number) {
   let str: string = "";
@@ -162,21 +175,55 @@ async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
 
     buttonConfirmChange.addEventListener("click", async () => {
       const status = Number(form.dataset.status);
-      const payload: Partial<OrderProps> = {
-        _id: orderID,
-        status,
-        cancelCount: status === 5 ? 1 : 0,
-      };
-      if (payload) {
-        const res = await Order.updateField(orderID, payload);
-        const update: ResponseFromServer = await res.json();
-        if (update.status === "success") {
-          toast.success("Cập nhật thành công");
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        } else {
-          toast.error(update.message);
+      if (status === 4 || status === 5) {
+        const orderDetail = await OrderDetail.loadOne(orderID as string);
+        if (Array.isArray(orderDetail) && orderDetail.length > 0) {
+          orderDetail.forEach(async (item) => {
+            const productID = (item.productID as ProductProps)._id;
+            const refundQuantity: Partial<ProductProps> = {
+              _id: productID,
+              quantity:
+                item.quantity + (item.productID as ProductProps).quantity,
+            };
+            const payload: Partial<OrderProps> = {
+              _id: orderID,
+              status,
+              cancelCount: status === 5 ? 1 : 0,
+            };
+            const promise1 = Order.updateField(orderID, payload);
+            const promise2 = Product.updateField(productID, refundQuantity);
+            const [resOrder, resProduct] = await Promise.all([
+              promise1,
+              promise2,
+            ]);
+            const update: ResponseFromServer = await resOrder.json();
+            if (update.status === "success") {
+              toast.success("Cập nhật thành công");
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+            } else {
+              toast.error(update.message);
+            }
+          });
+        }
+      } else {
+        const payload: Partial<OrderProps> = {
+          _id: orderID,
+          status,
+          cancelCount: status === 5 ? 1 : 0,
+        };
+        if (payload) {
+          const res = await Order.updateField(orderID, payload);
+          const update: ResponseFromServer = await res.json();
+          if (update.status === "success") {
+            toast.success("Cập nhật thành công");
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          } else {
+            toast.error(update.message);
+          }
         }
       }
     });
@@ -213,9 +260,13 @@ async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
   const modalChangeStatus = document.getElementById(
     "changeModal"
   ) as HTMLDivElement;
+  const buttonInvoice = document.getElementById(
+    "btn-invoice"
+  ) as HTMLDivElement;
   buttonDetail.forEach((btn) => {
     btn.addEventListener("click", async () => {
       const orderID = btn.dataset.id;
+      modalDetail.dataset.id = orderID;
       try {
         if (orderID) {
           const orders = (await OrderDetail.loadOne(
@@ -278,6 +329,28 @@ async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
       const orderID = <string>btn.dataset.id;
       await registerFormChangeStatus(modalChangeStatus, orderID);
     });
+  });
+  buttonInvoice.addEventListener("click", async (e: Event) => {
+    e.preventDefault();
+    const orderID = modalDetail.dataset.id as string;
+    try {
+      if (orderID) {
+        showSpinner();
+        const res = await Order.invoice(orderID);
+        hideSpinner();
+        const invoice: ApiResponseOrder = await res.json();
+        if (invoice.success) {
+          toast.success(invoice.data.message);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          toast.error(invoice.data.message);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
   initLogout("logout-btn");
 })();

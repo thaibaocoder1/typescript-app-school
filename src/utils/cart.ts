@@ -1,6 +1,6 @@
 import { calcPrice, formatCurrencyNumber } from "./format";
 import { Params, Carts, CouponsStorage } from "../constants";
-import { Product } from "../models/Product";
+import { Product, ProductProps } from "../models/Product";
 import Swal from "sweetalert2";
 import { toast } from ".";
 
@@ -52,7 +52,7 @@ export async function renderListProductInCart(
         shipping += item.quantity * 5000 * ((100 - totalPercentCounpon) / 100);
         total = subtotal + shipping;
         totalQuantity += item.quantity;
-        const product = await Product.loadOne(item.productID);
+        const product = (await Product.loadOne(item.productID)) as ProductProps;
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
         tableRow.dataset.id = item.productID;
         tableRow.innerHTML = `
@@ -115,7 +115,7 @@ export async function renderListProductInCart(
 export async function addProductToCart(params: Params) {
   let { cart, productID } = params;
   let cartItemIndex: number = cart.findIndex((x) => x.productID === productID);
-  const product = await Product.loadOne(productID);
+  const product = (await Product.loadOne(productID)) as ProductProps;
   const price = calcPrice(product.price, product.discount);
   if (cart.length <= 0) {
     cart = [

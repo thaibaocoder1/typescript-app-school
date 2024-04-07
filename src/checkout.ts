@@ -84,23 +84,27 @@ function filterCartApply(isHasCart: string) {
   let accessTokenAdmin: string | null =
     localStorage.getItem("accessTokenAdmin");
   let cart: Carts[] = [];
+  let cartClone: Carts[] = [];
   let whitelist: WhiteLists[] = [];
   if (typeof isHasCart === "string") {
     cart = filterCartApply(isHasCart);
+    cartClone = JSON.parse(isHasCart);
   }
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);
   }
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumOrder("num-order", cartClone);
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumOrder("num-order", cartClone);
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumOrder("num-order", cartClone);
     }
   }
-  displayNumOrder("num-order", cart);
   displayNumberWhitelist("whitelist-order", whitelist);
   await renderSidebar("#sidebar-category");
   // Checkout page

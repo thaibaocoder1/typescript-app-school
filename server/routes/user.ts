@@ -14,8 +14,12 @@ router.post("/change", userController.reset);
 router.get("/logout/:id", userController.logout);
 
 router.post("/save", upload.single("imageUrl"), userController.add);
+router.delete("/soft/:id", userController.softDelete);
+router.delete("/:id", userController.delete);
 router.patch("/update/:id", upload.single("imageUrl"), userController.update);
+router.patch("/restore/:id", userController.restore);
 router.patch("/update-fields/:id", userController.updateFields);
+router.get("/trash-users", userController.trash);
 router.get("/:id", userController.detail);
 router.get("/", userController.index);
 

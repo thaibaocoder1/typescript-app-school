@@ -1,6 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, QueryWithHelpers } from "mongoose";
+import MongooseDelete from "mongoose-delete";
 
-interface Users extends Document {
+interface Users extends MongooseDelete.SoftDeleteDocument {
   fullname: string;
   username: string;
   email: string;
@@ -66,4 +67,13 @@ const userSchema = new Schema<Users>(
   { timestamps: true }
 );
 
-export const User = model<Users>("User", userSchema);
+userSchema.plugin(MongooseDelete, {
+  deletedAt: true,
+  deletedByType: String,
+  overrideMethods: true,
+});
+
+export const User = model<Users>(
+  "User",
+  userSchema
+) as MongooseDelete.SoftDeleteModel<Users>;

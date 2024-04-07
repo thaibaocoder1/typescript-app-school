@@ -34,7 +34,7 @@ async function handleChangeWard(e: Event) {
   const target = e.target as HTMLSelectElement;
   const districtID = target.value;
   try {
-    if (districtID) {
+    if (districtID && districtID !== "") {
       await getAllWards(districtID, "ward");
     } else {
       const wardElement = document.getElementById("ward") as HTMLSelectElement;
@@ -49,6 +49,7 @@ async function getAllDistricts(provinceID: string, selector: string) {
   const districtElement = document.getElementById(
     selector
   ) as HTMLSelectElement;
+  districtElement.innerHTML = `<option value="">Select one district</option>`;
   try {
     const response = await fetch(
       "https://vapi.vnappmob.com/api/province/district/" + provinceID
@@ -68,9 +69,8 @@ async function getAllDistricts(provinceID: string, selector: string) {
   }
 }
 async function getAllWards(districtID: string, selector: string) {
-  const districtElement = document.getElementById(
-    selector
-  ) as HTMLSelectElement;
+  const wardElement = document.getElementById(selector) as HTMLSelectElement;
+  wardElement.innerHTML = `<option value="">Select one ward</option>`;
   try {
     const response = await fetch(
       "https://vapi.vnappmob.com/api/province/ward/" + districtID
@@ -82,7 +82,7 @@ async function getAllWards(districtID: string, selector: string) {
       optionEl.dataset.value = ward.ward_name;
       optionEl.value = ward.ward_id;
       optionEl.text = ward.ward_name;
-      districtElement.add(optionEl);
+      wardElement.add(optionEl);
     });
   } catch (error) {
     console.error("Error:", error);
@@ -93,6 +93,7 @@ export async function getAllProvinces(selector: string) {
   const provinceElement = document.getElementById(
     selector
   ) as HTMLSelectElement;
+  provinceElement.innerHTML = `<option value="">Select one province</option>`;
   try {
     const response = await fetch("https://vapi.vnappmob.com/api/province/");
     const data = await response.json();

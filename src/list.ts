@@ -1,10 +1,11 @@
 import Swal from "sweetalert2";
 import { AccessTokenData, Carts, WhiteLists } from "./constants";
-import { Product } from "./models/Product";
+import { Product, ProductProps } from "./models/Product";
 import {
   calcPrice,
   displayNumberWhitelist,
   formatCurrencyNumber,
+  handleViewModal,
   hideSpinner,
   renderAccountInfo,
   showSpinner,
@@ -12,6 +13,7 @@ import {
 import { displayNumOrder } from "./utils/cart";
 import { renderSidebar } from "./utils/sidebar";
 import { toast } from "./utils/toast";
+import { handleOrderBuyNow } from "./utils/order-buy-now";
 
 // functions
 async function renderWhitelistProduct(
@@ -23,7 +25,9 @@ async function renderWhitelistProduct(
   whitelistWrapper.textContent = "";
   whitelist.forEach(async (item) => {
     showSpinner();
-    const product = await Product.loadOne(item.productID as string);
+    const product = (await Product.loadOne(
+      item.productID as string
+    )) as ProductProps;
     hideSpinner();
     const productItem = document.createElement("div");
     productItem.className = "col-lg-3 col-md-6 col-sm-12 pb-1";
@@ -36,14 +40,19 @@ async function renderWhitelistProduct(
         <i class="fas fa-trash" style="color: inherit;"></i>
         </span>
       </div>
+      <div class="card-modal" data-id=${product._id}>
+      <span>
+        <i class="fas fa-eye" style="color: inherit;"></i>
+        </span>
+      </div>
       <div
         class="card-header product-img position-relative overflow-hidden bg-transparent border p-0"
       >
       <a href="detail.html?id=${
         product._id
-      }"><img class="img-fluid w-100" src="${product.thumb.fileName}" alt="${
-      product.name
-    }" /></a>
+      }"><img class="img-fluid w-100" style="height: 220px; object-fit: contain" src="${
+      product.thumb.fileName
+    }" alt="${product.name}" /></a>
       </div>
       <div
         class="card-body border-left border-right text-center p-0 pt-4 pb-3"
@@ -93,18 +102,23 @@ async function renderWhitelistProduct(
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);
   }
+  displayNumOrder("num-order", cart);
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumberWhitelist("whitelist-order", whitelist);
+    await renderWhitelistProduct(whitelist, "whitelist-product");
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
+      await renderWhitelistProduct(whitelist, "whitelist-product");
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
+      await renderWhitelistProduct(whitelist, "whitelist-product");
     }
   }
-  displayNumOrder("num-order", cart);
-  displayNumberWhitelist("whitelist-order", whitelist);
-  await renderWhitelistProduct(whitelist, "whitelist-product");
+
   await renderSidebar("#sidebar-category");
   // Handle whitelist
   window.addEventListener("load", () => {
@@ -161,5 +175,7 @@ async function renderWhitelistProduct(
         }
       });
     });
+    handleViewModal(".card-modal");
+    handleOrderBuyNow("#modal-view", cart);
   });
 })();

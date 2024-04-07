@@ -173,17 +173,19 @@ async function renderArrivedProduct(idElement: string) {
     whitelist = JSON.parse(isHasWhiteList);
   }
   displayNumOrder("num-order", cart);
-  displayNumberWhitelist("whitelist-order", whitelist);
   await renderSidebar("#sidebar-category");
   await renderLatestProduct("#latest-product");
   await renderArrivedProduct("#arrived-product");
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumberWhitelist("whitelist-order", whitelist);
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     }
   }
   // Handle cart

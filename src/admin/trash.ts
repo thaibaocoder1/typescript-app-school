@@ -12,7 +12,7 @@ async function renderListCategory(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const users = await User.loadAll();
+    const users = await User.loadRemove();
     if (users.length > 0 && Array.isArray(users)) {
       users.forEach((item: UserProps, index: number) => {
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
@@ -25,7 +25,7 @@ async function renderListCategory(selector: string) {
         <td>
           <button class="btn btn-primary btn-sm" data-id=${
             item._id
-          } id="btn-edit">Chỉnh sửa</button>
+          } id="btn-recover">Khôi phục</button>
           <button class="btn btn-secondary btn-sm" data-id=${
             item._id
           }  data-toggle="modal"
@@ -35,7 +35,7 @@ async function renderListCategory(selector: string) {
       });
     } else {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
-      tableRow.innerHTML = `<th scope="row" colspan="9">Chưa có khách hàng nào. <a href="/admin/add-edit-user.html">Thêm ngay</a></th>`;
+      tableRow.innerHTML = `<th scope="row" colspan="9">Thùng rác trống!!</th>`;
       tableBody.appendChild(tableRow);
     }
   } catch (error) {
@@ -45,17 +45,28 @@ async function renderListCategory(selector: string) {
 // main
 (async () => {
   await renderListCategory("#table-user");
-  const buttonEdit = document.querySelectorAll(
-    "#btn-edit"
+  const buttonRecover = document.querySelectorAll(
+    "#btn-recover"
   ) as NodeListOf<HTMLButtonElement>;
   const buttonDelete = document.querySelectorAll(
     "#btn-delete"
   ) as NodeListOf<HTMLButtonElement>;
   const modalDelete = document.getElementById("deleteModal") as HTMLElement;
-  buttonEdit.forEach((btn) => {
-    btn.addEventListener("click", () => {
+  buttonRecover.forEach((btn) => {
+    btn.addEventListener("click", async () => {
       const userID = btn.dataset.id;
-      userID && window.location.assign("add-edit-user.html?id=" + userID);
+      if (userID) {
+        const res = await User.restore(userID);
+        const restore: ApiResponseAuth = await res.json();
+        if (restore.success) {
+          toast.success(restore.message);
+          setTimeout(() => {
+            window.location.assign("/admin/list-user.html");
+          }, 1000);
+        } else {
+          toast.error(restore.message);
+        }
+      }
     });
   });
   buttonDelete.forEach((btn) => {
@@ -73,7 +84,7 @@ async function renderListCategory(selector: string) {
       const userID = modalDelete.dataset.id as string;
       try {
         if (userID) {
-          const res = await User.softDelete(userID);
+          const res = await User.delete(userID);
           const remove: ApiResponseAuth = await res.json();
           if (remove.success) {
             toast.success(remove.message);

@@ -22,7 +22,7 @@ async function handleOnSubmitForm(data: Record<string, any>): Promise<void> {
             toast.success("Register successfully");
             setTimeout(() => {
               window.location.assign("/login.html");
-            }, 2000);
+            }, 1000);
           } else {
             toast.error("Register failed");
           }

@@ -1,11 +1,22 @@
-export function handleAddCartDetail(type: string, selector: string) {
+import { toast } from "./toast";
+
+export async function handleAddCartDetail(
+  type: string,
+  selector: string,
+  count: number
+) {
   const inputQuantity = document.querySelector(
     `input[name='${selector}']`
   ) as HTMLInputElement;
   let currentValue: number = parseInt(inputQuantity.value as string);
   switch (type) {
     case "plus":
-      inputQuantity.value = (currentValue + 1).toString();
+      if (inputQuantity.value === count.toString()) {
+        toast.error("Sản phẩm đạt tối đa số lượng");
+        inputQuantity.value = count.toString();
+      } else {
+        inputQuantity.value = (currentValue + 1).toString();
+      }
       break;
     case "minus":
       inputQuantity.value = Math.max(currentValue - 1, 1).toString();

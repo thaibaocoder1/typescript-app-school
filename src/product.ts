@@ -48,6 +48,7 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
   const listProductEl = document.querySelector(params.idElement) as HTMLElement;
   if (!listProductEl) return;
   listProductEl.textContent = "";
+  const ulPagination = document.getElementById("pagination") as HTMLElement;
   try {
     let products = [...data];
     if (params.slug) {
@@ -60,7 +61,9 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
         products = <ProductProps[]>dataWithSlug.data;
       }
     }
+
     if (products && products.length > 0) {
+      if (ulPagination.hidden) ulPagination.hidden = false;
       products.forEach((item: ProductProps) => {
         const productItem = document.createElement("div");
         productItem.className = "col-lg-4 col-md-6 col-sm-12 pb-1";
@@ -130,7 +133,7 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
     console.log(error);
   }
 }
-function initSearch(selector: string, params: URLSearchParams) {
+function initSearch(selector: string, params: URLSearchParams, cart: Carts[]) {
   const inputSearch = document.getElementById(selector) as HTMLInputElement;
   if (params.has("searchTerm")) {
     inputSearch.value = params.get("searchTerm") as string;
@@ -139,7 +142,7 @@ function initSearch(selector: string, params: URLSearchParams) {
     const debounceSearch = debounce(async (e: Event) => {
       const target = e.target as HTMLInputElement;
       const value = target.value;
-      await handleFilterChange("searchTerm", value);
+      await handleFilterChange("searchTerm", value, cart);
     }, 500);
     inputSearch.addEventListener("input", debounceSearch);
   }
@@ -149,7 +152,8 @@ function renderPagination(
   data: Pagination,
   params: URLSearchParams
 ) {
-  if (params.has("page")) params.delete("page");
+  const paramsClone = new URLSearchParams(params);
+  if (paramsClone.has("page")) paramsClone.delete("page");
   const ulPagination = document.getElementById(selector) as HTMLElement;
   const { page, totalRows, limit } = data;
   const totalPages = Math.ceil(totalRows / limit);
@@ -166,7 +170,7 @@ function renderPagination(
     prevLink.innerHTML = `<a class="page-link" data-page=${Math.max(
       page - 1,
       1
-    )} href="?page=${Math.max(page - 1, 1)}&${params}">&laquo;</a>`;
+    )} href="?page=${Math.max(page - 1, 1)}&${paramsClone}">&laquo;</a>`;
   }
   ulPagination.appendChild(prevLink);
 
@@ -174,7 +178,7 @@ function renderPagination(
   for (let i = 1; i <= totalPages; ++i) {
     const liElement = document.createElement("li");
     liElement.className = "page-item";
-    liElement.innerHTML = `<a class="page-link" data-page=${i} href="?page=${i}&${params}">${i}</a>`;
+    liElement.innerHTML = `<a class="page-link" data-page=${i} href="?page=${i}&${paramsClone}">${i}</a>`;
     if (i === page) {
       liElement.classList.add("active");
     }
@@ -191,13 +195,17 @@ function renderPagination(
     nextLink.innerHTML = `<a class="page-link" data-page=${Math.min(
       page + 1,
       totalPages
-    )} href="?page=${Math.min(page + 1, totalPages)}&${params}">&raquo;</a>`;
+    )} href="?page=${Math.min(
+      page + 1,
+      totalPages
+    )}&${paramsClone}">&raquo;</a>`;
   }
   ulPagination.appendChild(nextLink);
 }
 async function handleFilterChange(
   filterName: string,
-  filterValue: string | number
+  filterValue: string | number,
+  cart?: Carts[]
 ) {
   const url = new URL(window.location.href);
   if (filterName === "searchTerm") {
@@ -212,32 +220,6 @@ async function handleFilterChange(
   hideSpinner();
   const paramsFn: ParamsProudct = {
     idElement: "#list-product",
-    slug: url.searchParams.get("slug"),
-  };
-  if (res.status === "success") {
-    const { data, pagination } = res;
-    console.log(data);
-    const paramsPagination = pagination as Pagination;
-    await renderListProduct(paramsFn, <ProductProps[]>data);
-    renderPagination("pagination", paramsPagination, url.searchParams);
-  }
-}
-
-// main
-(async () => {
-  // init pagination
-  const url: URL = new URL(window.location.href);
-  if (!url.searchParams.get("page")) url.searchParams.set("page", "1");
-  if (!url.searchParams.get("limit")) url.searchParams.set("limit", "3");
-  history.pushState({}, "", url);
-  const queryParams = url.searchParams;
-  showSpinner();
-  const res = (await Product.loadWithParams(
-    queryParams
-  )) as ApiResponseProducts<ProductProps>;
-  hideSpinner();
-  const paramsFn: ParamsProudct = {
-    idElement: "#list-product",
     slug: url.searchParams,
   };
   if (res.status === "success") {
@@ -245,7 +227,44 @@ async function handleFilterChange(
     const paramsPagination = pagination as Pagination;
     await renderListProduct(paramsFn, <ProductProps[]>data);
     renderPagination("pagination", paramsPagination, url.searchParams);
+    // Handle whitelist
+    handleWhitelist(".card-whitelist");
+    handleViewModal(".card-modal");
+    if (cart) {
+      handleOrderBuyNow("#modal-view", cart);
+    }
   }
+}
+function initURL(): URLSearchParams {
+  const url: URL = new URL(window.location.href);
+  if (!url.searchParams.get("page")) url.searchParams.set("page", "1");
+  if (!url.searchParams.get("limit")) url.searchParams.set("limit", "3");
+  history.pushState({}, "", url);
+  return url.searchParams;
+}
+
+// main
+(async () => {
+  // init pagination
+  const queryParams = initURL();
+  showSpinner();
+  const res = (await Product.loadWithParams(
+    queryParams
+  )) as ApiResponseProducts<ProductProps>;
+  hideSpinner();
+
+  const paramsFn: ParamsProudct = {
+    idElement: "#list-product",
+    slug: queryParams,
+  };
+
+  if (res.status === "success") {
+    const { data, pagination } = res;
+    const paramsPagination = pagination as Pagination;
+    await renderListProduct(paramsFn, <ProductProps[]>data);
+    renderPagination("pagination", paramsPagination, queryParams);
+  }
+
   // end init pagination
   let isHasCart: string | null = localStorage.getItem("cart");
   let isHasWhiteList: string | null = localStorage.getItem("whitelist");
@@ -260,15 +279,19 @@ async function handleFilterChange(
   if (typeof isHasWhiteList === "string") {
     whitelist = JSON.parse(isHasWhiteList);
   }
+  // Search
+  initSearch("search", queryParams, cart);
   displayNumOrder("num-order", cart);
-  displayNumberWhitelist("whitelist-order", whitelist);
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumberWhitelist("whitelist-order", whitelist);
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     }
   }
   await renderSidebar("#sidebar-category");
@@ -292,20 +315,21 @@ async function handleFilterChange(
       }
     });
   });
-  // Search
-  initSearch("search", url.searchParams);
   // Handle whitelist
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
+  handleOrderBuyNow("#modal-view", cart);
   // Hash
   let productApply: ProductProps[] = [];
   window.addEventListener("hashchange", async (e: HashChangeEvent) => {
     const newURL = e.newURL;
+    console.log(newURL);
     showSpinner();
     const res = (await Product.loadWithParams(
-      url.searchParams
+      queryParams
     )) as ApiResponseProducts<ProductProps>;
     hideSpinner();
+    console.log(res);
     toast.info("Filter success!");
     if (newURL.indexOf("increase") >= 0) {
       productApply = (res.data as ProductProps[]).sort(

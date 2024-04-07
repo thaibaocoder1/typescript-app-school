@@ -10,6 +10,14 @@ export class DataResource<T> {
     return result.data;
   }
 
+  async loadRemove(): Promise<T[]> {
+    const res = await fetch(`${this.endpoint}/trash-users`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    return result.data;
+  }
+
   async loadWithSlug(slug: string): Promise<T[]> {
     const res = await fetch(`${this.endpoint}/list?slug=${slug}`, {
       credentials: "include",
@@ -143,6 +151,22 @@ export class DataResource<T> {
     return res;
   }
 
+  async softDelete(id: string): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/soft/${id}?_method=DELETE`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return res;
+  }
+
+  async restore(id: string): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/restore/${id}?_method=PATCH`, {
+      method: "PATCH",
+      credentials: "include",
+    });
+    return res;
+  }
+
   // [UPDATE]
   async update(id: string, fieldsToUpdate: Partial<T>): Promise<Response> {
     const res = await fetch(`${this.endpoint}/${id}?_method=PATCH`, {
@@ -165,6 +189,19 @@ export class DataResource<T> {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(fieldsToUpdate),
+        credentials: "include",
+      }
+    );
+    return res;
+  }
+
+  // [Update - FormData]
+  async updateFormData(data: FormData): Promise<Response> {
+    const res = await fetch(
+      `${this.endpoint}/update/${data.get("id")}?_method=PATCH`,
+      {
+        method: "PATCH",
+        body: data,
         credentials: "include",
       }
     );
@@ -194,16 +231,9 @@ export class DataResource<T> {
     return res;
   }
 
-  // [Update - FormData]
-  async updateFormData(data: FormData): Promise<Response> {
-    const res = await fetch(
-      `${this.endpoint}/update/${data.get("id")}?_method=PATCH`,
-      {
-        method: "PATCH",
-        body: data,
-        credentials: "include",
-      }
-    );
+  // Email: Invoice
+  async invoice(id: string): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/invoice/${id}`);
     return res;
   }
 }

@@ -27,24 +27,20 @@ class ProductController {
       const limit = Number(req.query.limit);
       const searchTerm = req.query.searchTerm;
       const slug = req.query.slug;
-      const skip = (page - 1) * limit;
-      console.log(req.query);
       let products: any;
       let count: any;
       if (searchTerm && searchTerm !== "") {
         if (slug && slug !== "") {
           const catalog = await Catalog.findOne({ slug });
+          const skip = (page - 1) * limit;
           products = await Product.find({
             $and: [
               { name: { $regex: searchTerm, $options: "i" } },
               { categoryID: catalog?._id },
             ],
           })
-            .sort("-createdAt")
             .skip(skip)
             .limit(limit);
-          console.log(products);
-          console.log("taoo day ne");
           count = await Product.countDocuments({
             $and: [
               { name: { $regex: searchTerm, $options: "i" } },
@@ -52,11 +48,10 @@ class ProductController {
             ],
           });
         } else {
-          console.log("tao nhay xuong day roi");
+          const skip = (page - 1) * limit;
           products = await Product.find({
             name: { $regex: searchTerm, $options: "i" },
           })
-            .sort("-createdAt")
             .skip(skip)
             .limit(limit);
           count = await Product.countDocuments({
@@ -65,21 +60,19 @@ class ProductController {
         }
       } else {
         if (slug && slug !== "") {
+          const skip = (page - 1) * limit;
           const catalog = await Catalog.findOne({ slug });
           products = await Product.find({
             categoryID: catalog?._id,
           })
-            .sort("-createdAt")
             .skip(skip)
             .limit(limit);
           count = await Product.countDocuments({
             categoryID: catalog?._id,
           });
         } else {
-          products = await Product.find({})
-            .sort("-createdAt")
-            .skip(skip)
-            .limit(limit);
+          const skip = (page - 1) * limit;
+          products = await Product.find({}).skip(skip).limit(limit);
           count = await Product.countDocuments();
         }
       }

@@ -5,6 +5,7 @@ import { toast } from "./utils";
 export type ApiResponseAuth = {
   success: boolean | string;
   data?: any;
+  isActive?: boolean;
   message: string;
 };
 // main
@@ -15,10 +16,14 @@ export type ApiResponseAuth = {
     const res = await User.active(activeID);
     const active: ApiResponseAuth = await res.json();
     if (active.success) {
-      toast.success("Active thành công");
+      if (active.isActive) {
+        toast.info(active.message);
+      } else {
+        toast.success("Active thành công");
+      }
       setTimeout(() => {
         window.location.assign("/login.html");
-      }, 500);
+      }, 1500);
     } else {
       toast.error(active.message);
       return;

@@ -75,7 +75,9 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
   <div class="d-flex align-items-center mb-4 pt-2">
     <div class="input-group quantity mr-3" style="width: 130px">
       <div class="input-group-btn">
-        <button class="btn btn-primary btn-minus" id="btn-minus">
+        <button class="btn btn-primary btn-minus" data-id=${
+          params.productInfo._id
+        } id="btn-minus">
           <i class="fa fa-minus"></i>
         </button>
       </div>
@@ -87,7 +89,9 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
         data-value="1"
       />
       <div class="input-group-btn">
-        <button class="btn btn-primary btn-plus" id="btn-plus">
+        <button class="btn btn-primary btn-plus" data-id=${
+          params.productInfo._id
+        } id="btn-plus">
           <i class="fa fa-plus"></i>
         </button>
       </div>
@@ -213,14 +217,16 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     whitelist = JSON.parse(isHasWhiteList);
   }
   displayNumOrder("num-order", cart);
-  displayNumberWhitelist("whitelist-order", whitelist);
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumberWhitelist("whitelist-order", whitelist);
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     }
   }
   const searchParams = new URLSearchParams(location.search);
@@ -304,10 +310,18 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
     }
   });
   buttonMinus.addEventListener("click", async () => {
-    handleAddCartDetail("minus", "order");
+    const productID = buttonPlus.dataset.id as string;
+    if (productID) {
+      const product = (await Product.loadOne(productID)) as ProductProps;
+      handleAddCartDetail("minus", "order", product.quantity);
+    }
   });
   buttonPlus.addEventListener("click", async () => {
-    handleAddCartDetail("plus", "order");
+    const productID = buttonPlus.dataset.id as string;
+    if (productID) {
+      const product = (await Product.loadOne(productID)) as ProductProps;
+      handleAddCartDetail("plus", "order", product.quantity);
+    }
   });
   buttonAddCart.addEventListener("click", async () => {
     const inputQuantity = document.querySelector(

@@ -35,14 +35,16 @@ import { displayListOrder } from "./utils/orders";
     whitelist = JSON.parse(isHasWhiteList);
   }
   displayNumOrder("num-order", cart);
-  displayNumberWhitelist("whitelist-order", whitelist);
   if (accessToken !== null && accessTokenAdmin !== null) {
     renderAccountInfo("account");
+    displayNumberWhitelist("whitelist-order", whitelist);
   } else {
     if (typeof accessToken === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     } else if (typeof accessTokenAdmin === "string") {
       renderAccountInfo("account");
+      displayNumberWhitelist("whitelist-order", whitelist);
     }
   }
   // Account

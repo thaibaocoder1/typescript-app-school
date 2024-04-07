@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../model/User";
 import { StatusCodes } from "http-status-codes";
 import { generateToken, decodeToken } from "../../auth/AuthController";
-import transporter from "../../middleware/mailer";
+import mailer from "../../middleware/mailer";
 import bcrypt from "bcrypt";
 
 class UserController {
@@ -10,6 +10,20 @@ class UserController {
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const users = await User.find({}).sort("-createdAt");
+      res.status(StatusCodes.OK).json({
+        status: "success",
+        results: users.length,
+        data: users,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  trash = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const users = await User.findWithDeleted({ deleted: true }).sort(
+        "-createdAt"
+      );
       res.status(StatusCodes.OK).json({
         status: "success",
         results: users.length,
@@ -57,7 +71,7 @@ class UserController {
           },
         });
       } else {
-        let user;
+        let user: any;
         const salt = bcrypt.genSaltSync(10);
         if (data.admin === "true") {
           const hashPassword: string = bcrypt.hashSync("passwordtemp", salt);
@@ -76,11 +90,11 @@ class UserController {
           data.password_confirmation = hashCPassowrd;
           user = await User.create(data);
           const content = `<b>Vui lòng click vào đường link này để xác thực việc kích hoạt tài khoản. <a href="http://localhost:5173/active.html?id=${user._id}">Xác thực</a></b>`;
-          (await transporter()).sendMail({
-            from: "iSmart Admin",
+          (await mailer.createTransporter()).sendMail({
+            from: "BSmart ADMIN",
             to: user.email,
-            subject: "Kích hoạt tài khoản tại hệ thống iSmart ✔",
-            text: "Kích hoạt tài khoản tại hệ thống iSmart",
+            subject: "Kích hoạt tài khoản tại hệ thống BSmart ✔",
+            text: "Kích hoạt tài khoản tại hệ thống BSmart",
             html: content,
           });
         }
@@ -163,6 +177,85 @@ class UserController {
         res.status(StatusCodes.BAD_REQUEST).json({
           status: "failed",
           message: "Password not match!!",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: "failed",
+        message: "ERROR froms server",
+      });
+    }
+  };
+  // Delete
+  delete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOneDeleted({ _id: id });
+      if (user) {
+        await User.deleteOne({ _id: id, deleted: true });
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: "Remove successfully!",
+        });
+      } else {
+        res.status(StatusCodes.OK).json({
+          success: false,
+          message: "Remove failed!",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: "failed",
+        message: "ERROR froms server",
+      });
+    }
+  };
+  softDelete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOne({ _id: id });
+      if (user) {
+        if (user.role.toLowerCase() === "user") {
+          await User.delete({ _id: id });
+          res.status(StatusCodes.OK).json({
+            success: true,
+            message: "Remove successfully!",
+          });
+        } else {
+          res.status(StatusCodes.OK).json({
+            success: false,
+            message: "Can't remove admin account!",
+          });
+        }
+      } else {
+        await User.deleteOne({ _id: id, deleted: true });
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: "Remove successfully!",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: "failed",
+        message: "ERROR froms server",
+      });
+    }
+  };
+  // Restore
+  restore = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findOneDeleted({ _id: id });
+      if (user) {
+        await User.restore({ _id: id });
+        res.status(StatusCodes.OK).json({
+          success: true,
+          message: "Restore successfully!",
+        });
+      } else {
+        res.status(StatusCodes.OK).json({
+          success: false,
+          message: "Restore failed!",
         });
       }
     } catch (error) {
@@ -312,6 +405,8 @@ class UserController {
       if (user?.isActive === true) {
         res.status(StatusCodes.OK).json({
           success: true,
+          isActive: true,
+          message: "Account has already active!",
         });
       } else {
         if (now - timeCreated > 5 * 60 * 1000) {
@@ -349,11 +444,11 @@ class UserController {
         user!._id
       }">Xác thực</a></b>`;
       if (user) {
-        (await transporter()).sendMail({
-          from: "Ismart admin",
+        (await mailer.createTransporter()).sendMail({
+          from: "BSmart ADMIN",
           to: user.email,
-          subject: "Xác thực việc lấy lại mật khẩu tại iSmart ✔",
-          text: "Xác thực việc lấy lại mật khẩu tại iSmart",
+          subject: "Xác thực việc lấy lại mật khẩu tại BSmart ✔",
+          text: "Xác thực việc lấy lại mật khẩu tại BSmart",
           html: content,
         });
         await User.findOneAndUpdate(

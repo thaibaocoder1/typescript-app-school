@@ -3,7 +3,7 @@ import { AccessTokenData } from "../constants";
 import { ResponseFromServer } from "../constants/orders";
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { Order, OrderProps } from "../models/Order";
-import { ProductProps } from "../models/Product";
+import { Product, ProductProps } from "../models/Product";
 
 async function renderTextStatus(status: number): Promise<string> {
   let str: string = "";
@@ -203,20 +203,32 @@ window.addEventListener("click", async (e) => {
     const payload: Partial<OrderProps> = {
       status: 4,
     };
-    showSpinner();
-    const res = await Order.updateField(
-      modalCancel.dataset.id as string,
-      payload
+    const orderDetail = await OrderDetail.loadOne(
+      modalCancel.dataset.id as string
     );
-    hideSpinner();
-    const data: ResponseFromServer = await res.json();
-    if (data.status === "success") {
-      toast.info("Cancel order success!");
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    } else {
-      toast.error(data.message);
+    if (Array.isArray(orderDetail) && orderDetail.length > 0) {
+      orderDetail.forEach(async (item) => {
+        const refundQuantity: Partial<ProductProps> = {
+          _id: (item.productID as ProductProps)._id,
+          quantity: item.quantity + (item.productID as ProductProps).quantity,
+        };
+        showSpinner();
+        const orderID = modalCancel.dataset.id as string;
+        const productID = (item.productID as ProductProps)._id;
+        const promise1 = Order.updateField(orderID, payload);
+        const promise2 = Product.updateField(productID, refundQuantity);
+        hideSpinner();
+        const [resOrder, resProduct] = await Promise.all([promise1, promise2]);
+        const data: ResponseFromServer = await resOrder.json();
+        if (data.status === "success") {
+          toast.info("Cancel order success!");
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        } else {
+          toast.error(data.message);
+        }
+      });
     }
   }
 });

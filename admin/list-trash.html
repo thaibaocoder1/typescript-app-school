@@ -10,7 +10,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>BSmart - Order</title>
+    <title>BSmart - User</title>
     <!-- Favicon -->
     <link href="/src/typescript.svg" rel="icon" />
 
@@ -27,11 +27,9 @@
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet" />
-    <link href="css/spinner.css" rel="stylesheet" />
   </head>
 
   <body id="page-top">
-    <div class="spinner"></div>
     <!-- Page Wrapper -->
     <div id="wrapper">
       <!-- Sidebar -->
@@ -224,7 +222,6 @@
               <i class="fa fa-bars"></i>
             </button>
 
-            <!-- Topbar Search -->
             <div
               class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
             >
@@ -492,8 +489,11 @@
             <div
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
-              <h1 class="h3 mb-0 text-gray-800">Trang quản lý đơn hàng</h1>
-              <!-- Topbar Search -->
+              <div class="d-inline-flex">
+                <h1 class="h3 mb-0 text-gray-800 mr-3">
+                  Trang tài khoản bị xoá
+                </h1>
+              </div>
               <form
                 class="d-none d-sm-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100 navbar-search"
               >
@@ -514,15 +514,23 @@
               </form>
             </div>
 
+            <div class="mb-3">
+              <a href="/admin/list-trash.html" class="text-decoration-none"
+                >Thùng rác</a
+              >
+            </div>
+
             <!-- Content Row -->
             <div class="row pl-3">
-              <table class="table table-striped" id="table-order">
+              <table class="table table-striped" id="table-user">
                 <thead>
                   <tr>
-                    <th scope="col">STT</th>
+                    <th scope="col">Số thứ tự</th>
+                    <th scope="col">Họ và tên</th>
+                    <th scope="col">Tên đăng nhập</th>
                     <th scope="col">Email</th>
                     <th scope="col">Số điện thoại</th>
-                    <th scope="col">Địa chỉ</th>
+                    <th scope="col">Vai trò</th>
                     <th scope="col" colspan="2">Thao tác</th>
                   </tr>
                 </thead>
@@ -594,10 +602,10 @@
       </div>
     </div>
 
-    <!-- Detail Modal-->
+    <!-- Delete Modal-->
     <div
-      class="modal fade modal-lg"
-      id="detailModal"
+      class="modal fade"
+      id="deleteModal"
       tabindex="-1"
       role="dialog"
       aria-labelledby="exampleModalLabel"
@@ -607,7 +615,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
-              Chi tiết đơn hàng
+              Ngừng kích hoạt tài khoản này?
             </h5>
             <button
               class="close"
@@ -619,28 +627,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="modal-info">
-              <ul class="modal-info-user"></ul>
-            </div>
-            <table class="table" id="table-detail">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Tên sản phẩm</th>
-                  <th scope="col">Hình ảnh</th>
-                  <th scope="col">Số lượng</th>
-                  <th scope="col">Đơn giá</th>
-                  <th scope="col">Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="3" id="total"></th>
-                  <th colspan="3" id="order-date"></th>
-                </tr>
-              </tfoot>
-            </table>
+            Việc làm sẽ khiến tài khoản này ngừng hoạt động. Vẫn tiếp tục?
           </div>
           <div class="modal-footer">
             <button
@@ -650,61 +637,7 @@
             >
               Cancel
             </button>
-            <a class="btn btn-primary" href="" id="btn-invoice"
-              >Print Invoice</a
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Logout Modal-->
-    <div
-      class="modal fade"
-      id="changeModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog--custom" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              Cập nhật trạng thái đơn hàng
-            </h5>
-            <button
-              class="close"
-              type="button"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div id="form-change-status">
-              <div class="mb-3">
-                <label for="status" class="form-label">Trạng thái</label>
-                <select class="form-control" id="status" name="status"></select>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-secondary"
-              type="button"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              class="btn btn-primary"
-              type="button"
-              id="btn-confirm-change"
-            >
-              Confirm
-            </button>
+            <a class="btn btn-primary" href="" id="delete-btn">Confirm</a>
           </div>
         </div>
       </div>
@@ -719,8 +652,7 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-
     <script type="module" src="/src/admin/home.ts"></script>
-    <script type="module" src="/src/admin/order.ts"></script>
+    <script type="module" src="/src/admin/trash.ts"></script>
   </body>
 </html>

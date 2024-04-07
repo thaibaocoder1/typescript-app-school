@@ -1,5 +1,5 @@
 import { calcPrice, formatCurrencyNumber } from "./format";
-import { Product } from "../models/Product";
+import { Product, ProductProps } from "../models/Product";
 
 export function handleViewModal(selecotor: string) {
   const buttonModal = document.querySelectorAll(
@@ -12,7 +12,7 @@ export function handleViewModal(selecotor: string) {
       const productID = btn.closest("div")?.dataset.id as string;
       if (productID) {
         modal.classList.add("is-show");
-        const product = await Product.loadOne(productID);
+        const product = (await Product.loadOne(productID)) as ProductProps;
         const modalBodyEl = modal.querySelector(
           ".modal-body"
         ) as HTMLDivElement;
