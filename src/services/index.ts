@@ -21,6 +21,14 @@ export class DataResource<T> {
     return result;
   }
 
+  async loadWithParams(params: URLSearchParams): Promise<T> {
+    const res = await fetch(`${this.endpoint}/params?${params}`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    return result;
+  }
+
   async loadOne(id: string): Promise<T> {
     const res = await fetch(`${this.endpoint}/${id}`, {
       credentials: "include",

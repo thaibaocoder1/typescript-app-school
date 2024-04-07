@@ -1,5 +1,5 @@
 import { Carts } from "../constants";
-import { Product } from "../models/Product";
+import { Product, ProductProps } from "../models/Product";
 import { sweetAlert } from "./alert";
 import { calcPrice } from "./format";
 
@@ -12,7 +12,7 @@ export function handleOrderBuyNow(selecotor: string, cart: Carts[]) {
       e.preventDefault();
       const productID = target.dataset.id as string;
       if (productID) {
-        const product = await Product.loadOne(productID);
+        const product = (await Product.loadOne(productID)) as ProductProps;
         const newItem: Carts = {
           productID: productID,
           price: calcPrice(product.price, product.discount),

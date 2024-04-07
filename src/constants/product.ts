@@ -1,4 +1,4 @@
 export interface ParamsProudct {
   idElement: string;
-  slug?: string | null;
+  slug?: string | null | URLSearchParams;
 }

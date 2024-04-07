@@ -1,6 +1,6 @@
 import { Selectors } from "./constants/checkout";
 import { Carts, WhiteLists } from "./constants";
-import { Product } from "./models/Product";
+import { Product, ProductProps } from "./models/Product";
 import {
   calcPrice,
   displayNumberWhitelist,
@@ -40,7 +40,7 @@ async function renderBillCheckout(params: Selectors, cart: Carts[]) {
       let shipCostPercent: number = shipCost * ((100 - shipping) / 100);
       total = subtotal + shipCostPercent;
       showSpinner();
-      const product = await Product.loadOne(item.productID);
+      const product = (await Product.loadOne(item.productID)) as ProductProps;
       hideSpinner();
       const divElement = document.createElement("div");
       divElement.className = "d-flex justify-content-between";

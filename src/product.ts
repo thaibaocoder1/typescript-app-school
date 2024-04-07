@@ -13,10 +13,17 @@ import {
   handleWhitelist,
 } from "./utils";
 import { CatalogProps, Catalog } from "./models/Catalog";
-import { ProductProps, Product } from "./models/Product";
+import { ProductProps, Product, ApiResponseProducts } from "./models/Product";
 import { Carts, Params, ParamsProudct, WhiteLists } from "./constants";
 import debounce from "debounce";
+import { handleOrderBuyNow } from "./utils/order-buy-now";
 
+// types
+type Pagination = {
+  page: number;
+  limit: number;
+  totalRows: number;
+};
 // functions
 async function renderSidebar(idElement: string) {
   const sidebar = document.querySelector(idElement) as HTMLElement;
@@ -45,10 +52,12 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
     let products = [...data];
     if (params.slug) {
       showSpinner();
-      const dataWithSlug = await Product.loadWithSlug(params.slug);
+      const dataWithSlug = (await Product.loadWithParams(
+        <URLSearchParams>params.slug
+      )) as ApiResponseProducts<ProductProps>;
       hideSpinner();
-      if (dataWithSlug) {
-        products = dataWithSlug;
+      if (dataWithSlug.status === "success") {
+        products = <ProductProps[]>dataWithSlug.data;
       }
     }
     if (products && products.length > 0) {
@@ -113,63 +122,131 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
         listProductEl.appendChild(productItem);
       });
     } else {
+      const ulPagination = document.getElementById("pagination") as HTMLElement;
+      ulPagination.hidden = true;
       toast.info("Sản phẩm đang được phát triển.");
     }
   } catch (error) {
     console.log(error);
   }
 }
-function initSearch(selector: string, cart: Carts[]) {
+function initSearch(selector: string, params: URLSearchParams) {
   const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (params.has("searchTerm")) {
+    inputSearch.value = params.get("searchTerm") as string;
+  }
   if (inputSearch) {
     const debounceSearch = debounce(async (e: Event) => {
       const target = e.target as HTMLInputElement;
       const value = target.value;
-      const res = await Product.loadAll();
-      const dataApply = res.filter((item) =>
-        item.name.toLowerCase().includes(value.toLowerCase())
-      );
-      if (Array.isArray(dataApply) && dataApply.length > 0) {
-        const searchParamsURL: URLSearchParams = new URLSearchParams(
-          location.search
-        );
-        const slug: string | null = searchParamsURL.get("slug");
-        const paramsFn: ParamsProudct = {
-          idElement: "#list-product",
-          slug: slug,
-        };
-        await renderListProduct(paramsFn, dataApply);
-        // Handle cart
-        const buttonCart = document.querySelectorAll(
-          "#btn-cart"
-        ) as NodeListOf<Element>;
-        buttonCart.forEach((btn) => {
-          btn.addEventListener("click", async (e: Event) => {
-            e.preventDefault();
-            const buttonElement = e.target as HTMLAnchorElement;
-            const productID: string | undefined = buttonElement.dataset.id;
-            if (productID) {
-              sweetAlert.success();
-              const params: Params = {
-                productID,
-                cart,
-                quantity: 1,
-              };
-              cart = await addProductToCart(params);
-            }
-          });
-        });
-        // Handle whitelist
-        handleWhitelist(".card-whitelist");
-        handleViewModal(".card-modal");
-      }
+      await handleFilterChange("searchTerm", value);
     }, 500);
     inputSearch.addEventListener("input", debounceSearch);
+  }
+}
+function renderPagination(
+  selector: string,
+  data: Pagination,
+  params: URLSearchParams
+) {
+  if (params.has("page")) params.delete("page");
+  const ulPagination = document.getElementById(selector) as HTMLElement;
+  const { page, totalRows, limit } = data;
+  const totalPages = Math.ceil(totalRows / limit);
+  ulPagination.dataset.totalPages = totalPages.toString();
+  ulPagination.innerHTML = ""; // Clear previous pagination
+
+  // Previous link
+  const prevLink = document.createElement("li");
+  prevLink.className = "page-item";
+  if (page === 1) {
+    prevLink.classList.add("disabled");
+    prevLink.innerHTML = `<span class="page-link">&laquo;</span>`;
+  } else {
+    prevLink.innerHTML = `<a class="page-link" data-page=${Math.max(
+      page - 1,
+      1
+    )} href="?page=${Math.max(page - 1, 1)}&${params}">&laquo;</a>`;
+  }
+  ulPagination.appendChild(prevLink);
+
+  // Page links
+  for (let i = 1; i <= totalPages; ++i) {
+    const liElement = document.createElement("li");
+    liElement.className = "page-item";
+    liElement.innerHTML = `<a class="page-link" data-page=${i} href="?page=${i}&${params}">${i}</a>`;
+    if (i === page) {
+      liElement.classList.add("active");
+    }
+    ulPagination.appendChild(liElement);
+  }
+
+  // Next link
+  const nextLink = document.createElement("li");
+  nextLink.className = "page-item";
+  if (page === totalPages) {
+    nextLink.classList.add("disabled");
+    nextLink.innerHTML = `<span class="page-link">&raquo;</span>`;
+  } else {
+    nextLink.innerHTML = `<a class="page-link" data-page=${Math.min(
+      page + 1,
+      totalPages
+    )} href="?page=${Math.min(page + 1, totalPages)}&${params}">&raquo;</a>`;
+  }
+  ulPagination.appendChild(nextLink);
+}
+async function handleFilterChange(
+  filterName: string,
+  filterValue: string | number
+) {
+  const url = new URL(window.location.href);
+  if (filterName === "searchTerm") {
+    url.searchParams.set("page", "1");
+  }
+  url.searchParams.set(filterName, filterValue as string);
+  history.pushState({}, "", url);
+  showSpinner();
+  const res = (await Product.loadWithParams(
+    url.searchParams
+  )) as ApiResponseProducts<ProductProps>;
+  hideSpinner();
+  const paramsFn: ParamsProudct = {
+    idElement: "#list-product",
+    slug: url.searchParams.get("slug"),
+  };
+  if (res.status === "success") {
+    const { data, pagination } = res;
+    console.log(data);
+    const paramsPagination = pagination as Pagination;
+    await renderListProduct(paramsFn, <ProductProps[]>data);
+    renderPagination("pagination", paramsPagination, url.searchParams);
   }
 }
 
 // main
 (async () => {
+  // init pagination
+  const url: URL = new URL(window.location.href);
+  if (!url.searchParams.get("page")) url.searchParams.set("page", "1");
+  if (!url.searchParams.get("limit")) url.searchParams.set("limit", "3");
+  history.pushState({}, "", url);
+  const queryParams = url.searchParams;
+  showSpinner();
+  const res = (await Product.loadWithParams(
+    queryParams
+  )) as ApiResponseProducts<ProductProps>;
+  hideSpinner();
+  const paramsFn: ParamsProudct = {
+    idElement: "#list-product",
+    slug: url.searchParams,
+  };
+  if (res.status === "success") {
+    const { data, pagination } = res;
+    const paramsPagination = pagination as Pagination;
+    await renderListProduct(paramsFn, <ProductProps[]>data);
+    renderPagination("pagination", paramsPagination, url.searchParams);
+  }
+  // end init pagination
   let isHasCart: string | null = localStorage.getItem("cart");
   let isHasWhiteList: string | null = localStorage.getItem("whitelist");
   let accessToken: string | null = localStorage.getItem("accessToken");
@@ -194,19 +271,7 @@ function initSearch(selector: string, cart: Carts[]) {
       renderAccountInfo("account");
     }
   }
-  const searchParamsURL: URLSearchParams = new URLSearchParams(location.search);
-  const slug: string | null = searchParamsURL.get("slug");
-  const paramsFn: ParamsProudct = {
-    idElement: "#list-product",
-    slug: slug,
-  };
-  renderSidebar("#sidebar-category");
-  showSpinner();
-  const data = await Product.loadAll();
-  hideSpinner();
-  await renderListProduct(paramsFn, data);
-  // Search
-  initSearch("search", cart);
+  await renderSidebar("#sidebar-category");
   // Handle cart
   const buttonCart = document.querySelectorAll(
     "#btn-cart"
@@ -227,22 +292,33 @@ function initSearch(selector: string, cart: Carts[]) {
       }
     });
   });
+  // Search
+  initSearch("search", url.searchParams);
   // Handle whitelist
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
   // Hash
-  let productApply: ProductProps[];
+  let productApply: ProductProps[] = [];
   window.addEventListener("hashchange", async (e: HashChangeEvent) => {
     const newURL = e.newURL;
     showSpinner();
-    const products = await Product.loadAll();
+    const res = (await Product.loadWithParams(
+      url.searchParams
+    )) as ApiResponseProducts<ProductProps>;
     hideSpinner();
+    toast.info("Filter success!");
     if (newURL.indexOf("increase") >= 0) {
-      productApply = products.sort((a, b) => a.price - b.price);
+      productApply = (res.data as ProductProps[]).sort(
+        (a, b) => a.price - b.price
+      );
     } else if (newURL.indexOf("decrease") >= 0) {
-      productApply = products.sort((a, b) => b.price - a.price);
+      productApply = (res.data as ProductProps[]).sort(
+        (a, b) => b.price - a.price
+      );
     } else {
-      productApply = products.sort((a, b) => b.discount - a.discount);
+      productApply = (res.data as ProductProps[]).sort(
+        (a, b) => b.discount - a.discount
+      );
     }
     await renderListProduct(paramsFn, productApply);
     const buttonCart = document.querySelectorAll(
@@ -267,5 +343,6 @@ function initSearch(selector: string, cart: Carts[]) {
     // Handle whitelist
     handleWhitelist(".card-whitelist");
     handleViewModal(".card-modal");
+    handleOrderBuyNow("#modal-view", cart);
   });
 })();

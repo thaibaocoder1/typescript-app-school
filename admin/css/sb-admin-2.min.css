@@ -10344,7 +10344,10 @@ body.sidebar-toggled footer.sticky-footer {
     color: var(--blue);
   }
   50% {
-    color: var(--cyan);
+    color: var(--success);
+  }
+  75% {
+    color: var(--yellow);
   }
   100% {
     color: var(--blue);

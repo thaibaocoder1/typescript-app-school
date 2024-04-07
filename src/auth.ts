@@ -1,6 +1,7 @@
 import { AccessTokenData } from "./constants";
 import { User } from "./models/User";
 import { getCookie, setCookie } from "./utils/cookie";
+import { initSearchProduct } from "./utils/search";
 
 // functions
 
@@ -27,4 +28,5 @@ async function checkAccessToken() {
 // main
 (async () => {
   await checkAccessToken();
+  await initSearchProduct();
 })();

@@ -23,7 +23,7 @@ async function renderLatestProduct(idElement: string) {
   container.textContent = "";
   try {
     showSpinner();
-    const data = await Product.loadAll();
+    const data = (await Product.loadAll()) as ProductProps[];
     hideSpinner();
     const productClone = [...data].slice(0, 8);
     productClone.forEach((item: ProductProps) => {
@@ -92,7 +92,7 @@ async function renderArrivedProduct(idElement: string) {
   container.textContent = "";
   try {
     showSpinner();
-    const data = await Product.loadAll();
+    const data = (await Product.loadAll()) as ProductProps[];
     hideSpinner();
     const productClone = [...data].slice(8, 16);
     productClone.forEach((item: ProductProps) => {

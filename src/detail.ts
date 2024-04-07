@@ -8,7 +8,7 @@ import {
   renderAccountInfo,
 } from "./utils";
 import { CatalogProps } from "./models/Catalog";
-import { Product } from "./models/Product";
+import { Product, ProductProps } from "./models/Product";
 import { addProductToCart, displayNumOrder } from "./utils/cart";
 import { handleAddCartDetail } from "./utils/handle-detail";
 import { renderSidebar } from "./utils/sidebar";
@@ -21,6 +21,7 @@ import {
   WhiteLists,
 } from "./constants";
 import { handleViewModal } from "./utils/modal";
+import { handleOrderBuyNow } from "./utils/order-buy-now";
 
 // functions
 async function renderInfoProduct(params: RenderInfoProductParams) {
@@ -91,8 +92,13 @@ async function renderInfoProduct(params: RenderInfoProductParams) {
         </button>
       </div>
     </div>
-    <button class="btn btn-primary px-3" id="btn-add-cart">
+    <button class="btn btn-primary px-3 mr-2" id="btn-add-cart">
       <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+    </button>
+    <button data-id=${
+      params.productInfo._id
+    } class="btn btn-secondary px-3" id="btn-buy-now">
+      <i class="fa fa-money-bill mr-1"></i> Buy Now
     </button>
   </div>
   <div class="d-flex pt-2">
@@ -123,7 +129,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   if (!relatedElement) return;
   relatedElement.textContent = "";
   try {
-    const data = await Product.loadAll();
+    const data = (await Product.loadAll()) as ProductProps[];
     const relatedProducts = data
       .filter(
         (item) =>
@@ -221,7 +227,7 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   const productID = searchParams.get("id");
   if (!productID) return;
   showSpinner();
-  const productInfo = await Product.loadOne(productID);
+  const productInfo = (await Product.loadOne(productID)) as ProductProps;
   hideSpinner();
   const catalogObj = productInfo.categoryID as unknown as CatalogProps;
   const categoryID = catalogObj?._id;
@@ -249,6 +255,9 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   const buttonAddCart = document.getElementById(
     "btn-add-cart"
   ) as HTMLButtonElement;
+  const buttonBuyNow = document.getElementById(
+    "btn-buy-now"
+  ) as HTMLButtonElement;
   buttonCart.forEach((btn) => {
     btn.addEventListener("click", async (e: Event) => {
       e.preventDefault();
@@ -264,6 +273,35 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
         cart = await addProductToCart(params);
       }
     });
+  });
+  buttonBuyNow.addEventListener("click", async (e: Event) => {
+    const target = e.target as HTMLElement;
+    const productID = target.dataset.id as string;
+    if (productID) {
+      const product = (await Product.loadOne(productID)) as ProductProps;
+      const newItem: Carts = {
+        productID: productID,
+        price: calcPrice(product.price, product.discount),
+        quantity: 1,
+        isBuyNow: true,
+      };
+      if (cart.length === 0) {
+        cart.push(newItem);
+        localStorage.setItem("cart", JSON.stringify(cart));
+      } else {
+        const cartItem = cart.find((item) => item.productID === productID);
+        if (cartItem) {
+          cartItem.quantity += 1;
+        } else {
+          cart.push(newItem);
+        }
+        localStorage.setItem("cart", JSON.stringify(cart));
+      }
+      sweetAlert.dialog();
+      setTimeout(() => {
+        window.location.assign("/checkout.html");
+      }, 1000);
+    }
   });
   buttonMinus.addEventListener("click", async () => {
     handleAddCartDetail("minus", "order");
@@ -285,4 +323,5 @@ async function renderRelatedProduct(params: RenderInfoProductRelated) {
   });
   handleWhitelist(".card-whitelist");
   handleViewModal(".card-modal");
+  handleOrderBuyNow("#modal-view", cart);
 })();

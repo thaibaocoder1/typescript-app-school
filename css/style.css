@@ -10146,3 +10146,63 @@ button > i {
 .hidden {
   display: none;
 }
+#searchForm {
+  position: relative;
+}
+.search-list {
+  position: absolute;
+  background-color: whitesmoke;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  width: 96%;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 20%;
+  transition: all 0.25s linear;
+  max-height: 350px;
+  overflow: scroll;
+}
+.search-list::-webkit-scrollbar {
+  width: 6px;
+  border-radius: 4px;
+}
+
+/* Track */
+.search-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+.search-list::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+.search-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+.search-list.is-show {
+  opacity: 1;
+  visibility: visible;
+}
+.search-item {
+  display: flex;
+  gap: 0 10px;
+}
+.search-item + .search-item {
+  margin-top: 0.5rem;
+}
+.search-item .search-img {
+  width: 100px;
+}
+.search-name {
+  color: #d19c97;
+  font-size: 1.2rem;
+}
+.search-price-discount {
+  color: var(--dark);
+}

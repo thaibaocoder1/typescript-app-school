@@ -1,5 +1,16 @@
 import { DataResource } from "../services/index";
 
+export type ApiResponseProducts<T = ProductProps> = {
+  status: string;
+  message: string;
+  results?: number;
+  data?: T[];
+  pagination?: {
+    page: number;
+    limit: number;
+    totalRows: number;
+  };
+};
 export interface ProductProps {
   _id: string;
   categoryID: string;
@@ -20,6 +31,6 @@ export interface ProductProps {
   updatedAt: string;
 }
 
-export const Product = new DataResource<ProductProps>(
+export const Product = new DataResource<ProductProps | ApiResponseProducts>(
   "http://localhost:8888/api/products"
 );
