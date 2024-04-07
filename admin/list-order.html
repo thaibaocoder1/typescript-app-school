@@ -223,24 +223,13 @@
             </button>
 
             <!-- Topbar Search -->
-            <form
-              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+            <div
+              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
             >
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control bg-light border-0 small"
-                  placeholder="Search for..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+              <h4 class="mb-0" id="heading">
+                Chào mừng admin đến với hệ thống BSmart
+              </h4>
+            </div>
 
             <!-- Topbar Navbar -->
             <ul class="navbar-nav ml-auto">
@@ -502,6 +491,25 @@
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
               <h1 class="h3 mb-0 text-gray-800">Trang quản lý đơn hàng</h1>
+              <!-- Topbar Search -->
+              <form
+                class="d-none d-sm-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+              >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control bg-gradient-light text-dark border-0 small"
+                    placeholder="Search for..."
+                    aria-label="Search"
+                    aria-describedby="basic-addon2"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" type="button">
+                      <i class="fas fa-search fa-sm"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
 
             <!-- Content Row -->
@@ -626,7 +634,8 @@
               <tbody></tbody>
               <tfoot>
                 <tr>
-                  <th colspan="6" id="total"></th>
+                  <th colspan="3" id="total"></th>
+                  <th colspan="3" id="order-date"></th>
                 </tr>
               </tfoot>
             </table>
@@ -642,6 +651,58 @@
             <a class="btn btn-primary" href="" id="btn-invoice"
               >Print Invoice</a
             >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logout Modal-->
+    <div
+      class="modal fade"
+      id="changeModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog--custom" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Cập nhật trạng thái đơn hàng
+            </h5>
+            <button
+              class="close"
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="form-change-status">
+              <div class="mb-3">
+                <label for="status" class="form-label">Trạng thái</label>
+                <select class="form-control" id="status" name="status"></select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              class="btn btn-primary"
+              type="button"
+              id="btn-confirm-change"
+            >
+              Confirm
+            </button>
           </div>
         </div>
       </div>

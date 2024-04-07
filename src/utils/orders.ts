@@ -5,7 +5,7 @@ import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { Order, OrderProps } from "../models/Order";
 import { ProductProps } from "../models/Product";
 
-function renderTextStatus(status: number): string {
+async function renderTextStatus(status: number): Promise<string> {
   let str: string = "";
   switch (status) {
     case 1:
@@ -24,6 +24,7 @@ function renderTextStatus(status: number): string {
       str = "Declined";
       break;
     default:
+      str = "Declined";
       break;
   }
   return str;
@@ -32,13 +33,11 @@ function handleShowButton(status: number) {
   let str: string = "";
   switch (status) {
     case 1:
-    case 2:
-    case 3:
       str = "";
       break;
+    case 2:
+    case 3:
     case 4:
-      str = "hidden";
-      break;
     case 5:
       str = "hidden";
       break;
@@ -57,7 +56,7 @@ export async function displayListOrder(token: string, selector: string) {
     hideSpinner();
     tableBody.textContent = "";
     if (Array.isArray(orders) && orders.length > 0) {
-      orders.forEach((item) => {
+      orders.forEach(async (item) => {
         const tableRow = document.createElement("tr");
         tableRow.innerHTML = `
         <td>${item.fullname}</td>
@@ -69,7 +68,7 @@ export async function displayListOrder(token: string, selector: string) {
           }>Detail</button>
           <button class="btn btn-danger btn-sm ${handleShowButton(
             item.status
-          )}" id="cancel" data-id=${item._id}>${renderTextStatus(
+          )}" id="cancel" data-id=${item._id}>${await renderTextStatus(
           item.status
         )}</button>
         </td>`;
@@ -115,6 +114,9 @@ function getStatusOrder(item: OrderProps): string {
       break;
     case 4:
       status = "Đã huỷ";
+      break;
+    case 5:
+      status = "Từ chối nhận hàng";
       break;
     default:
       break;

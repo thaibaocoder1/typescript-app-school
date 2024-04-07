@@ -222,25 +222,13 @@
               <i class="fa fa-bars"></i>
             </button>
 
-            <!-- Topbar Search -->
-            <form
-              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+            <div
+              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
             >
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control bg-light border-0 small"
-                  placeholder="Search for..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+              <h4 class="mb-0" id="heading">
+                Chào mừng admin đến với hệ thống BSmart
+              </h4>
+            </div>
 
             <!-- Topbar Navbar -->
             <ul class="navbar-nav ml-auto">
@@ -501,10 +489,30 @@
             <div
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
-              <h1 class="h3 mb-0 text-gray-800">Trang mã giảm giá</h1>
-              <a href="/admin/add-edit-coupon.html" class="btn btn-info"
-                >Tạo mới</a
+              <div class="d-inline-flex">
+                <h1 class="h3 mb-0 text-gray-800 mr-3">Trang mã giảm giá</h1>
+                <a href="/admin/add-edit-coupon.html" class="btn btn-info"
+                  >Tạo mới</a
+                >
+              </div>
+              <form
+                class="d-none d-sm-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100 navbar-search"
               >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control bg-gradient-light text-dark border-0 small"
+                    placeholder="Search for..."
+                    aria-label="Search"
+                    aria-describedby="basic-addon2"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" type="button">
+                      <i class="fas fa-search fa-sm"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
 
             <!-- Content Row -->

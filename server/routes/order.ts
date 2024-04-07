@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/save", orderController.add);
 router.patch("/update-fields/:id", orderController.updateFields);
+router.get("/:id", orderController.detail);
 router.get("/", orderController.index);
 
 export default router;

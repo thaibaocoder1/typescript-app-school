@@ -6,6 +6,7 @@ interface Orders extends Document {
   address: string;
   note: string;
   status: number;
+  cancelCount?: number;
   phone: string;
 }
 
@@ -32,6 +33,9 @@ const orderSchema: Schema = new Schema<Orders>(
     status: {
       type: Number,
       default: 1,
+    },
+    cancelCount: {
+      type: Number,
     },
     phone: {
       type: String,

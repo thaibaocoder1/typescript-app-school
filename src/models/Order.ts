@@ -8,6 +8,7 @@ export interface OrderProps {
   note: string;
   phone: string;
   status: number;
+  cancelCount?: number;
   createdAt: string;
   updatedAt: string;
 }

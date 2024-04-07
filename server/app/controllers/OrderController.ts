@@ -18,10 +18,10 @@ class OrderController {
   };
   detail = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const catalog = await Catalog.findOne({ _id: req.params.id });
+      const order = await Order.findOne({ _id: req.params.id });
       res.status(StatusCodes.OK).json({
         status: "success",
-        data: catalog,
+        data: order,
       });
     } catch (error) {
       next(error);

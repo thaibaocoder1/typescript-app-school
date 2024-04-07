@@ -63,36 +63,26 @@ class ProductController {
     try {
       const { ...obj } = req.body;
       const product = await Product.findById({ _id: req.params.id });
-      const productExist = await Product.findOne({ code: obj.code });
-      if (productExist) {
-        res.status(StatusCodes.CONFLICT).json({
-          status: "failed",
-          message: "Duplicate product code. Try again!!",
-        });
-      } else {
-        if (!req.files) {
-          if (
-            JSON.stringify(req.body) !== JSON.stringify(product!.toObject())
-          ) {
-            await Product.findOneAndUpdate({ _id: req.params.id }, obj, {
-              new: true,
-            });
-          }
-        } else {
-          obj.thumb = {
-            data: req.file?.originalname,
-            contentType: req.file?.mimetype,
-            fileName: `http://localhost:8888/uploads/${req.file?.originalname}`,
-          };
+      if (!req.files) {
+        if (JSON.stringify(req.body) !== JSON.stringify(product!.toObject())) {
           await Product.findOneAndUpdate({ _id: req.params.id }, obj, {
             new: true,
           });
         }
-        res.status(StatusCodes.CREATED).json({
-          status: "success",
-          data: product,
+      } else {
+        obj.thumb = {
+          data: req.file?.originalname,
+          contentType: req.file?.mimetype,
+          fileName: `http://localhost:8888/uploads/${req.file?.originalname}`,
+        };
+        await Product.findOneAndUpdate({ _id: req.params.id }, obj, {
+          new: true,
         });
       }
+      res.status(StatusCodes.CREATED).json({
+        status: "success",
+        data: product,
+      });
     } catch (error) {
       next(error);
     }

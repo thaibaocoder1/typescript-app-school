@@ -1,10 +1,29 @@
 import { Order, OrderProps } from "../models/Order";
 import dayjs from "dayjs";
-import { formatCurrencyNumber, initLogout } from "../utils";
+import { formatCurrencyNumber, initLogout, toast } from "../utils";
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { ProductProps } from "../models/Product";
+import { ResponseFromServer } from "../constants/orders";
 
 // functions
+function handleShowButton(status: number) {
+  let str: string = "";
+  switch (status) {
+    case 1:
+      str = "";
+      break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      str = "hidden";
+      break;
+    default:
+      break;
+  }
+  return str;
+}
+
 async function renderListOrder(selector: string) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
@@ -25,9 +44,11 @@ async function renderListOrder(selector: string) {
         <button class="btn btn-primary btn-sm" data-id=${
           item._id
         } data-toggle="modal" data-target="#detailModal" id="btn-edit">Chi tiết</button>
-        <button class="btn btn-secondary btn-sm" data-id=${
-          item._id
-        } id="btn-status">Chỉnh sửa</button>
+        <button class="btn btn-secondary btn-sm ${handleShowButton(
+          item.status
+        )}" data-toggle="modal" data-target="#changeModal" data-id=${
+        item._id
+      } id="btn-status">Chỉnh sửa</button>
       </td>`;
       tableBody.appendChild(tableRow);
     });
@@ -76,17 +97,102 @@ function getStatusOrder(value: number): string {
     case 4:
       status = "Đã huỷ";
       break;
+    case 5:
+      status = "Từ chối nhận hàng";
+      break;
     default:
       break;
   }
   return status;
 }
+async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
+  const form = modal.querySelector("#form-change-status") as HTMLFormElement;
+  const selectElement = form.querySelector(
+    "[name='status']"
+  ) as HTMLSelectElement;
+  const buttonConfirmChange = modal.querySelector(
+    "#btn-confirm-change"
+  ) as HTMLButtonElement;
+  selectElement.textContent = "";
+  try {
+    const order = await Order.loadOne(orderID);
+    [
+      "Chờ xác nhận",
+      "Đã xác nhận + vận chuyển",
+      "Đã nhận hàng",
+      "Đã huỷ",
+      "Từ chối nhận hàng",
+    ].forEach((name, i) => {
+      const optionElement = document.createElement("option");
+      optionElement.value = (i + 1).toString();
+      if (i + 1 === order.status) {
+        optionElement.selected = true;
+      }
+      if (order.status !== 1 && i === 0) {
+        optionElement.disabled = true;
+      }
+      if (order.status === 2) {
+        if (i !== 1 && i !== 4 && i !== 2) {
+          optionElement.disabled = true;
+        }
+      }
+      if (order.status === 3) {
+        if (i !== 2) {
+          optionElement.disabled = true;
+        }
+      }
+      if (order.status === 4) {
+        if (i !== 3) {
+          optionElement.disabled = true;
+        }
+      }
+      if (order.status === 5) {
+        if (i !== 4) {
+          optionElement.disabled = true;
+        }
+      }
+      optionElement.text = name;
+      selectElement.add(optionElement);
+    });
+    form.dataset.status = order?.status.toString();
+    selectElement.addEventListener("change", (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      form.dataset.status = target.value;
+    });
+
+    buttonConfirmChange.addEventListener("click", async () => {
+      const status = Number(form.dataset.status);
+      const payload: Partial<OrderProps> = {
+        _id: orderID,
+        status,
+        cancelCount: status === 5 ? 1 : 0,
+      };
+      if (payload) {
+        const res = await Order.updateField(orderID, payload);
+        const update: ResponseFromServer = await res.json();
+        if (update.status === "success") {
+          toast.success("Cập nhật thành công");
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        } else {
+          toast.error(update.message);
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 // main
 (async () => {
   await renderListOrder("#table-order");
-  const buttonEditCatalog = document.querySelectorAll(
+  const buttonDetail = document.querySelectorAll(
     "#btn-edit"
+  ) as NodeListOf<HTMLButtonElement>;
+  const buttonChangeStatus = document.querySelectorAll(
+    "#btn-status"
   ) as NodeListOf<HTMLButtonElement>;
   const modalDetail = document.getElementById("detailModal") as HTMLDivElement;
   const tableDetail = modalDetail.querySelector(
@@ -98,10 +204,16 @@ function getStatusOrder(value: number): string {
   const totalElement = tableDetail.querySelector(
     "#total"
   ) as HTMLTableRowElement;
+  const orderDateElement = tableDetail.querySelector(
+    "#order-date"
+  ) as HTMLTableRowElement;
   const infoUserElement = modalDetail.querySelector(
     ".modal-info-user"
   ) as HTMLDivElement;
-  buttonEditCatalog.forEach((btn) => {
+  const modalChangeStatus = document.getElementById(
+    "changeModal"
+  ) as HTMLDivElement;
+  buttonDetail.forEach((btn) => {
     btn.addEventListener("click", async () => {
       const orderID = btn.dataset.id;
       try {
@@ -150,12 +262,21 @@ function getStatusOrder(value: number): string {
               totalElement.innerHTML = `Tổng thanh toán: ${formatCurrencyNumber(
                 total
               )}`;
+              orderDateElement.innerHTML = `Ngày đặt hàng: ${dayjs(
+                item.createdAt
+              ).format("DD/MM/YYYY HH:mm:ss")}`;
             });
           }
         }
       } catch (error) {
         console.log(error);
       }
+    });
+  });
+  buttonChangeStatus.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const orderID = <string>btn.dataset.id;
+      await registerFormChangeStatus(modalChangeStatus, orderID);
     });
   });
   initLogout("logout-btn");

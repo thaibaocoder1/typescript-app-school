@@ -10336,3 +10336,20 @@ body.sidebar-toggled footer.sticky-footer {
 .modal-info-user li:last-child {
   grid-column-end: span 2;
 }
+#heading {
+  animation: colorChange 2s infinite alternate;
+}
+@keyframes colorChange {
+  0% {
+    color: var(--blue);
+  }
+  50% {
+    color: var(--cyan);
+  }
+  100% {
+    color: var(--blue);
+  }
+}
+.hidden {
+  display: none;
+}

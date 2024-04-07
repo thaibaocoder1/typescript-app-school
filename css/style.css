@@ -10143,3 +10143,6 @@ button > i {
   background-color: var(--red);
   color: #fff;
 }
+.hidden {
+  display: none;
+}
