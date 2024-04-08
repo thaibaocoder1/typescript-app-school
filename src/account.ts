@@ -34,7 +34,7 @@ async function displayInfoAccount(token: string, formSelector: string) {
     showSpinner();
     const user = await User.loadOne(accessToken.id);
     hideSpinner();
-    if (user) {
+    if (user && user !== null) {
       setFieldValue(formElement, "[name='fullname']", user?.fullname);
       setFieldValue(formElement, "[name='username']", user?.username);
       setFieldValue(formElement, "[name='email']", user?.email);
@@ -44,6 +44,16 @@ async function displayInfoAccount(token: string, formSelector: string) {
         ".img-thumbnail",
         user?.imageUrl.fileName
       );
+    } else {
+      toast.error("Tài khoản đã bị xoá");
+      if (accessToken.role === "User") {
+        removeLocalStorageCustomer();
+      } else {
+        removeLocalStorageAdmin();
+      }
+      setTimeout(() => {
+        window.location.assign("/login.html");
+      }, 500);
     }
     const modal = document.getElementById("modal-account") as HTMLDivElement;
     window.addEventListener("click", async (e: Event) => {

@@ -1,10 +1,11 @@
 import { CounponProps, Coupon } from "../models/Coupon";
 import dayjs from "dayjs";
-import { initLogout } from "../utils";
+import { initLogout, toast } from "../utils";
 import { initRemoveCoupon } from "../utils/form-coupon";
+import debounce from "debounce";
 
 // functions
-async function renderListCoupon(selector: string) {
+async function renderListCoupon(selector: string, coupons: CounponProps[]) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
   const tableBody = table.getElementsByTagName(
@@ -13,7 +14,6 @@ async function renderListCoupon(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const coupons = await Coupon.loadAll();
     coupons.forEach((item: CounponProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
@@ -36,9 +36,29 @@ async function renderListCoupon(selector: string) {
     console.log("Error", error);
   }
 }
+async function initSearchInput(selector: string, coupons: CounponProps[]) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceFn = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        const couponApply = coupons.filter((item) =>
+          item.name.toLowerCase().includes(target.value.toLowerCase())
+        );
+        if (couponApply.length > 0) {
+          await renderListCoupon("#table-coupon", couponApply);
+        } else {
+          toast.info("Not found apply value");
+        }
+      }
+    }, 700);
+    inputSearch.addEventListener("input", debounceFn);
+  }
+}
 // main
 (async () => {
-  await renderListCoupon("#table-coupon");
+  const coupons = (await Coupon.loadAll()) as CounponProps[];
+  await renderListCoupon("#table-coupon", coupons);
   const buttonEditCoupon = document.querySelectorAll(
     "#btn-edit"
   ) as NodeListOf<HTMLButtonElement>;
@@ -60,5 +80,6 @@ async function renderListCoupon(selector: string) {
       }
     });
   });
+  await initSearchInput("searchInput", coupons);
   initLogout("logout-btn");
 })();

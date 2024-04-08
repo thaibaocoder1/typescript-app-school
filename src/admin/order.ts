@@ -10,6 +10,7 @@ import {
 import { OrderDetail, OrderDetailProps } from "../models/Detail";
 import { Product, ProductProps } from "../models/Product";
 import { ResponseFromServer } from "../constants/orders";
+import debounce from "debounce";
 
 // types
 type ApiResponseOrder = {
@@ -37,7 +38,7 @@ function handleShowButton(status: number) {
   return str;
 }
 
-async function renderListOrder(selector: string) {
+async function renderListOrder(selector: string, orders: OrderProps[]) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
   const tableBody = table.getElementsByTagName(
@@ -46,7 +47,6 @@ async function renderListOrder(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const orders = await Order.loadAll();
     orders.forEach((item: OrderProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<td>${index + 1}</td>
@@ -231,10 +231,30 @@ async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
     console.log(error);
   }
 }
+async function initSearchInput(selector: string, orders: OrderProps[]) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceFn = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        const orderApply = orders.filter((item) =>
+          item.email.toLowerCase().includes(target.value.toLowerCase())
+        );
+        if (orderApply.length > 0) {
+          await renderListOrder("#table-order", orderApply);
+        } else {
+          toast.info("Not found apply value");
+        }
+      }
+    }, 700);
+    inputSearch.addEventListener("input", debounceFn);
+  }
+}
 
 // main
 (async () => {
-  await renderListOrder("#table-order");
+  const orders = (await Order.loadAll()) as OrderProps[];
+  await renderListOrder("#table-order", orders);
   const buttonDetail = document.querySelectorAll(
     "#btn-edit"
   ) as NodeListOf<HTMLButtonElement>;
@@ -352,5 +372,6 @@ async function registerFormChangeStatus(modal: HTMLElement, orderID: string) {
       console.log(error);
     }
   });
+  await initSearchInput("searchInput", orders);
   initLogout("logout-btn");
 })();

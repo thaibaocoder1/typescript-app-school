@@ -1,9 +1,10 @@
 import { Catalog, CatalogProps } from "../models/Catalog";
 import dayjs from "dayjs";
-import { initLogout } from "../utils";
+import { initLogout, toast } from "../utils";
+import debounce from "debounce";
 
 // functions
-async function renderListCategory(selector: string) {
+async function renderListCategory(selector: string, catalogs: CatalogProps[]) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
   const tableBody = table.getElementsByTagName(
@@ -12,7 +13,6 @@ async function renderListCategory(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const catalogs = await Catalog.loadAll();
     catalogs.forEach((item: CatalogProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
@@ -31,9 +31,29 @@ async function renderListCategory(selector: string) {
     console.log("Error", error);
   }
 }
+async function initSearchInput(selector: string, catalogs: CatalogProps[]) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceFn = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        const couponApply = catalogs.filter((item) =>
+          item.title.toLowerCase().includes(target.value.toLowerCase())
+        );
+        if (couponApply.length > 0) {
+          await renderListCategory("#table-category", couponApply);
+        } else {
+          toast.info("Not found apply value");
+        }
+      }
+    }, 700);
+    inputSearch.addEventListener("input", debounceFn);
+  }
+}
 // main
 (async () => {
-  await renderListCategory("#table-category");
+  const catalogs = (await Catalog.loadAll()) as CatalogProps[];
+  await renderListCategory("#table-category", catalogs);
   const buttonEditCatalog = document.querySelectorAll(
     "#btn-edit"
   ) as NodeListOf<HTMLButtonElement>;
@@ -44,5 +64,6 @@ async function renderListCategory(selector: string) {
         window.location.assign("add-edit-category.html?id=" + catalogID);
     });
   });
+  await initSearchInput("searchInput", catalogs);
   initLogout("logout-btn");
 })();

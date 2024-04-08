@@ -1,10 +1,17 @@
 // main
 import dayjs from "dayjs";
 import { Product, ProductProps } from "../models/Product";
-import { calcPrice, formatCurrencyNumber, initLogout } from "../utils";
+import {
+  calcPrice,
+  formatCurrencyNumber,
+  initLogout,
+  showSpinner,
+  toast,
+} from "../utils";
+import debounce from "debounce";
 
 // functions
-async function renderListProduct(selector: string) {
+async function renderListProduct(selector: string, products: ProductProps[]) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
   const tableBody = table.getElementsByTagName(
@@ -13,7 +20,6 @@ async function renderListProduct(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const products = await Product.loadAll();
     products.forEach((item: ProductProps, index: number) => {
       const tableRow = document.createElement("tr") as HTMLTableRowElement;
       tableRow.innerHTML = `<th scope="row">${index + 1}</th>
@@ -37,9 +43,29 @@ async function renderListProduct(selector: string) {
     console.log("Error", error);
   }
 }
+async function initSearchInput(selector: string, products: ProductProps[]) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceFn = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        const productApply = products.filter((item) =>
+          item.name.toLowerCase().includes(target.value.toLowerCase())
+        );
+        if (productApply.length > 0) {
+          await renderListProduct("#table-product", productApply);
+        } else {
+          toast.info("Not found apply value");
+        }
+      }
+    }, 700);
+    inputSearch.addEventListener("input", debounceFn);
+  }
+}
 // main
 (async () => {
-  await renderListProduct("#table-product");
+  const products = (await Product.loadAll()) as ProductProps[];
+  await renderListProduct("#table-product", products);
   const buttonEditProduct = document.querySelectorAll(
     "#btn-edit"
   ) as NodeListOf<HTMLButtonElement>;
@@ -50,5 +76,6 @@ async function renderListProduct(selector: string) {
         window.location.assign("add-edit-product.html?id=" + productID);
     });
   });
+  await initSearchInput("searchInput", products);
   initLogout("logout-btn");
 })();

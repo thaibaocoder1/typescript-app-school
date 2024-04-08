@@ -1,7 +1,6 @@
 import { ApiResponseAuth } from "./active";
 import { User } from "./models/User";
 import { hideSpinner, showSpinner } from "./utils";
-import { setCookie } from "./utils/cookie";
 import { toast } from "./utils/toast";
 import { Validator } from "./utils/validator";
 
@@ -15,13 +14,11 @@ async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
       toast.success("Đăng nhập thành công");
       if (user.data.role === "User") {
         localStorage.setItem("accessToken", JSON.stringify(user.data));
-        setCookie("refreshToken", user.data.refreshToken, 365);
         setTimeout(() => {
           window.location.assign("/index.html");
         }, 500);
       } else {
         localStorage.setItem("accessTokenAdmin", JSON.stringify(user.data));
-        setCookie("refreshTokenAdmin", user.data.refreshToken, 365);
         setTimeout(() => {
           window.location.assign("/admin/index.html");
         }, 500);

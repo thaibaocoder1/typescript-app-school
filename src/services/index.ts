@@ -45,6 +45,14 @@ export class DataResource<T> {
     return result.data;
   }
 
+  async loadWithStatus(): Promise<T> {
+    const res = await fetch(`${this.endpoint}/statistical`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    return result.data;
+  }
+
   // [AUTH]
   async check(data: Partial<T>): Promise<Response> {
     const res = await fetch(`${this.endpoint}/login?_method=POST`, {
@@ -58,12 +66,11 @@ export class DataResource<T> {
     return res;
   }
 
-  async refresh(token: string): Promise<Response> {
-    const res = await fetch(`${this.endpoint}/refresh/${token}`, {
+  async refresh(): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/refresh`, {
       credentials: "include",
     });
-    const result = await res.json();
-    return result.data;
+    return res;
   }
 
   async verify(id: string): Promise<T> {
@@ -108,6 +115,26 @@ export class DataResource<T> {
       credentials: "include",
     });
     return res;
+  }
+
+  async recover(value: Partial<T>): Promise<Response> {
+    const res = await fetch(`${this.endpoint}/recover`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(value),
+      credentials: "include",
+    });
+    return res;
+  }
+
+  async confirmRecovey(params: URLSearchParams): Promise<T> {
+    const res = await fetch(`${this.endpoint}/confirm-recover?${params}`, {
+      credentials: "include",
+    });
+    const result = await res.json();
+    return result;
   }
 
   async logout(id: string): Promise<T> {
@@ -233,7 +260,9 @@ export class DataResource<T> {
 
   // Email: Invoice
   async invoice(id: string): Promise<Response> {
-    const res = await fetch(`${this.endpoint}/invoice/${id}`);
+    const res = await fetch(`${this.endpoint}/invoice/${id}`, {
+      credentials: "include",
+    });
     return res;
   }
 }

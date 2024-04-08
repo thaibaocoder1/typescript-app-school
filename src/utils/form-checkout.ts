@@ -121,14 +121,19 @@ function findCommonElements(arr1: Carts[], arr2: Carts[]) {
   const commonElements = arr2.filter((item) => !idSet.has(item.productID));
   return commonElements;
 }
-async function handleAddOrderDetail(orderID: string, cart: Array<Carts>) {
+async function handleAddOrderDetail(
+  orderID: string,
+  userID: string,
+  cart: Array<Carts>
+) {
   let isSuccess: Boolean = true;
   try {
     for (const item of cart) {
-      const product = await Product.loadOne(item.productID);
+      const product = (await Product.loadOne(item.productID)) as ProductProps;
       const totalQuantity = product.quantity;
       const payload: Partial<OrderDetailProps> = {
         orderID,
+        userID,
         productID: item.productID,
         price: item.price,
         quantity: item.quantity,
@@ -201,7 +206,7 @@ export async function initFormCheckout(selector: string, cart: Carts[]) {
           const order: OrderProps = data.data;
           if (order) {
             orderID = order._id;
-            await handleAddOrderDetail(orderID, cart);
+            await handleAddOrderDetail(orderID, user._id, cart);
           }
         } else {
           toast.error(data.message);

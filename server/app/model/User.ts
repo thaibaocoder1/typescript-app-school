@@ -12,8 +12,10 @@ interface Users extends MongooseDelete.SoftDeleteDocument {
   imageUrl?: Object;
   isActive: boolean;
   refreshToken: string;
+  recoverHashCode?: string;
   createdAt?: Date;
   resetedAt?: number;
+  timeExpireRecover?: number;
 }
 
 const userSchema = new Schema<Users>(
@@ -60,7 +62,13 @@ const userSchema = new Schema<Users>(
     refreshToken: {
       type: String,
     },
+    recoverHashCode: {
+      type: String,
+    },
     resetedAt: {
+      type: Number,
+    },
+    timeExpireRecover: {
       type: Number,
     },
   },

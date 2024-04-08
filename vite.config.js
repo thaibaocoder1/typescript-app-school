@@ -2,6 +2,6 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   optimizeDeps: {
-    exclude: ["zod"],
+    exclude: ["zod", "chart"],
   },
 });

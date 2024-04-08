@@ -7,6 +7,7 @@ export interface OrderProps {
   address: string;
   note: string;
   phone: string;
+  payment: string;
   status: number;
   cancelCount?: number;
   createdAt: string;

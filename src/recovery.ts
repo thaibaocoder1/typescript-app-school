@@ -7,7 +7,7 @@ import { Validator } from "./utils/validator";
 async function handleOnSubmitForm1(data: Record<string, any>): Promise<void> {
   try {
     showSpinner();
-    const res = await User.forgot(data);
+    const res = await User.recover(data);
     hideSpinner();
     const user: ApiResponseAuth = await res.json();
     if (user.success) {

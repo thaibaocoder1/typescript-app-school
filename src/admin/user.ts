@@ -1,9 +1,10 @@
+import debounce from "debounce";
 import { ApiResponseAuth } from "../active";
 import { User, UserProps } from "../models/User";
 import { initLogout, toast } from "../utils";
 
 // functions
-async function renderListCategory(selector: string) {
+async function renderListUsers(selector: string, users: UserProps[]) {
   const table = document.querySelector(selector) as HTMLTableElement;
   if (!table) return;
   const tableBody = table.getElementsByTagName(
@@ -12,7 +13,6 @@ async function renderListCategory(selector: string) {
   if (!tableBody) return;
   tableBody.textContent = "";
   try {
-    const users = await User.loadAll();
     if (users.length > 0 && Array.isArray(users)) {
       users.forEach((item: UserProps, index: number) => {
         const tableRow = document.createElement("tr") as HTMLTableRowElement;
@@ -42,9 +42,29 @@ async function renderListCategory(selector: string) {
     console.log("Error", error);
   }
 }
+async function initSearchInput(selector: string, users: UserProps[]) {
+  const inputSearch = document.getElementById(selector) as HTMLInputElement;
+  if (inputSearch) {
+    const debounceFn = debounce(async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target) {
+        const userApply = users.filter((item) =>
+          item.fullname.toLowerCase().includes(target.value.toLowerCase())
+        );
+        if (userApply.length > 0) {
+          await renderListUsers("#table-user", userApply);
+        } else {
+          toast.info("Not found apply value");
+        }
+      }
+    }, 700);
+    inputSearch.addEventListener("input", debounceFn);
+  }
+}
 // main
 (async () => {
-  await renderListCategory("#table-user");
+  const users = await User.loadAll();
+  await renderListUsers("#table-user", users);
   const buttonEdit = document.querySelectorAll(
     "#btn-edit"
   ) as NodeListOf<HTMLButtonElement>;
@@ -89,5 +109,6 @@ async function renderListCategory(selector: string) {
       }
     }
   });
+  await initSearchInput("searchInput", users);
   initLogout("logout-btn");
 })();

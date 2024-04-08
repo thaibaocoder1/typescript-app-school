@@ -190,12 +190,19 @@ export async function handleChangeQuantity(
   cart: Carts[]
 ) {
   const productID = <string>inputElement.dataset.id;
+  const product = (await Product.loadOne(productID)) as ProductProps;
+  const totalQuantity = product.quantity;
   const index: number = cart.findIndex((x) => x.productID === productID);
   let currentValue = Number.parseInt(inputElement.value, 10);
   switch (type) {
     case "plus":
       if (index >= 0) {
-        inputElement.value = (currentValue + 1).toString();
+        if (inputElement.value === totalQuantity.toString()) {
+          toast.info("Sản phẩm đạt tối đa số lượng");
+          inputElement.value = totalQuantity.toString();
+        } else {
+          inputElement.value = (currentValue + 1).toString();
+        }
         cart[index].quantity = Number(inputElement.value);
       }
       break;

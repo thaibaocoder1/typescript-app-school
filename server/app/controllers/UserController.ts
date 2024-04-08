@@ -37,10 +37,18 @@ class UserController {
   detail = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await User.findOne({ _id: req.params.id });
-      res.status(StatusCodes.OK).json({
-        status: "success",
-        data: user,
-      });
+      if (user && user !== null) {
+        res.status(StatusCodes.OK).json({
+          status: "success",
+          data: user,
+        });
+      } else {
+        res.status(StatusCodes.OK).json({
+          status: "failed",
+          data: user,
+          message: "User has delete!",
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -313,11 +321,17 @@ class UserController {
   check = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
-      const user = await User.findOne({ email: email });
+      const user = await User.findOneDeleted({ email: email });
       if (!user) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           success: false,
           message: "Tài khoản chưa được kích hoạt.",
+        });
+      }
+      if (user?.deleted) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: "Tài khoản đã bị xoá",
         });
       }
       const isPasswordValid: boolean = await bcrypt.compare(
@@ -336,10 +350,12 @@ class UserController {
           message: "Missing required information: 'email or password'",
         });
       }
-      const accessTokenLife: string = "20m";
-      const refreshTokenLife: string = "365d";
-      const accessTokenSecret: string = "thaibao2004";
-      const refreshTokenSecret: string = "thaibao2004refresh";
+      const accessTokenLife: string = <string>process.env.ACCESS_TOKEN_LIFE;
+      const refreshTokenLife: string = <string>process.env.REFRESH_TOKEN_LIFE;
+      const accessTokenSecret: string = <string>process.env.ACCESS_TOKEN_SECRET;
+      const refreshTokenSecret: string = <string>(
+        process.env.REFRESH_TOKEN_SECRET
+      );
       const dataForAccessToken = {
         email: user.email,
       };
@@ -367,25 +383,35 @@ class UserController {
         refreshToken = user.refreshToken;
       }
       if (user.role === "User") {
+        res.cookie("refreshToken", refreshToken, {
+          secure: false,
+          httpOnly: true,
+          path: "/",
+          expires: new Date(Date.now() + Number(process.env.COOKIE_EXPIRE)),
+        });
         res.status(StatusCodes.CREATED).json({
           success: true,
           data: {
             role: user.role,
             id: user._id,
             accessToken,
-            refreshToken,
-            expireIns: Date.now() + 20 * 60 * 1000,
+            expireIns: Date.now() + Number(process.env.ACCESS_TOKEN_LIFE_CLI),
           },
         });
       } else {
+        res.cookie("refreshTokenAdmin", refreshToken, {
+          secure: false,
+          httpOnly: true,
+          path: "/",
+          expires: new Date(Date.now() + Number(process.env.COOKIE_EXPIRE)),
+        });
         res.status(StatusCodes.CREATED).json({
           success: true,
           data: {
             role: user.role,
             id: user._id,
             accessToken,
-            refreshToken,
-            expireIns: Date.now() + 20 * 60 * 1000,
+            expireIns: Date.now() + Number(process.env.ACCESS_TOKEN_LIFE_CLI),
           },
         });
       }
@@ -474,6 +500,95 @@ class UserController {
       });
     }
   };
+  recover = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOneDeleted({ email });
+      if (user) {
+        const salt = bcrypt.genSaltSync(15);
+        const hash = bcrypt.hashSync(email, salt);
+        const content = `<b>Vui lòng click vào đường link này để xác thực việc khôi phục tài khoản. <a href="http://localhost:5173/confirm.html?id=${user._id}&hash=${hash}">Xác thực</a></b>`;
+        (await mailer.createTransporter()).sendMail({
+          from: "BSmart ADMIN",
+          to: user.email,
+          subject: "Xác thực việc khôi phục tài khoản tại BSmart ✔",
+          text: "Xác thực việc khôi phục tài khoản tại BSmart",
+          html: content,
+        });
+        await User.findOneAndUpdateDeleted(
+          {
+            email,
+          },
+          {
+            recoverHashCode: hash,
+            timeExpireRecover: Date.now() + 5 * 60 * 1000,
+          }
+        );
+        return res.status(StatusCodes.CREATED).json({
+          success: true,
+          message: "Kiểm tra email để xác thực",
+        });
+      } else {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Tài khoản đã bị xoá vĩnh viễn!",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        data: {
+          message: "Error from SERVER!",
+        },
+      });
+    }
+  };
+  confirm = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { hash, id } = req.query;
+      const user = await User.findOneDeleted({ _id: id });
+      if (user) {
+        const match = req.query.hash === user.recoverHashCode;
+        const now = Math.floor(Date.now());
+        const expireIns = Math.floor(user.timeExpireRecover as number);
+        if (match && now < expireIns) {
+          await User.restore({
+            _id: id,
+          });
+          await User.findOneAndUpdateDeleted(
+            {
+              _id: id,
+            },
+            {
+              recoverHashCode: "",
+              timeExpireRecover: 0,
+            }
+          );
+          return res.status(StatusCodes.CREATED).json({
+            success: true,
+            message: "Khôi phục tài khoản thành công",
+          });
+        } else {
+          return res.status(StatusCodes.UNAUTHORIZED).json({
+            success: false,
+            message: "Đã hết thời hạn khôi phục tài khoản!",
+          });
+        }
+      } else {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Không thể khôi phục tài khoản!",
+        });
+      }
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        data: {
+          message: "Error from SERVER!",
+        },
+      });
+    }
+  };
   verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
@@ -500,14 +615,23 @@ class UserController {
   };
   refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { token } = req.params;
-      if (!token) {
-        next();
+      const { refreshToken, refreshTokenAdmin } = req.cookies;
+      let token: string = "";
+      if (!refreshToken && !refreshTokenAdmin) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: "UNAUTHORIZED",
+        });
+      } else {
+        if (refreshToken) token = refreshToken;
+        if (refreshTokenAdmin) token = refreshTokenAdmin;
       }
-      const accessTokenLife: string = "20m";
-      const refreshTokenLife: string = "365d";
-      const accessTokenSecret: string = "thaibao2004";
-      const refreshTokenSecret: string = "thaibao2004refresh";
+      const accessTokenLife: string = <string>process.env.ACCESS_TOKEN_LIFE;
+      const refreshTokenLife: string = <string>process.env.REFRESH_TOKEN_LIFE;
+      const accessTokenSecret: string = <string>process.env.ACCESS_TOKEN_SECRET;
+      const refreshTokenSecret: string = <string>(
+        process.env.REFRESH_TOKEN_SECRET
+      );
       const verifyToken = await decodeToken(token, refreshTokenSecret);
       if (verifyToken) {
         const newAccessToken = await generateToken(
@@ -527,18 +651,31 @@ class UserController {
           }
         );
         if (user) {
+          if (user.role.toLowerCase() === "user") {
+            res.cookie("refreshToken", newRefreshToken, {
+              secure: false,
+              httpOnly: true,
+              path: "/",
+              expires: new Date(Date.now() + Number(process.env.COOKIE_EXPIRE)),
+            });
+          } else {
+            res.cookie("refreshTokenAdmin", newRefreshToken, {
+              secure: false,
+              httpOnly: true,
+              path: "/",
+              expires: new Date(Date.now() + Number(process.env.COOKIE_EXPIRE)),
+            });
+          }
           res.status(StatusCodes.CREATED).json({
             success: true,
             data: {
               id: user._id,
               role: user.role,
               accessToken: newAccessToken,
-              refreshToken: newRefreshToken,
-              expireIns: Date.now() + 20 * 60 * 1000,
+              expireIns: Date.now() + Number(process.env.ACCESS_TOKEN_LIFE_CLI),
             },
           });
         }
-        next();
       }
     } catch (error) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

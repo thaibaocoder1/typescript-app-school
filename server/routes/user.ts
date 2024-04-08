@@ -6,11 +6,13 @@ const router = express.Router();
 
 router.post("/login", userController.check);
 
-router.get("/refresh/:token", userController.refresh);
+router.get("/refresh", userController.refresh);
 router.get("/verify/:id", userController.verify);
 router.post("/active", userController.active);
 router.post("/forgot", userController.forgot);
 router.post("/change", userController.reset);
+router.post("/recover", userController.recover);
+router.get("/confirm-recover", userController.confirm);
 router.get("/logout/:id", userController.logout);
 
 router.post("/save", upload.single("imageUrl"), userController.add);

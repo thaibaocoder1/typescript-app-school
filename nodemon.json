@@ -3,6 +3,6 @@
   "exec": "tsx --no-cache ./server/index.ts",
   "watch": ["server"],
   "execMap": {
-    "ts": "tsx"
+    "ts": "ts"
   }
 }

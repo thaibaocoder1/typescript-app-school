@@ -5,9 +5,13 @@ import { routes } from "./routes/index";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import path, { dirname } from "path";
 import methodOveride from "method-override";
 import errorHandler from "./utils/error";
+
+// ENV
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,25 +21,19 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204,
 };
+// http://localhost:3002/api/products
+
 // Start app
 const app: Express = express();
 const port = 8888;
+// cors
+app.use(cookieParser());
+app.use(cors(corsOptions));
 // Connect database
 startDB("mongodb://127.0.0.1:27017/course-typescript-poly");
 // Static folder
 app.use(express.static(path.join(__dirname, "public")));
 // Middeware
-app.use(cookieParser());
-app.use(cors(corsOptions));
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
 app.use(methodOveride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

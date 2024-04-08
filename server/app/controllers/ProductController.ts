@@ -22,60 +22,39 @@ class ProductController {
     }
   };
   params = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const page = Number(req.query.page);
-      const limit = Number(req.query.limit);
-      const searchTerm = req.query.searchTerm;
-      const slug = req.query.slug;
-      let products: any;
-      let count: any;
-      if (searchTerm && searchTerm !== "") {
-        if (slug && slug !== "") {
-          const catalog = await Catalog.findOne({ slug });
-          const skip = (page - 1) * limit;
-          products = await Product.find({
-            $and: [
-              { name: { $regex: searchTerm, $options: "i" } },
-              { categoryID: catalog?._id },
-            ],
-          })
-            .skip(skip)
-            .limit(limit);
-          count = await Product.countDocuments({
-            $and: [
-              { name: { $regex: searchTerm, $options: "i" } },
-              { categoryID: catalog?._id },
-            ],
-          });
-        } else {
-          const skip = (page - 1) * limit;
-          products = await Product.find({
-            name: { $regex: searchTerm, $options: "i" },
-          })
-            .skip(skip)
-            .limit(limit);
-          count = await Product.countDocuments({
-            name: { $regex: searchTerm, $options: "i" },
-          });
-        }
-      } else {
-        if (slug && slug !== "") {
-          const skip = (page - 1) * limit;
-          const catalog = await Catalog.findOne({ slug });
-          products = await Product.find({
-            categoryID: catalog?._id,
-          })
-            .skip(skip)
-            .limit(limit);
-          count = await Product.countDocuments({
-            categoryID: catalog?._id,
-          });
-        } else {
-          const skip = (page - 1) * limit;
-          products = await Product.find({}).skip(skip).limit(limit);
-          count = await Product.countDocuments();
-        }
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const searchTerm = req.query.searchTerm;
+    const slug = req.query.slug;
+    const brands = req.query.brands;
+    let products: any;
+    let count: any;
+
+    let query: any = {};
+
+    if (searchTerm && searchTerm !== "") {
+      query.name = { $regex: searchTerm, $options: "i" };
+    }
+    if (slug && slug !== "") {
+      const catalog = await Catalog.findOne({ slug });
+      if (catalog) {
+        query.categoryID = catalog._id;
       }
+    }
+    if (brands && brands !== "") {
+      let brandsArray: string[] = [];
+      if (typeof brands === "string") {
+        brandsArray = brands.split(",").map((brand) => brand.trim());
+      }
+      const regexConditions = brandsArray.map((brand) => ({
+        name: { $regex: brand, $options: "i" },
+      }));
+      query.$or = regexConditions;
+    }
+    try {
+      const skip = (page - 1) * limit;
+      products = await Product.find(query).skip(skip).limit(limit);
+      count = await Product.countDocuments(query);
       res.status(StatusCodes.OK).json({
         status: "success",
         results: products.length,
@@ -87,7 +66,10 @@ class ProductController {
         },
       });
     } catch (error) {
-      next(error);
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
   };
   detail = async (req: Request, res: Response, next: NextFunction) => {

@@ -24,6 +24,10 @@ type Pagination = {
   limit: number;
   totalRows: number;
 };
+type QueryObj = {
+  brands: string[];
+  price: number;
+};
 // functions
 async function renderSidebar(idElement: string) {
   const sidebar = document.querySelector(idElement) as HTMLElement;
@@ -50,21 +54,19 @@ async function renderListProduct(params: ParamsProudct, data: ProductProps[]) {
   listProductEl.textContent = "";
   const ulPagination = document.getElementById("pagination") as HTMLElement;
   try {
-    let products = [...data];
-    if (params.slug) {
+    if (params.params?.has("slug") && params.params.get("slug") !== "") {
       showSpinner();
       const dataWithSlug = (await Product.loadWithParams(
-        <URLSearchParams>params.slug
+        <URLSearchParams>params.params
       )) as ApiResponseProducts<ProductProps>;
       hideSpinner();
       if (dataWithSlug.status === "success") {
-        products = <ProductProps[]>dataWithSlug.data;
+        data = <ProductProps[]>dataWithSlug.data;
       }
     }
-
-    if (products && products.length > 0) {
+    if (data && data.length > 0) {
       if (ulPagination.hidden) ulPagination.hidden = false;
-      products.forEach((item: ProductProps) => {
+      data.forEach((item: ProductProps) => {
         const productItem = document.createElement("div");
         productItem.className = "col-lg-4 col-md-6 col-sm-12 pb-1";
         productItem.innerHTML = `
@@ -220,7 +222,7 @@ async function handleFilterChange(
   hideSpinner();
   const paramsFn: ParamsProudct = {
     idElement: "#list-product",
-    slug: url.searchParams,
+    params: url.searchParams,
   };
   if (res.status === "success") {
     const { data, pagination } = res;
@@ -255,7 +257,7 @@ function initURL(): URLSearchParams {
 
   const paramsFn: ParamsProudct = {
     idElement: "#list-product",
-    slug: queryParams,
+    params: queryParams,
   };
 
   if (res.status === "success") {
@@ -329,7 +331,6 @@ function initURL(): URLSearchParams {
       queryParams
     )) as ApiResponseProducts<ProductProps>;
     hideSpinner();
-    console.log(res);
     toast.info("Filter success!");
     if (newURL.indexOf("increase") >= 0) {
       productApply = (res.data as ProductProps[]).sort(
@@ -368,5 +369,53 @@ function initURL(): URLSearchParams {
     handleWhitelist(".card-whitelist");
     handleViewModal(".card-modal");
     handleOrderBuyNow("#modal-view", cart);
+  });
+  // Filter
+  const filterForm = document.getElementById("filter-form") as HTMLFormElement;
+  filterForm.addEventListener("submit", async (e: SubmitEvent) => {
+    e.preventDefault();
+    let checkedBrands: string[] = [];
+    const listCheckboxBrands = document.querySelectorAll(
+      "input[name='brands']:checked"
+    ) as NodeListOf<HTMLInputElement>;
+    listCheckboxBrands.forEach((checkbox) => {
+      checkedBrands.push(checkbox.value);
+    });
+
+    const brandObj: QueryObj = {
+      brands: checkedBrands,
+      price: 1,
+    };
+    const params: Record<string, string> = {
+      brands: brandObj.brands.join(","),
+      price: brandObj.price.toString(),
+    };
+    const originalParams = new URLSearchParams(window.location.search);
+    const combinedParams = new URLSearchParams(originalParams.toString());
+    for (const [key, value] of Object.entries(params)) {
+      combinedParams.set(key, value);
+    }
+    try {
+      showSpinner();
+      const res = (await Product.loadWithParams(
+        combinedParams
+      )) as ApiResponseProducts<ProductProps>;
+      hideSpinner();
+      const paramsFn: ParamsProudct = {
+        idElement: "#list-product",
+        params: combinedParams,
+      };
+      if (res.status === "success") {
+        toast.success("Filter success");
+        const { data, pagination } = res;
+        const paramsPagination = pagination as Pagination;
+        await renderListProduct(paramsFn, <ProductProps[]>data);
+        renderPagination("pagination", paramsPagination, combinedParams);
+      } else {
+        toast.error("Filter error");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 })();
